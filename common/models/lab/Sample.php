@@ -64,7 +64,7 @@ class Sample extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['rstl_id', 'sampletype_id', 'samplename', 'description', 'sampling_date', 'request_id', 'sample_month', 'sample_year'], 'required'],
+            [['rstl_id', 'sampletype_id', 'samplename', 'description', 'request_id', 'sample_month', 'sample_year'], 'required'],
             [['rstl_id', 'pstcsample_id', 'testcategory_id', 'sampletype_id', 'request_id', 'sample_month', 'sample_year', 'active', 'completed', 'referral_sample_id', 'sample_old_id', 'oldColumn_batch_num', 'oldColumn_package_count', 'old_request_id', 'local_sample_id', 'local_request_id', 'migrated'], 'integer'],
             [['description', 'customer_description'], 'string'],
             [['sampling_date', 'oldColumn_datedisposal'], 'safe'],
