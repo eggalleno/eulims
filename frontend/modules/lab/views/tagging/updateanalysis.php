@@ -52,6 +52,7 @@ $manner= ArrayHelper::map(Sampledisposal::find()->where(['status'=>1])->all(),'d
                     echo $form->field($taggingmodel, 'disposed_date')->widget(DatePicker::classname(), [
                     'options' => ['placeholder' => 'Select Date ...',
                     'autocomplete'=>'off'],
+                    'value'=> date('Y-m-d'),
                     'type' => DatePicker::TYPE_COMPONENT_APPEND,
                         'pluginOptions' => [
                             'format' => 'yyyy-mm-dd',
@@ -63,7 +64,7 @@ $manner= ArrayHelper::map(Sampledisposal::find()->where(['status'=>1])->all(),'d
                      <?= $form->field($taggingmodel,'manner')->widget(Select2::classname(),[
                                         'data' => $manner,
                                         'theme' => Select2::THEME_KRAJEE,
-                                        'options' => ['id'=>'tagging-manner'],
+                                        'options' => ['id'=>'tagging-manner','value'=>1],
                                         'pluginOptions' => ['allowClear' => true,'placeholder' => 'Select type of disposal'],
                                 ])->label('Manner')
                         ?>
@@ -74,9 +75,9 @@ $manner= ArrayHelper::map(Sampledisposal::find()->where(['status'=>1])->all(),'d
 <script type="text/javascript">
    function updateanalysis() {
 
-         jQuery.ajax( {
+         $.post( {
             type: 'POST',
-            url: 'tagging/updateana',
+            url: '/lab/tagging/updateana',
             data: { start_date: $('#tagging-start_date').val(),
              end_date: $('#tagging-end_date').val(), 
              id: $('#tagging-analysis_id').val(),
@@ -87,9 +88,13 @@ $manner= ArrayHelper::map(Sampledisposal::find()->where(['status'=>1])->all(),'d
                  $("#xyz").html(response);
                  $(".modal").modal('hide');
                },
-            error: function ( xhr, ajaxOptions, thrownError ) {
-                alert( thrownError );
-            }
+            // error: function ( xhr, ajaxOptions, thrownError ) {
+            //     alert( thrownError );
+            // },
+            result: function (response) {
+                 $("#xyz").html(response);
+                 $(".modal").modal('hide');
+               },
         });
     }
 

@@ -117,7 +117,7 @@ class TaggingController extends Controller
         $taggingmodel = Tagging::find()->where(['analysis_id'=>$id])->one();
         $analysis = Analysis::find()->where(['analysis_id'=>$id])->one();      
         $model = new Tagging();
-        
+        $taggingmodel->disposed_date = date('Y-m-d',strtotime("+1 month"));
         if ($taggingmodel){
             return $this->renderAjax('updateanalysis', [
                 'taggingmodel' => $taggingmodel,
@@ -160,14 +160,21 @@ class TaggingController extends Controller
 
     public function actionUpdateana()
     {      
-        if(isset($_POST['id'])){
 
+        // var_dump($_POST); exit;
+        if(isset($_POST['id'])){
             $start = $_POST['start_date'];
             $end = $_POST['end_date'];
             $user_id = $_POST['user_id'];
 
-            $manner = $_POST['manner'];
-            $disposed = $_POST['disposed_date'];
+            $manner = null;
+            $disposed = null;
+
+            if(isset($_POST['manner']) && isset($_POST['disposed_date'])){
+                $manner = $_POST['manner'];
+                $disposed = $_POST['disposed_date'];
+            }
+
             $profile = Profile::find()->where(['fullname'=> $user_id])->one();
 
             $name = $profile->user_id;
@@ -218,9 +225,10 @@ class TaggingController extends Controller
              ]);
          
             
-        }
-            
-     }
+        }else{
+            return "<h3>No Data</h3>";  
+         }
+    }
 
     /**
      * Deletes an existing Tagging model.

@@ -53,6 +53,16 @@ $(".select-on-check-all").change(function(){
 
 SCRIPT;
 $this->registerJs($js);
+
+
+//get the roles
+$roles = \Yii::$app->authManager->getRolesByUser(\Yii::$app->user->id);
+$show = true;
+foreach ($roles as $role) {
+
+    if($role->name == "Analyst")
+        $show=true;
+}
 ?>
 
 <?= GridView::widget([
@@ -206,6 +216,7 @@ $this->registerJs($js);
                 ['class' => 'kartik\grid\ActionColumn',
                 'contentOptions' => ['style' => 'width: 8.7%'],
                 'template' => '{view}',
+                'visible' =>$show,
                 'buttons'=>[
                     'view'=>function ($url, $model) {
                         return Html::button('<span class="glyphicon glyphicon-pencil"></span>', ['value'=>Url::to(['/lab/tagging/updateanalysis','id'=>$model->analysis_id]), 'class' => 'btn btn-primary','onclick'=>'LoadModal(this.title, this.value);','title' => Yii::t('app', "Update Analysis")]);
