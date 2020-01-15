@@ -170,7 +170,7 @@ class Customer extends \yii\db\ActiveRecord
         else{
             $address = Barangay::findOne($this->barangay_id);
             if($address)
-                return $address->municipalityCity->province->prov_desc.', '.$address->municipalityCity->citymun_desc.', '.$address->brgy_desc;
+            return $address->brgy_desc.', '.$address->municipalityCity->citymun_desc.', '.$address->municipalityCity->province->prov_desc;
             else
                 return "none";
         }
