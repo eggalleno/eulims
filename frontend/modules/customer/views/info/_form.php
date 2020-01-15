@@ -107,7 +107,7 @@ use yii\jui\Accordion;
                         'options' => ['tag' => 'div'],
                     ],
                 ],
-                'options' => ['tag' => 'div'],
+                'options' => ['tag' => 'div','autoHeight'=>true,],
                 'itemOptions' => ['tag' => 'div'],
                 'headerOptions' => ['tag' => 'h3'],
                 'clientOptions' => ['collapsible' => false],

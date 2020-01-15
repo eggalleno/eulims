@@ -55,7 +55,7 @@ if(Yii::$app->user->can('allow-create-op')){
                 'type' => GridView::TYPE_PRIMARY,
                 // 'before'=>Html::button('<span class="glyphicon glyphicon-plus"></span> Create New Customer', ['value'=>'/customer/info/create', 'class' => 'btn btn-success btn-modal','title' => Yii::t('app', "Create New Customer"),'name'=>'Create New Customer']),
                 'heading' => '<span class="glyphicon glyphicon-book"></span>  ' . Html::encode($this->title),
-                'before'=>"<button type='button' onclick='LoadModal(\"Create New Customer\",\"/customer/info/create\",true,\"900\")' class=\"btn btn-success\"><i class=\"fa fa-plus-o\"></i> Create Customer</button>",
+                'before'=>"<button type='button' onclick='LoadModal(\"Create New Customer\",\"/customer/info/create\",true,\"1000\")' class=\"btn btn-success\"><i class=\"fa fa-plus-o\"></i> Create Customer</button>",
             ],
             'columns' => [
                 ['class' => 'yii\grid\SerialColumn'],
