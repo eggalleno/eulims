@@ -57,7 +57,7 @@ $this->registerJs($js);
 
 //get the roles
 $roles = \Yii::$app->authManager->getRolesByUser(\Yii::$app->user->id);
-$show = true;
+$show = false;
 foreach ($roles as $role) {
 
     if($role->name == "Analyst")
