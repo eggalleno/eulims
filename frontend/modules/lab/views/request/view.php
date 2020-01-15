@@ -122,8 +122,15 @@ if($Request_Ref){//With Reference
     $enableRequest=true;
     $disableButton="disabled";///reports/preview?url=/lab/request/print-request?id=10
     $EnablePrint="<a href='/reports/preview?url=/lab/request/print-request?id=".$model->request_id."' class='btn btn-primary' style='margin-left: 5px'><i class='fa fa-print'></i> Print Request</a>";
-    // $ClickButton=''; //temporary , only lab manager
-    $ClickButton='addSample(this.value,this.title)';
+    $ClickButton=''; //temporary , only lab manager
+   
+    //get the roles
+    $roles = \Yii::$app->authManager->getRolesByUser(\Yii::$app->user->id);
+    foreach ($roles as $role) {
+
+        if($role->name == "lab-manager")
+             $ClickButton='addSample(this.value,this.title)';
+    }
     $btnID="";
 }else{ // NO reference number yet
     $enableRequest=false;
