@@ -332,6 +332,7 @@ class RequestController extends Controller
         $mpdf = new \Mpdf\Mpdf([
             'format' => [60,66], 
             'orientation' => 'L',
+            'tempDir' => sys_get_temp_dir().DIRECTORY_SEPARATOR.'mpdf'
         ]);
         $request = Request::find()->where(['request_id' => $id]);
         $samplesquery = Sample::find()->where(['request_id' => $id])->all();
