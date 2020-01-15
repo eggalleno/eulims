@@ -211,6 +211,7 @@ class Printing {
         $mPDF->format =Pdf::FORMAT_A4;
         $mPDF->destination = Pdf::DEST_BROWSER;
         $mPDF->methods =['SetFooter'=>['|{PAGENO}|']];
+       // $mPDF->SetDirectionality='rtl';
         $mPDF->render();
         exit;
     }
@@ -1199,7 +1200,7 @@ class Printing {
         $RstlDetails = RstlDetails::find()->where(['rstl_id' => $rstl_id])->one();
         if ($RstlDetails) {
             
-            $RequestTemplate = "<table border='0' style='border-collapse: collapse;font-size: 10px' width=100%>";
+            $RequestTemplate = "<table border='0' style='border-collapse: collapse;font-size: 12px;table-layout:fixed' width=100%>";
             $RequestTemplate .= "<thead>";
             $RequestTemplate .= "<tr>";
             $RequestTemplate .= "<td colspan='10' style='text-align: center;font-size: 12px'>$RstlDetails->name</td>";
@@ -1230,20 +1231,20 @@ class Printing {
             $RequestTemplate .= "</thead>";
             $RequestTemplate .= "<tbody>";
             $RequestTemplate .= "<tr>";
-            $RequestTemplate .= "<td colspan='2' style='border-top: 1px solid black;border-left: 1px solid black;'>Request Reference No.:</td>";
-            $RequestTemplate .= "<td colspan='3' style='border-top: 1px solid black;border-top: 1px solid black;border-right: 1px solid black;text-align: left;color:blue;font-weight'>$RequestHeader->request_ref_num</td>";
+            $RequestTemplate .= "<td colspan='2' style='border-top: 1px solid black;border-left: 1px solid black;font-size:10px'>Request Reference No.:</td>";
+            $RequestTemplate .= "<td colspan='3' style='border-top: 1px solid black;border-top: 1px solid black;border-right: 1px solid black;text-align: left;color:#0f17c4;font-weight;margin-left-20px'>$RequestHeader->request_ref_num</td>";
             $RequestTemplate .= "<td colspan='5'>&nbsp;</td>";
             $RequestTemplate .= "</tr>";
             $RequestTemplate .= "<tr>";
-            $RequestTemplate .= "<td colspan='2' style='border-left: 1px solid black;border-top: 1px solid black;'>Date :</td>";
+            $RequestTemplate .= "<td colspan='2' style='border-left: 1px solid black;border-top: 1px solid black;font-size:11px'>Date :</td>";
            // $RequestTemplate .= "<td colspan='4' style='text-align: left'>" . date('m/d/Y h:i A', strtotime($RequestHeader->request_datetime)) . "</td>";
-            $RequestTemplate .= "<td colspan='3' style='border-top: 1px solid black;border-right: 1px solid black;text-align: left;color:blue'>" . date('F d, Y', strtotime($RequestHeader->request_datetime)) . "</td>";
+            $RequestTemplate .= "<td colspan='3' style='border-top: 1px solid black;border-right: 1px solid black;text-align: left;color:#0f17c4'>" . date('F d, Y', strtotime($RequestHeader->request_datetime)) . "</td>";
             $RequestTemplate .= "<td colspan='5'>&nbsp;</td>";
             $RequestTemplate .= "</tr>";
             $RequestTemplate .= "</tr>";
             $RequestTemplate .= "<tr>";
-            $RequestTemplate .= "<td colspan='2' style='border-left: 1px solid black;border-top: 1px solid black;border-bottom: 1px solid black;'>Time :</td>";
-            $RequestTemplate .= "<td colspan='3' style='border-top: 1px solid black;border-bottom: 1px solid black;border-right: 1px solid black;text-align: left;color:blue'>" . date('h:i A', strtotime($RequestHeader->request_datetime)) . "</td>";
+            $RequestTemplate .= "<td colspan='2' style='border-left: 1px solid black;border-top: 1px solid black;border-bottom: 1px solid black;font-size:11px'>Time :</td>";
+            $RequestTemplate .= "<td colspan='3' style='border-top: 1px solid black;border-bottom: 1px solid black;border-right: 1px solid black;text-align: left;color:#0f17c4'>" . date('h:i A', strtotime($RequestHeader->request_datetime)) . "</td>";
             $RequestTemplate .= "<td colspan='5'>&nbsp;</td>";
             $RequestTemplate .= "</tr>";
             $RequestTemplate .= "<tr>";
@@ -1252,17 +1253,17 @@ class Printing {
             
             $RequestTemplate .= "<tr>";
             $RequestTemplate .= "<td style='border-top: 1px solid black;border-left: 1px solid black'>Customer:</td>";
-            $RequestTemplate .= "<td colspan='6' style='color:blue;border-top: 1px solid black;font-weight:bold'>" . strtoupper($RequestHeader->customer_name) . "</td>";
+            $RequestTemplate .= "<td colspan='6' style='color:#0f17c4;border-top: 1px solid black;font-weight:bold'>" . strtoupper($RequestHeader->customer_name) . "</td>";
             $RequestTemplate .= "<td style='border-top: 1px solid black;border-top: 1px solid black;border-left: 1px solid black;'>Tel No.:</td>";
-            $RequestTemplate .= "<td colspan='2' style='color:blue;border-top: 1px solid black;border-right: 1px solid black;border-top: 1px solid black;'>$RequestHeader->tel</td>";
+            $RequestTemplate .= "<td colspan='2' style='color:#0f17c4;border-top: 1px solid black;border-right: 1px solid black;border-top: 1px solid black;'>$RequestHeader->tel</td>";
             $RequestTemplate .= "</tr>";
             
             $RequestTemplate .= "<tr>";
             $RequestTemplate .= "<td style='border-bottom: 1px solid black;border-left: 1px solid black;border-top: 1px solid black;'>Address:</td>";
-            $RequestTemplate .= "<td colspan='6' style='color:blue;border-bottom: 1px solid black;border-bottom: 1px solid black;border-top: 1px solid black;'>". $this->sentenceCase($completeaddress)  ."</td>";
+            $RequestTemplate .= "<td colspan='6' style='color:#0f17c4;border-bottom: 1px solid black;border-bottom: 1px solid black;border-top: 1px solid black;'>". $this->sentenceCase($completeaddress)  ."</td>";
          //   $RequestTemplate .= "<td colspan='6' style='border-bottom: 1px solid black;border-bottom: 1px solid black;'>$RequestHeader->address</td>";
             $RequestTemplate .= "<td style='border-bottom: 1px solid black;border-top: 1px solid black;border-left: 1px solid black;'>Fax No.:</td>";
-            $RequestTemplate .= "<td colspan='2' style='color:blue;border-bottom: 1px solid black;border-right: 1px solid black;border-top: 1px solid black;'>$RequestHeader->fax</td>";
+            $RequestTemplate .= "<td colspan='2' style='color:#0f17c4;border-bottom: 1px solid black;border-right: 1px solid black;border-top: 1px solid black;'>$RequestHeader->fax</td>";
             $RequestTemplate .= "</tr>";
             $RequestTemplate .= "<tr ><td style='height:10px'></td></tr>";
             $RequestTemplate .= "<tr>";
@@ -1270,13 +1271,13 @@ class Printing {
             $RequestTemplate .= "</tr>";
             
             $RequestTemplate .= "<tr>";
-            $RequestTemplate .= "<th colspan='2' class='text-center border-center-line border-left-line border-right-line padding-left-5' style=''>SAMPLE</th>";
-            $RequestTemplate .= "<th class='text-center border-bottom-line border-right-line padding-left-5' style='width: 15%;'>SAMPLE CODE</th>";
-            $RequestTemplate .= "<th colspan='2' class='text-center border-bottom-line border-right-line padding-left-5' style='width: 15%;'>CALIBRATION OR TEST REQUESTED</th>";
-            $RequestTemplate .= "<th colspan='2' class='text-center border-bottom-line border-right-line padding-left-5' style='width: 15%;'>CALIBRATION OR TEST METHOD</th>";
-            $RequestTemplate .= "<th class='text-center border-bottom-line border-right-line padding-left-5' style='width: 9%;'>NO OF SAMPLES</th>";
-            $RequestTemplate .= "<th class='text-center border-bottom-line border-right-line padding-right-5' style='width: 9%;'>UNIT COST</th>";
-            $RequestTemplate .= "<th class='text-center border-bottom-line border-right-line border-right-line padding-right-5' style='width: 9%;'>TOTAL</th>";
+            $RequestTemplate .= "<th colspan='2' class='text-center border-center-line border-left-line border-right-line padding-left-5' style=''>Sample</th>";
+            $RequestTemplate .= "<th class='text-center border-bottom-line border-right-line padding-left-5' style='width: 15%;'>Sample Code</th>";
+            $RequestTemplate .= "<th colspan='2' class='text-center border-bottom-line border-right-line padding-left-5' style='width: 15%;'>Calibration or Test Requested</th>";
+            $RequestTemplate .= "<th colspan='2' class='text-center border-bottom-line border-right-line padding-left-5' style='width: 15%;'>Calibration or Test Method</th>";
+            $RequestTemplate .= "<th class='text-center border-bottom-line border-right-line padding-left-5' style='width: 9%;'>No. of Samples</th>";
+            $RequestTemplate .= "<th class='text-center border-bottom-line border-right-line padding-right-5' style='width: 9%;'>Unit Cost</th>";
+            $RequestTemplate .= "<th class='text-center border-bottom-line border-right-line border-right-line padding-right-5' style='width: 9%;'>Total</th>";
             $RequestTemplate .= "</tr>";
             
             $CurSampleCode = "";
@@ -1293,24 +1294,26 @@ class Printing {
 //             }
 // }
 //
-
+            $i = 0;
             foreach ($RequestRows as $RequestRow) {
+               
+                
                 $RequestRow = (object) $RequestRow;
                 $CurSampleCode = $RequestRow->sample_code;
                 $RequestTemplate .= "<tr>";
                 if ($CurSampleCode != $PrevSampleCode) {
-                    $RequestTemplate .= "<td style='color:blue' class='text-left border-left-line border-top-line border-bottom-line padding-left-5' colspan='2'>$RequestRow->samplename</td>";
-                    $RequestTemplate .= "<td style='color:blue' class='text-left border-left-line border-top-line border-right-line border-bottom-line padding-left-5'>$RequestRow->sample_code</td>";
+                    $RequestTemplate .= "<td style='color:#0f17c4' class='text-left border-left-line border-top-line border-bottom-line padding-left-5' colspan='2'>$RequestRow->samplename</td>";
+                    $RequestTemplate .= "<td style='color:#0f17c4' class='text-left border-left-line border-top-line border-right-line border-bottom-line padding-left-5'>$RequestRow->sample_code</td>";
                 } else {
                     $RequestTemplate .= "<td class='text-left border-left-line border-top-line border-bottom-line' colspan='2'></td>";
                     $RequestTemplate .= "<td class='text-left border-right-line border-top-line border-left-line border-bottom-line'></td>";
                 }
-                $RequestTemplate .= "<td style='color:blue' class='text-left border-bottom-line border-top-line border-right-line padding-left-5' colspan='2'>$RequestRow->testcalibration</td>";
+                $RequestTemplate .= "<td style='color:#0f17c4' class='text-left border-bottom-line border-top-line border-right-line padding-left-5' colspan='2'>$RequestRow->testcalibration</td>";
                 $html=$RequestRow->method;//$RequestRow->method;
-                $RequestTemplate .= "<td style='color:blue;word-wrap: break-word;' class='text-left border-bottom-line border-top-line border-right-line padding-left-5 padding-right-5' colspan='2'>$html</td>";
-                $RequestTemplate .= "<td style='color:blue' class='text-center border-bottom-line border-top-line border-right-line'>$RequestRow->NoSampleUnit</td>";
-                $RequestTemplate .= "<td style='color:blue' class='text-right border-bottom-line border-top-line border-right-line padding-right-5'>$RequestRow->UnitCost</td>";
-                $RequestTemplate .= "<td style='color:blue' class='text-right border-bottom-line border-top-line border-right-line padding-right-5'>$RequestRow->TotalAnalysis</td>";
+                $RequestTemplate .= "<td style='color:#0f17c4;word-wrap: break-word;' class='text-left border-bottom-line border-top-line border-right-line padding-left-5 padding-right-5' colspan='2'>$html</td>";
+                $RequestTemplate .= "<td style='color:#0f17c4' class='text-center border-bottom-line border-top-line border-right-line'>$RequestRow->NoSampleUnit</td>";
+                $RequestTemplate .= "<td style='color:#0f17c4' class='text-right border-bottom-line border-top-line border-right-line padding-right-5'>$RequestRow->UnitCost</td>";
+                $RequestTemplate .= "<td style='color:#0f17c4' class='text-right border-bottom-line border-top-line border-right-line padding-right-5'>$RequestRow->TotalAnalysis</td>";
                 $RequestTemplate .= "</tr>";
                 $PrevSampleCode = $CurSampleCode;
             }
@@ -1321,25 +1324,25 @@ class Printing {
             // $RequestTemplate .= "</tr>";
             // SUB-TOTAL
             $RequestTemplate .= "<tr>";
-            $RequestTemplate .= "<td style='color:blue' class='text-left border-left-line border-top-line border-bottom-line padding-left-5' colspan='2'></td>";
-            $RequestTemplate .= "<td style='color:blue' class='text-left border-left-line border-top-line border-right-line border-bottom-line padding-left-5'></td>";
-            $RequestTemplate .= "<td style='color:blue' class='text-left border-bottom-line border-top-line border-right-line padding-left-5' colspan='2'></td>";
-            $RequestTemplate .= "<td style='color:blue;word-wrap: break-word;' class='text-left border-bottom-line border-top-line border-right-line padding-left-5 padding-right-5' colspan='2'></td>";
+            $RequestTemplate .= "<td style='color:#0f17c4' class='text-left border-left-line border-top-line border-bottom-line padding-left-5' colspan='2'></td>";
+            $RequestTemplate .= "<td style='color:#0f17c4' class='text-left border-left-line border-top-line border-right-line border-bottom-line padding-left-5'></td>";
+            $RequestTemplate .= "<td style='color:#0f17c4' class='text-left border-bottom-line border-top-line border-right-line padding-left-5' colspan='2'></td>";
+            $RequestTemplate .= "<td style='color:#0f17c4;word-wrap: break-word;' class='text-left border-bottom-line border-top-line border-right-line padding-left-5 padding-right-5' colspan='2'></td>";
             
             $RequestTemplate .= "<td class='text-right border-left-line  border-bottom-line'></td>";
             $RequestTemplate .= "<td class='text-right border-left-line border-bottom-line padding-right-5'>Sub-Total</td>";
-            $RequestTemplate .= "<td style='color:blue;font-weight:bold' class='text-right border-left-line border-bottom-line border-right-line padding-right-5'>".number_format($RequestHeader->SubTotal,2)."</td>";
+            $RequestTemplate .= "<td style='color:#0f17c4;font-weight:bold' class='text-right border-left-line border-bottom-line border-right-line padding-right-5'>".number_format($RequestHeader->SubTotal,2)."</td>";
             $RequestTemplate .= "</tr>";
             // Discount
             $RequestTemplate .= "<tr>";
-             $RequestTemplate .= "<td style='color:blue' class='text-left border-left-line border-top-line border-bottom-line padding-left-5' colspan='2'></td>";
-            $RequestTemplate .= "<td style='color:blue' class='text-left border-left-line border-top-line border-right-line border-bottom-line padding-left-5'></td>";
-            $RequestTemplate .= "<td style='color:blue' class='text-left border-bottom-line border-top-line border-right-line padding-left-5' colspan='2'></td>";
-            $RequestTemplate .= "<td style='color:blue;word-wrap: break-word;' class='text-left border-bottom-line border-top-line border-right-line padding-left-5 padding-right-5' colspan='2'></td>";
+             $RequestTemplate .= "<td style='color:#0f17c4' class='text-left border-left-line border-top-line border-bottom-line padding-left-5' colspan='2'></td>";
+            $RequestTemplate .= "<td style='color:#0f17c4' class='text-left border-left-line border-top-line border-right-line border-bottom-line padding-left-5'></td>";
+            $RequestTemplate .= "<td style='color:#0f17c4' class='text-left border-bottom-line border-top-line border-right-line padding-left-5' colspan='2'></td>";
+            $RequestTemplate .= "<td style='color:#0f17c4;word-wrap: break-word;' class='text-left border-bottom-line border-top-line border-right-line padding-left-5 padding-right-5' colspan='2'></td>";
             
             $RequestTemplate .= "<td class='text-right border-left-line border-bottom-line'></td>";
             $RequestTemplate .= "<td class='text-right border-left-line border-bottom-line padding-right-5'>Discount</td>";
-            $RequestTemplate .= "<td style='color:blue;font-weight:bold' class='text-right border-left-line border-bottom-line border-right-line padding-right-5'>".number_format($RequestHeader->DiscountPrice,2)."</td>";
+            $RequestTemplate .= "<td style='color:#0f17c4;font-weight:bold' class='text-right border-left-line border-bottom-line border-right-line padding-right-5'>".number_format($RequestHeader->DiscountPrice,2)."</td>";
             $RequestTemplate .= "</tr>";
             // TOTAL
 //            $RequestTemplate .= "<tr>";
@@ -1354,7 +1357,7 @@ class Printing {
             $RequestTemplate .= "<td class='text-right' colspan='8'></td>";
             $RequestTemplate .= "<th class='text-right padding-right-5'></th>";
             $GTotal=$RequestHeader->SubTotal-$RequestHeader->DiscountPrice;
-            $RequestTemplate .= "<th style='color:blue' class='text-right padding-right-5'></th>";
+            $RequestTemplate .= "<th style='color:#0f17c4' class='text-right padding-right-5'></th>";
             
             $RequestTemplate .= "</tr>";
             
@@ -1375,7 +1378,7 @@ class Printing {
                 $CurSampleCode2 = $RequestRow->sample_code;
                 if ($CurSampleCode2 != $PrevSampleCode2) {
                     $RequestTemplate .= "<tr>";
-                    $RequestTemplate .= "<td class='text-left border-left-line border-right-line padding-left-5' colspan='10'> $RequestRow->Remarks</td>";
+                    $RequestTemplate .= "<td style='color:#0f17c4;' class='text-left border-left-line border-right-line padding-left-5' colspan='10'> $RequestRow->Remarks</td>";
                     $RequestTemplate .= "</tr>";
                 }
                 $PrevSampleCode2 = $CurSampleCode2;
@@ -1389,24 +1392,31 @@ class Printing {
             
             $RequestTemplate .= "<tr>";
             $RequestTemplate .= "<td colspan='4'></td>";
-            $RequestTemplate .= "<td colspan='4'></td>";
-            $RequestTemplate .= "<td colspan='1' class='text-right text-bold border-bottom-line' >TOTAL : </td>";
-            $RequestTemplate .= "<td colspan='1' style='color:blue' colspan='2' class='text-right text-bold border-bottom-line'>₱ ".number_format($GTotal,2)."</td>";
+            $RequestTemplate .= "<td colspan='3'></td>";
+            $strGratis="";
+            if($RequestHeader->discount_id == 8)
+            {
+                $strGratis = '(Gratis)';
+            }
+            $RequestTemplate .= "<td colspan='2' class='text-right text-bold border-bottom-line' >TOTAL ". $strGratis . ": </td>";
+            $RequestTemplate .= "<td colspan='1' style='color:#0f17c4' colspan='2' class='text-right text-bold border-bottom-line'>₱ ".number_format($GTotal,2)."</td>";
             $RequestTemplate .= "</tr>";
             
              $RequestTemplate .= "<tr ><td style='height:10px'></td></tr>";
             //Footer
             $RequestTemplate .= "<tr>";
-            $RequestTemplate .= "<td class='text-left border-left-line border-top-line padding-left-5'>OR NO.:</td>";
-            $RequestTemplate .= "<td style='color:blue' class='text-left border-top-line padding-left-5' colspan='4'>$RequestHeader->OR_Numbers</td>";
-            $RequestTemplate .= "<td style='border-left: 1px solid black' class='text-right border-top-line padding-left-5' colspan='3'>AMOUNT RECEIVED:</td>";
-            $RequestTemplate .= "<td colspan='2' style='color:blue' class='text-right border-top-line padding-left-5 border-right-line padding-right-5'>".number_format($RequestHeader->TotalAmount,2)."</td>";
+            $RequestTemplate .= "<td class='text-left border-left-line border-top-line padding-left-5'>Official Receipt No.:</td>";
+            $RequestTemplate .= "<td style='color:#0f17c4' class='text-left border-top-line padding-left-5' colspan='4'>$RequestHeader->OR_Numbers</td>";
+            $RequestTemplate .= "<td style='border-left: 1px solid black' class='text-right border-top-line padding-left-5' colspan='3'>Amount Received:</td>";
+          //  $RequestTemplate .= "<td colspan='2' style='color:blue' class='text-right border-top-line padding-left-5 border-right-line padding-right-5'>".number_format($RequestHeader->TotalAmount,2)."</td>";
+            $RequestTemplate .= "<td colspan='2' style='color:#0f17c4' class='text-right border-top-line padding-left-5 border-right-line padding-right-5'></td>";
             $RequestTemplate .= "</tr>";
             $RequestTemplate .= "<tr>";
-            $RequestTemplate .= "<td class='text-left border-bottom-line border-left-line padding-left-5'>DATE:</td>";
-            $RequestTemplate .= "<td style='color:blue;' class='text-left border-bottom-line padding-left-5' colspan='4'>$RequestHeader->ORDate</td>";
-            $RequestTemplate .= "<td style='border-left: 1px solid black;' class='text-right border-bottom-line padding-left-5' colspan='3'>UNPAID BALANCE:</td>";
-            $RequestTemplate .= "<td style='color:blue;' colspan='2' class='text-right border-bottom-line padding-left-5 border-right-line padding-right-5'>₱ ".number_format($GTotal-$RequestHeader->TotalAmount,2)."</td>";
+            $RequestTemplate .= "<td class='text-left border-bottom-line border-left-line padding-left-5'>Date:</td>";
+            $RequestTemplate .= "<td style='color:#0f17c4;' class='text-left border-bottom-line padding-left-5' colspan='4'>$RequestHeader->ORDate</td>";
+            $RequestTemplate .= "<td style='border-left: 1px solid black;' class='text-right border-bottom-line padding-left-5' colspan='3'>Unpaid Balance:</td>";
+            //$RequestTemplate .= "<td style='color:blue;' colspan='2' class='text-right border-bottom-line padding-left-5 border-right-line padding-right-5'>₱ ".number_format($GTotal-$RequestHeader->TotalAmount,2)."</td>";
+            $RequestTemplate .= "<td style='color:#0f17c4;' colspan='2' class='text-right border-bottom-line padding-left-5 border-right-line padding-right-5'></td>";
             $RequestTemplate .= "</tr>";
             $RequestTemplate .= "<tr>";
             $RequestTemplate .= "<td class='text-left' colspan='10'>&nbsp;</td>";
@@ -1414,7 +1424,7 @@ class Printing {
              //Report Due
             $RequestTemplate .= "<tr>";
             $RequestTemplate .= "<td class='text-left border-bottom-line border-left-line border-top-line padding-left-5'>Report Due On:</td>";
-            $RequestTemplate .= "<td style='color:blue' class='text-left border-bottom-line border-top-line padding-left-5' colspan='4'>".date('F d, Y', strtotime($RequestHeader->report_due))."</td>";
+            $RequestTemplate .= "<td style='color:#0f17c4' class='text-left border-bottom-line border-top-line padding-left-5' colspan='4'>".date('F d, Y', strtotime($RequestHeader->report_due))."</td>";
            
          //   $RequestTemplate .= "<td class='text-right border-bottom-line border-top-line padding-left-5' colspan='3'>MODE OF RELEASE:</td>";
          //   $RequestTemplate .= "<td colspan='2' class='text-right border-bottom-line border-top-line padding-left-5 border-right-line padding-right-5'>$RequestHeader->ModeOfRelease</td>";
@@ -1428,34 +1438,86 @@ class Printing {
              //
             $RequestTemplate .= "<tr>";
         //    $RequestTemplate .= "<td class='text-left border-bottom-line border-top-line padding-left-5 border-right-line padding-right-5' colspan='10'>DISCUSSED WITH CUSTOMER</td>";
-            $RequestTemplate .= "<td class='text-left border-bottom-line padding-right-5' colspan='10'>DISCUSSED WITH CUSTOMER</td>";
-            $RequestTemplate .= "</tr>";
+//            $RequestTemplate .= "<td class='text-left border-bottom-line padding-right-5' colspan='10'>Discussed with Customer</td>";
+//            $RequestTemplate .= "</tr>";
+//            $RequestTemplate .= "<tr>";
+//            
+//            $RequestTemplate .= "<td class='text-left border-left-line border-top-line padding-left-5 border-right-line padding-right-5' colspan='3'>Conforme:</td>";
+//            $RequestTemplate .= "<td class='text-left border-left-line border-top-line padding-left-5 border-right-line padding-right-5' colspan='4'></td>";
+//            $RequestTemplate .= "<td class='text-left border-left-line border-top-line padding-left-5 border-right-line padding-right-5' colspan='3'></td>";
+//            $RequestTemplate .= "</tr>";
+//            $RequestTemplate .= "<tr>";
+//            $RequestTemplate .= "<td class='text-center valign-bottom border-left-line border-bottom-line padding-left-5 border-right-line padding-right-5' colspan='3' style='height:35px;color:blue; '>".strtoupper($RequestHeader->conforme)."</td>";
+//            $RequestTemplate .= "<td class='text-center valign-bottom border-left-line border-bottom-line padding-left-5 border-right-line padding-right-5' colspan='4' style='color:blue;'>".strtoupper($RequestHeader->receivedBy)."</td>";
+//            $RequestTemplate .= "<td class='text-center valign-bottom border-left-line border-bottom-line padding-left-5 border-right-line padding-right-5' colspan='3' style='color:blue;'>".strtoupper($RequestHeader->LabManager)."</td>";
+//            $RequestTemplate .= "</tr>";
+//            $RequestTemplate .= "<tr>";
+//            $RequestTemplate .= "<td class='text-center border-bottom-line border-left-line border-top-line padding-left-5 border-right-line padding-right-5' colspan='3'>Customer/Authorized Representative</td>";
+//            $RequestTemplate .= "<td class='text-center border-bottom-line border-left-line border-top-line padding-left-5 border-right-line padding-right-5' colspan='4'>Sample/s Received By:</td>";
+//            $RequestTemplate .= "<td class='text-center border-bottom-line border-left-line border-top-line padding-left-5 border-right-line padding-right-5' colspan='3'>Sample/s Reviewed By:</td>";
+//            $RequestTemplate .= "</tr>";
+//            $RequestTemplate .= "<tr>";
+//            $RequestTemplate .= "<td class='text-left border-left-line border-bottom-line border-top-line padding-left-5 border-right-line padding-right-5' colspan='10'>Report No.:</td>";
+//            $RequestTemplate .= "</tr>";
+            
+    //        $RequestTemplate .= "<tr>";
+            
+     //       $RequestTemplate .= "</tr>";
+            
+            
+//            $RequestTemplate .= "</tbody>";
+//            $RequestTemplate .= "<tfoot>";
+//            $RequestTemplate .= "<tr>";
+//            $RequestTemplate .= "<td colspan='10' style='text-align: right;font-size: 7px'>$Form</td>";
+//            $RequestTemplate .= "</tr>";
+//            $RequestTemplate .= "</tfoot>";
+            $RequestTemplate .= "</table>";
+            
+            
+           // $RequestTemplate .= "<td class='text-center border-bottom-line border-left-line border-top-line padding-left-5 border-right-line padding-right-5' >".strtoupper($RequestHeader->conforme)."</td>";
+        //    $RequestTemplate .= "<td class='text-center border-bottom-line border-left-line border-top-line padding-left-5 border-right-line padding-right-5' >BBBB</td>";
+          //  $RequestTemplate .= "<td class='text-center border-bottom-line border-left-line border-top-line padding-left-5 border-right-line padding-right-5' >CCCC</td>";
+            
+            $RequestTemplate .= "<table style='width: 100%;border-collapse:collapse;font-size: 12px'><tbody>";
             $RequestTemplate .= "<tr>";
-            $RequestTemplate .= "<td class='text-left border-left-line border-top-line padding-left-5 border-right-line padding-right-5' colspan='4'>CONFORME:</td>";
-            $RequestTemplate .= "<td class='text-left border-left-line border-top-line padding-left-5 border-right-line padding-right-5' colspan='3'></td>";
-            $RequestTemplate .= "<td class='text-left border-left-line border-top-line padding-left-5 border-right-line padding-right-5' colspan='3'></td>";
+        //    $RequestTemplate .= "<td class='text-left border-bottom-line border-top-line padding-left-5 border-right-line padding-right-5' colspan='10'>DISCUSSED WITH CUSTOMER</td>";
+            $RequestTemplate .= "<td class='text-left border-bottom-line padding-right-5' style='width: 33%;'>Discussed with Customer</td>";
             $RequestTemplate .= "</tr>";
+            $RequestTemplate .="<tr>";
+            $RequestTemplate .= "<td class='text-left border-left-line border-top-line padding-left-5 border-right-line padding-right-5' style='width: 34%;'>Conforme:</td>";
+            $RequestTemplate .= "<td class='text-left border-left-line border-top-line padding-left-5 border-right-line padding-right-5' style='width: 33%;'></td>";
+            $RequestTemplate .= "<td class='text-left border-left-line border-top-line padding-left-5 border-right-line padding-right-5' style='width: 33%;'></td>";     
+            $RequestTemplate .="<tr>";
+            
             $RequestTemplate .= "<tr>";
-            $RequestTemplate .= "<td class='text-center valign-bottom border-left-line border-bottom-line padding-left-5 border-right-line padding-right-5' colspan='4' style='height: 35px;color:blue; '>".strtoupper($RequestHeader->conforme)."</td>";
-            $RequestTemplate .= "<td class='text-center valign-bottom border-left-line border-bottom-line padding-left-5 border-right-line padding-right-5' colspan='3' style='color:blue;'>".strtoupper($RequestHeader->receivedBy)."</td>";
-            $RequestTemplate .= "<td class='text-center valign-bottom border-left-line border-bottom-line padding-left-5 border-right-line padding-right-5' colspan='3' style='color:blue;'>".strtoupper($RequestHeader->LabManager)."</td>";
-            $RequestTemplate .= "</tr>";
-            $RequestTemplate .= "<tr>";
-            $RequestTemplate .= "<td class='text-center border-bottom-line border-left-line border-top-line padding-left-5 border-right-line padding-right-5' colspan='4'>Customer/Authorized Representative</td>";
-            $RequestTemplate .= "<td class='text-center border-bottom-line border-left-line border-top-line padding-left-5 border-right-line padding-right-5' colspan='3'>Sample/s Received By:</td>";
-            $RequestTemplate .= "<td class='text-center border-bottom-line border-left-line border-top-line padding-left-5 border-right-line padding-right-5' colspan='3'>Sample/s Reviewed By:</td>";
-            $RequestTemplate .= "</tr>";
-            $RequestTemplate .= "<tr>";
-            $RequestTemplate .= "<td class='text-left border-left-line border-bottom-line border-top-line padding-left-5 border-right-line padding-right-5' colspan='10'>REPORT NO.:</td>";
+            $RequestTemplate .= "<td class='text-center valign-bottom border-left-line border-bottom-line padding-left-5 border-right-line padding-right-5' style='height:35px;color:#0f17c4;width: 34%; '>".strtoupper($RequestHeader->conforme)."</td>";
+            $RequestTemplate .= "<td class='text-center valign-bottom border-left-line border-bottom-line padding-left-5 border-right-line padding-right-5' style='color:#0f17c4;width: 33%;'>".strtoupper($RequestHeader->receivedBy)."</td>";
+            $RequestTemplate .= "<td class='text-center valign-bottom border-left-line border-bottom-line padding-left-5 border-right-line padding-right-5' style='color:#0f17c4;width: 33%;'>".strtoupper($RequestHeader->LabManager)."</td>";
             $RequestTemplate .= "</tr>";
             
-            $RequestTemplate .= "</tbody>";
+            $RequestTemplate .= "<tr>";
+            $RequestTemplate .= "<td class='text-center border-bottom-line border-left-line border-top-line padding-left-5 border-right-line padding-right-5' style='width: 34%;'>Customer/Authorized Representative</td>";
+            $RequestTemplate .= "<td class='text-center border-bottom-line border-left-line border-top-line padding-left-5 border-right-line padding-right-5' style='width: 33%;'>Sample/s Received By:</td>";
+            $RequestTemplate .= "<td class='text-center border-bottom-line border-left-line border-top-line padding-left-5 border-right-line padding-right-5' style='width: 33%;'>Sample/s Reviewed By:</td>";
+            $RequestTemplate .= "</tr>";
+            
+            $RequestTemplate .= "<tr>";
+            $RequestTemplate .= "<td class='text-left border-left-line border-bottom-line border-top-line padding-left-5 padding-right-5' style='width: 34%;'>Report No.:</td>";
+            $RequestTemplate .= "<td class='text-left border-bottom-line border-top-line padding-left-5 padding-right-5' style='width: 33%;'></td>";
+            $RequestTemplate .= "<td class='text-left border-bottom-line border-top-line padding-left-5 border-right-line padding-right-5' style='width: 33%;'></td>";
+            $RequestTemplate .= "</tr></tbody>";
+            
             $RequestTemplate .= "<tfoot>";
             $RequestTemplate .= "<tr>";
             $RequestTemplate .= "<td colspan='10' style='text-align: right;font-size: 7px'>$Form</td>";
             $RequestTemplate .= "</tr>";
             $RequestTemplate .= "</tfoot>";
-            $RequestTemplate .= "</table>";
+            
+            
+            
+            $RequestTemplate .="</table>";
+
+            
         } else {
             $RequestTemplate = "<table border='0' width=100%>";
             $RequestTemplate .= "</table>";
