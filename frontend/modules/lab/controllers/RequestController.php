@@ -639,7 +639,7 @@ class RequestController extends Controller
             $query = new Query;
             $query->select('request_id as id, request_ref_num AS text')
                     ->from('tbl_request')
-                    ->where(['like', 'request_ref_num', $q])
+                    ->where(['like', 'request_ref_num', '%'.$q,false])
                     ->limit(20);
             $command = $query->createCommand();
             $command->db= \Yii::$app->labdb;
