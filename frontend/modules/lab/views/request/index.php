@@ -11,10 +11,12 @@ use common\models\lab\Request;
 use common\components\Functions;
 use common\models\lab\Customer;
 use common\models\lab\Sample;
+use common\models\lab\Analysis;
 use common\models\lab\RequestType;
 use yii\bootstrap\Modal;
 use common\models\finance\Paymentitem;
 use yii\helpers\Url;
+
 /* @var $this yii\web\View */
 /* @var $searchModel common\models\lab\RequestSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
@@ -139,19 +141,20 @@ if(Yii::$app->user->can('allow-cancel-request')){
                 'width' => '110px',
                 'value'=>function($model){
          
-                    $samples_count= Sample::find() 
-                    ->leftJoin('tbl_request', 'tbl_request.request_id=tbl_sample.request_id')    
+                    $samples_count= Analysis::find()
+                    ->leftJoin('tbl_sample', 'tbl_sample.sample_id=tbl_analysis.sample_id')
+                    ->leftJoin('tbl_request', 'tbl_request.request_id=tbl_sample.request_id')
+                    ->leftJoin('tbl_tagging', 'tbl_analysis.analysis_id=tbl_tagging.analysis_id')   
                     ->where(['tbl_request.request_id'=>$model->request_id ])
                     ->all();              
-                    $sampletagged= Sample::find()
-                    ->leftJoin('tbl_analysis', 'tbl_sample.sample_id=tbl_analysis.sample_id')
+                    $sampletagged= Analysis::find()
+                    ->leftJoin('tbl_sample', 'tbl_sample.sample_id=tbl_analysis.sample_id')
                     ->leftJoin('tbl_tagging', 'tbl_analysis.analysis_id=tbl_tagging.analysis_id') 
                     ->leftJoin('tbl_request', 'tbl_request.request_id=tbl_analysis.request_id')    
                     ->where(['tbl_tagging.tagging_status_id'=>2, 'tbl_request.request_id'=>$model->request_id ])
                     ->all();                 
                     $scount = count($samples_count); 
                     $rcount = count($sampletagged); 
-                    
                     if ($rcount==0){
                         return Html::button('<span"><b>PENDING</span>', ['value'=>Url::to(['/lab/tagging/samplestatus','id'=>$model->request_id]),'onclick'=>'LoadModal(this.title, this.value, true, 1200);', 'class' => 'btn btn-default','title' => Yii::t('app', "Analyses Monitoring"), 'style'=>'width:110px;']);
                         
