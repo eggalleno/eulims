@@ -286,7 +286,7 @@ $this->registerJs("$('#sample-test_id').on('change',function(){
     <script type="text/javascript">
     $('#sample-sample_type_id').on('change',function() {
         $.ajax({
-            url: '/lab/analysis/gettestnamemethod?id='+$(this).val(),
+            url: '/lab/analysis/gettestnamemethod?id='+$(this).val()+'&sampletype='+$('#sample-type_id').val(),
             method: "GET",
             dataType: 'html',
             data: { lab_id: $('#lab_id').val(),
