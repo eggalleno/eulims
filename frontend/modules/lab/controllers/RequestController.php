@@ -639,7 +639,9 @@ class RequestController extends Controller
             $query = new Query;
             $query->select('request_id as id, request_ref_num AS text')
                     ->from('tbl_request')
-                    ->where(['like', 'request_ref_num', '%'.$q,false])
+                    ->where(['lab_id'=>\Yii::$app->user->identity->profile->lab_id])
+                    ->andWhere(['like', 'request_ref_num', '%'.$q,false])
+                    ->orderBy(['request_id'=>SORT_DESC])
                     ->limit(20);
             $command = $query->createCommand();
             $command->db= \Yii::$app->labdb;
