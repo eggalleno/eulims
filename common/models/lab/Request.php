@@ -63,6 +63,7 @@ class Request extends \yii\db\ActiveRecord
     //public $customer_name;
     //public $modeofreleaseids;
     //public $request_date;
+    private $_oldAttributes=false;
     /**
      * {@inheritdoc}
      */
@@ -89,13 +90,40 @@ class Request extends \yii\db\ActiveRecord
             if(!$this->customer_old_id)
                 $this->request_ref_num=NULL;
         }else{
-            //incase if the request has no discount yet else this code below is not appropriate
-            if($this->discount_id){
-                $this->total = $this->total - ($this->total * ((int)$this->discount/100));
+            //check if there are changes in discount
+            if($this->_oldAttributes['discount_id']!=$this->attributes['discount_id']){
+                //if there are any changes
+                //check if the original data has no discount yet
+                if($this->_oldAttributes['discount_id']){
+                    //recompute all the fee in the anakysis
+                    $sql = "SELECT SUM(fee) as subtotal FROM tbl_analysis WHERE request_id=$this->request_id";
+                    $Connection = Yii::$app->labdb;
+                    $command = $Connection->createCommand($sql);
+                    $row = $command->queryOne();
+                    $subtotal = $row['subtotal'];
+                    $this->total = $subtotal - ($subtotal * ((int)$this->discount/100));
+
+                }else{
+                    //we just adjust the total base on the discount
+                    if($this->discount_id){
+                        $this->total = $this->total - ($this->total * ((int)$this->discount/100));
+                    }
+                }
             }
+            
         }
         return parent::beforeSave($insert);
     }
+
+    public function afterFind()
+    {
+        //acts like caching, we will save the original data in the old variable so that we could able to compare it with any changes
+
+        $this->_oldAttributes = $this->attributes;
+
+    }
+
+
     /**
      * @return \yii\db\Connection the database connection used by this AR class.
      */
