@@ -88,6 +88,11 @@ class Request extends \yii\db\ActiveRecord
         if ($insert) {
             if(!$this->customer_old_id)
                 $this->request_ref_num=NULL;
+        }else{
+            //incase if the request has no discount yet else this code below is not appropriate
+            if($this->discount_id){
+                $this->total = $this->total - ($this->total * ((int)$this->discount/100));
+            }
         }
         return parent::beforeSave($insert);
     }
