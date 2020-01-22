@@ -23,10 +23,10 @@ $refcomp = new ReferralComponent();
 <div class="referral-index">
     <?php
         // echo $func->GenerateStatusLegend("Legend/Status",false);
-        // echo "the data";
-        // echo "<pre>";
-        // var_dump($dataProvider); 
-        // echo "</pre>";exit;
+        echo "the data";
+        echo "<pre>";
+        var_dump($dataProvider); exit;
+        echo "</pre>";
     ?>
 
     <h1><?php //echo Html::encode($this->title) ?></h1>
@@ -55,26 +55,25 @@ $refcomp = new ReferralComponent();
             'before'=>null,
         ],
         'columns' => [
-            'id',
             [
                 'header' => 'Referral Code',
-                'attribute' => 'referralCode',
+                'attribute' => 'referral_code',
                 'format' => 'raw',
                 //'value' => function($data){ return $data->referral_code;},
                 'headerOptions' => ['class' => 'text-center'],
             ],
             [
                 'header' => 'Referral Date',
-                'attribute' => 'referralDate',
+                'attribute' => 'referral_date_time',
                 'format' => 'raw',
-                'value' => function($data){ return ($data['referralDate'] != "0000-00-00 00:00:00") ? Yii::$app->formatter->asDate($data['referralDate'], 'php:F j, Y h:i a') : "<i class='text-danger font-weight-bold h5'>Pending referral request</i>";},
+                'value' => function($data){ return ($data['referral_date_time'] != "0000-00-00 00:00:00") ? Yii::$app->formatter->asDate($data['referral_date_time'], 'php:F j, Y h:i a') : "<i class='text-danger font-weight-bold h5'>Pending referral request</i>";},
                 'headerOptions' => ['class' => 'text-center'],
             ],
             [
                 'header' => 'Customer',
                 'attribute' => 'customer_id',
                 'format' => 'raw',
-                'value' => function($data){ return $data['customer']['customerName'];},
+                'value' => function($data){ return $data['customer_name'];},
                 'headerOptions' => ['class' => 'text-center'],
             ],
             [
@@ -85,8 +84,7 @@ $refcomp = new ReferralComponent();
                     //$referred_agency = json_decode($refcomp->listAgency($data['receiving_agency_id']),true);
                     //$receiving_agency = !empty($referred_agency) ? $referred_agency[0]['name'] : null;
                     //return $receiving_agency;
-                    // return $data['receivingAgencyId'];
-                    return $data['referredBy']['name'];
+                    return $data['receiving_agency'];
                 },
                 'headerOptions' => ['class' => 'text-center'],
             ],
@@ -98,8 +96,7 @@ $refcomp = new ReferralComponent();
                     //$referred_agency = json_decode($refcomp->listAgency($data['testing_agency_id']),true);
                     //$testing_agency = !empty($referred_agency) ? $referred_agency[0]['name'] : null;
                     //return $testing_agency;
-                    // return $data['accepting_id'];
-                    return $data['referredTo']['name'];
+                    return $data['testing_agency'];
                 },
                 'headerOptions' => ['class' => 'text-center'],
             ],
@@ -112,7 +109,7 @@ $refcomp = new ReferralComponent();
                 'buttons' => [
                     'view' => function ($url, $data) {
 
-                        return Html::button('<span class="glyphicon glyphicon-eye-open"></span>', ['value'=>Url::to(['referral/viewoldreferral','id'=>$data['id']]),'onclick'=>'window.open(this.value)','class' => 'btn btn-primary','title' => 'View '.$data['referralCode']]);
+                        return Html::button('<span class="glyphicon glyphicon-eye-open"></span>', ['value'=>Url::to(['referral/viewreferral','id'=>$data['referral_id']]),'onclick'=>'window.open(this.value)','class' => 'btn btn-primary','title' => 'View '.$data['referral_code']]);
 
                         /*$checkActive = $referralcomp->checkActiveLab($model->lab_id,$data['agency_id']);
                         $checkNotify = $referralcomp->checkNotify($model->request_id,$data['agency_id']);

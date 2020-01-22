@@ -324,6 +324,147 @@ class ReferralController extends Controller
         }
     }
 
+    //bergel cutara
+    //temporary viewreferral pointing to old referral system
+    public function actionViewoldreferral($id)
+    {
+        $referralId = (int) $id;
+        $rstlId = (int) Yii::$app->user->identity->profile->rstl_id;
+
+        if($rstlId > 0 && $referralId > 0)
+        {
+            $refcomponent = new ReferralComponent();
+              $referralDetails = json_decode($refcomponent->getReferraldetails($referralId,$rstlId),true);
+            // var_dump($referralDetails); exit;
+            if($referralDetails != 0)
+            {
+                $model = new Request(); //for declaration required in Detailview
+               // $modelref = $this->findModelRef($id);       
+                $request = $referralDetails;
+                $samples = $referralDetails['samples'];
+                $analyses = $referralDetails['analyses'];
+                $customer = $referralDetails['customer'];
+                // $notification=$referralDetails['notification_data'];
+                $statuslogs= json_decode($refcomponent->getStatuslogs($referralId));
+               
+               /*
+                *  echo"<pre>";
+               var_dump($statuslogs);
+                echo"</pre>";
+                exit; */
+                //set third parameter to 1 for attachment type deposit slip
+                $deposit = json_decode($refcomponent->getAttachment($referralId,Yii::$app->user->identity->profile->rstl_id,1),true);
+                //set third parameter to 2 for attachment type or
+                $or = json_decode($refcomponent->getAttachment($referralId,Yii::$app->user->identity->profile->rstl_id,2),true);
+                $referred_agency = json_decode($refcomponent->getReferredAgency($referralId,Yii::$app->user->identity->profile->rstl_id),true);
+
+                $receiving_agency = !empty($referred_agency['receiving_agency']) && $referred_agency > 0 ? $referred_agency['receiving_agency']['name'] : null;
+                $testing_agency = !empty($referred_agency['testing_agency']) && $referred_agency > 0 ? $referred_agency['testing_agency']['name'] : null;
+
+                $testresult = json_decode($refcomponent->getAttachment($id,Yii::$app->user->identity->profile->rstl_id,3),true);
+              
+                if($testresult <> 0){
+                    $testresultDataProvider = new ArrayDataProvider([
+                        'allModels' => $testresult,
+                        'pagination'=> [
+                            'pageSize' => 10,
+                        ],
+                    ]); 
+                }else{
+                    $testresultDataProvider = new ArrayDataProvider([]);
+                }
+                // $notificationDataProvider = new ArrayDataProvider([
+                //     'allModels' => $notification,
+                //     'pagination'=> [
+                //         'pageSize' => 10,
+                //     ],
+                // ]);
+                
+                $sampleDataProvider = new ArrayDataProvider([
+                    'allModels' => $samples,
+                    'pagination'=> [
+                        'pageSize' => 10,
+                    ],
+                ]);
+
+                $analysisDataprovider = new ArrayDataProvider([
+                    'allModels' => $analyses,
+                    //'pagination'=>false,
+                    'pagination'=> [
+                        'pageSize' => 10,
+                    ],
+
+                ]);
+
+                $analysis_fees = implode(',', array_map(function ($data) {
+                    return $data['fee'];
+                }, $analyses));
+
+                $subtotal = array_sum(explode(",",$analysis_fees));
+                $rate = $request['discount']['rate'];
+                $discounted = $subtotal * ($rate/100);
+                $total = $subtotal - $discounted;
+
+                //print_r($testresult);exit;
+                return $this->render('viewoldreferral', [
+                    'model' => $model,
+                   // 'modelref' => $modelref,
+                    'request' => $request,
+                    'customer' => $customer,
+                    'sampleDataProvider' => $sampleDataProvider,
+                    'analysisdataprovider'=> $analysisDataprovider,
+                    'subtotal' => $subtotal,
+                    'discounted' => $discounted,
+                    'total' => $total,
+                    'countSample' => count($samples),
+                    'receiving_agency' => $receiving_agency,
+                    'testing_agency' => $testing_agency,
+                    'depositslip' => $deposit,
+                    'officialreceipt' => $or,
+                    'testresult' => $testresultDataProvider,
+                    // 'notificationDataProvider' => $notificationDataProvider,
+                    'logs'=>$statuslogs,
+                    'modelRefTracktesting'=>$this->findModeltestingtrack($id),
+                    'modelRefTrackreceiving'=>$this->findModelreceivedtrack($id)
+               
+                ]);
+            } else {
+                Yii::$app->session->setFlash('error', "Invalid referral!haha");
+                return $this->redirect(['/referrals/referral']);
+            }
+        } else {
+            Yii::$app->session->setFlash('error', "No RSTL ID or REFERRAL ID");
+            return $this->redirect(['/referrals/referral']);
+        }
+    }
+
+    //we will call this if need to generatesamplecode to the old referral
+    public function actionGeneratesamplecodereferral(){
+        if(isset($_POST['request_id'])){
+            $request_id = $_POST['request_id'];
+            $refcomponent = new ReferralComponent();
+
+            $response =  $refcomponent->generatesamplecode($request_id);
+            if($response){
+                $return="Success";
+                Yii::$app->session->setFlash('success', 'Request Reference # and Sample Code Successfully Generated!');
+            }else{
+                Yii::$app->session->setFlash('danger', 'Request Reference # and Sample Code Failed to Generate!');
+                $return="Failed";
+            }
+
+            return $this->redirect(['viewoldreferral','id'=>$request_id]);
+        }else{
+            return "no data has beeen received";
+        }
+
+        //get the request id
+
+        //query the request id and get all the samples
+
+
+    }
+
     /**
      * Creates a new Referral model.
      * If creation is successful, the browser will be redirected to the 'view' page.

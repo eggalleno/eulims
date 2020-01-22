@@ -22,8 +22,6 @@ use linslin\yii2\curl;
 use common\models\lab\exRequestreferral;
 use common\models\lab\Analysis;
 use common\models\lab\Sample;
-use common\models\lab\Lab;//used to point to old referral
-use common\models\lab\Samplecode;//used to point to old referral
 
 /**
  * Description of Referral Component
@@ -33,9 +31,9 @@ use common\models\lab\Samplecode;//used to point to old referral
 class ReferralComponent extends Component {
 
     // public $source = 'https://eulimsapi.onelab.ph';
-    public $source = 'https://referral.onelab.ph/';
+    // public $source = 'https://referral.onelab.ph/';
     //public $source = 'http://localhost/eulimsapi.onelab.ph';
-    // public $source = 'http://192.168.1.213/referral.onelab.ph/';
+    public $source = 'http://192.168.1.213/referral.onelab.ph/';
     /**
      * FindOne testname
      * @param integer $testnameId
@@ -462,10 +460,7 @@ class ReferralComponent extends Component {
     function getReferraldetails($referralId,$rstlId)
     {
         if($referralId > 0 && $rstlId > 0) {
-            //api pointing to the new referral system
             $apiUrl=$this->source.'/api/web/referral/referrals/viewdetail?referral_id='.$referralId.'&rstl_id='.$rstlId;
-            //api pointing to the old referral system
-            $apiUrl=$this->source.'/lab/api/view/model/referrals/id/'.$referralId;
             $curl = new curl\Curl();
             $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
             $curl->setOption(CURLOPT_TIMEOUT, 180);
@@ -641,7 +636,6 @@ class ReferralComponent extends Component {
     }
     function getIncomingReferral($rstlId) {
         if($rstlId > 0) {
-            //api for new referral
             // $apiUrl=$this->source.'/api/web/referral/referrals/incoming_referral?rstl_id='.$rstlId;
             //direct the api to the old referral
             $apiUrl=$this->source.'/lab/api/list/model/referrals/agency/'.$rstlId;
@@ -923,99 +917,6 @@ class ReferralComponent extends Component {
         } else {
             return 'false';
         }
-    }
-
-    function GenerateSampleCode($request_id){
-
-        $apiUrl=$this->source.'/lab/api/view/model/referrals/id/'.$request_id;
-        $curl = new curl\Curl();
-        $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
-        $curl->setOption(CURLOPT_TIMEOUT, 180);
-        $request = json_decode($curl->get($apiUrl),true);
-
-        $lab = Lab::findOne($request['lab_id']);
-
-        $year = date('Y', strtotime($request['referralDate']));
-
-        $connection= Yii::$app->labdb;
-        $rstlId = Yii::$app->user->identity->profile->rstl_id;
-        
-        foreach ($request['samples'] as $samp){
-            // var_dump($samp['id']);
-            $transaction = $connection->beginTransaction();
-            $return="false";
-            try {
-                $proc = 'spGetNextGenerateReferralSampleCode(:rstlId,:labId,:requestId,:year)';
-                $params = [':rstlId'=>$rstlId,':labId'=>$request['lab_id'],':requestId'=>$request_id,':year'=>$year];
-                $row = $this->ExecuteStoredProcedureOne($proc, $params, $connection);
-                $samplecodeGenerated = $row['GeneratedSampleCode'];
-                $samplecodeIncrement = $row['SampleIncrement'];
-                $sampleId = $samp['id'];
-                // $sample= Sample::find()->where(['sample_id'=>$sampleId])->one();
-                
-                //insert to tbl_samplecode
-                $samplecode = new Samplecode();
-                $samplecode->rstl_id = $rstlId;
-                $samplecode->reference_num = $request['referralCode'];
-                $samplecode->sample_id = $sampleId;
-                $samplecode->lab_id = $request['lab_id'];
-                $samplecode->number = $samplecodeIncrement;
-                $samplecode->year = $year;
-                $samplecode->source = 2;
-                
-                if($samplecode->save())
-                {
-                    //update samplecode of the sample in the api 
-                    $apiUrl=$this->source.'/lab/api/update/model/samples/id/'.$sampleId;
-                    //the data to pass
-
-                    $response = $curl->setPostParams([
-                            'sampleCode' => $samplecodeGenerated,
-                         ])
-                         ->get($apiUrl);
-                    $transaction->commit();
-                    $return="true";
-                } else {
-                    //error
-                    $transaction->rollBack();
-                    $samplecode->getErrors();
-                    $return="false";
-                }
-                
-                //$transaction->commit();
-
-            } catch (\Exception $e) {
-               $transaction->rollBack();
-               echo $e->getMessage();
-               $return="false";
-            } catch (\Throwable $e) {
-               $transaction->rollBack();
-               $return="false";
-               echo $e->getMessage();
-            }
-            
-        }
-        return $return;
-    }
-
-        /**
-     * 
-     * @param string $Proc
-     * @param array $Params
-     * @param CDBConnection $Connection
-     * @return array
-     */
-    public function ExecuteStoredProcedureOne($Proc,array $Params,$Connection){
-        if(!isset($Connection)){
-           $Connection=Yii::$app->db;
-        }
-        $Command=$Connection->createCommand("CALL $Proc");
-        //Iterate through arrays of parameters
-        foreach($Params as $Key=>$Value){
-           $Command->bindValue($Key, $Value); 
-        }
-        $Row=$Command->queryOne();
-        return $Row;
     }
     
 }
