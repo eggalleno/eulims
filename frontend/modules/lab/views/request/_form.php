@@ -298,7 +298,6 @@ $model->modeofreleaseids=$model->modeofrelease_ids;
         'pluginEvents'=>[
             "change" => 'function() { 
                 var discountid=this.value;
-                console.log(discountid);
                 $.post("/ajax/getdiscount/", {
                         discountid: discountid
                     }, function(result){
