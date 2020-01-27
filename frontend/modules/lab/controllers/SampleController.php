@@ -452,7 +452,7 @@ class SampleController extends Controller
 
     protected function listSampletype($labId)
     {
-        $sampletype = ArrayHelper::map(Sampletype::find()->joinWith('labSampletypes')->andWhere(['lab_id'=>$labId])->all(), 'sampletype_id', 
+        $sampletype = ArrayHelper::map(Sampletype::find()->joinWith('labSampletypes')->andWhere(['lab_id'=>$labId,'status_id'=>1])->all(), 'sampletype_id', 
             function($sampletype, $defaultValue) {
                 return $sampletype->type;
         });
