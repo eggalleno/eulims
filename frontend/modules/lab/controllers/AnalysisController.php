@@ -381,17 +381,11 @@ class AnalysisController extends Controller
         $model = $this->findModel($id);
         
         $analysisquery = Analysis::find()->where(['analysis_id' => $id])->one();
-        $samplesQuery = Sample::find()->where(['sample_id' => $analysisquery->sample_id]);
+        $samplesQuery = Sample::find()->where(['sample_id' => $analysisquery->sample_id])->all();
         $requestquery = Request::find()->where([ 'request_id'=> $analysisquery->request_id])->one();
         $paymentitem = Paymentitem::find()->where([ 'request_id'=> $analysisquery->request_id])->one();
         $request_id = $requestquery->request_id;
 
-            $sampleDataProvider = new ActiveDataProvider([
-                'query' => $samplesQuery,
-                'pagination' => [
-                 'pageSize' => 10,
-                        ],        
-                ]);
         
                 $url = \Yii::$app->request->url;
                 $rid = substr($url, 24);
@@ -442,20 +436,20 @@ class AnalysisController extends Controller
                 } elseif (Yii::$app->request->isAjax) {
         return $this->renderAjax('_form', [
             'model' => $model,
-             'sampleDataProvider' => $sampleDataProvider,
              'testcategory' => $testcategory,
              'request_id'=>$request_id,
             'test' => $test,
-            'sampletype'=>$sampletype
+            'sampletype'=>$sampletype,
+            'base_sample'=>$samplesQuery
         ]);
     }else{
         return $this->render('_form', [
             'model' => $model,
-             'sampleDataProvider' => $sampleDataProvider,
              'request_id'=>$request_id,
              'testcategory' => $testcategory,
             'sampletype' => $sampletype,
             'test' => $test,
+            'base_sample'=>$samplesQuery
         ]);
       }   
     }

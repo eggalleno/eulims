@@ -52,11 +52,7 @@ use kartik\money\MaskMoney;
       <?php echo Html::activeLabel($model,'sample'); ?>
       <?= Select2::widget([
           'name' => 'base_samples',
-          'data' => ArrayHelper::map($base_sample,'sample_id',function($data){
-            
-            // return ($data->request->lab_id == 1) ? $data->samplename." - Sampling Date:".$data->sampling_date.", Description:".$data->customer_description : $data->samplename.", Description:".$data->customer_description; //incase they need it
-            return $data->samplename;
-          }),
+          'data' => ArrayHelper::map($base_sample,'sample_id','samplename'),
           'options' => [
             'multiple' => true,
             'placeholder' => 'Select sample ...',
