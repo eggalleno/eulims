@@ -12,6 +12,7 @@ use Yii;
  * @property int $method_id
  * @property string $create_time
  * @property string $update_time
+ * @property int $lab_id
  *
  * @property Testname $testname
  */
@@ -39,8 +40,8 @@ class Testnamemethod extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['testname_id', 'method_id'], 'required'],
-            [['testname_id', 'method_id'], 'integer'],
+            [['testname_id', 'method_id', 'lab_id'], 'required'],
+            [['testname_id', 'method_id', 'lab_id'], 'integer'],
             [['create_time', 'update_time'], 'safe'],
             [['testname_id'], 'exist', 'skipOnError' => true, 'targetClass' => Testname::className(), 'targetAttribute' => ['testname_id' => 'testname_id']],
         ];
@@ -57,6 +58,7 @@ class Testnamemethod extends \yii\db\ActiveRecord
             'method_id' => 'Method',
             'create_time' => 'Create Time',
             'update_time' => 'Update Time',
+             'lab_id' => 'Lab ID',
         ];
     }
 
@@ -71,5 +73,10 @@ class Testnamemethod extends \yii\db\ActiveRecord
     public function getMethod()
     {
         return $this->hasOne(Methodreference::className(), ['method_reference_id' => 'method_id']);
+    }
+
+       public function getLab()
+    {
+        return $this->hasOne(Lab::className(), ['lab_id' => 'lab_id']);
     }
 }

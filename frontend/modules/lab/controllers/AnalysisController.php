@@ -158,9 +158,13 @@ class AnalysisController extends Controller
         $testname_id = $_GET['testname_id'];
         $sampletype_id = $_GET['sampletype_id'];
 
+
         //get the information of the sample
         $sample = Sample::findOne($sampletype_id[0]);
         $sampletype_id = $sample->sampletype_id;
+
+        //get the lab_id of the request
+        $lab_id= $sample->request->lab_id;
 
         // $testname_id = $_GET['testcategory_id'];
         // $testname_id = $_GET['sampletype_id'];
@@ -173,7 +177,7 @@ class AnalysisController extends Controller
         //dapat naka left join ito.. considering yung mga sample type and test category
         $testnamemethod = Testnamemethod::find()
         ->innerJoin('tbl_sampletype_testname', 'tbl_sampletype_testname.testname_id=tbl_testname_method.testname_id')
-        ->where(['tbl_testname_method.testname_id'=>$testname_id,'tbl_sampletype_testname.sampletype_id'=>$sampletype_id])->all();
+        ->where(['tbl_testname_method.testname_id'=>$testname_id,'tbl_sampletype_testname.sampletype_id'=>$sampletype_id,'tbl_testname_method.lab_id'=>$lab_id])->all();
 
         
         $testnamedataprovider = new ArrayDataProvider([

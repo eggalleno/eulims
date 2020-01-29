@@ -28,6 +28,19 @@ $methodlist= ArrayHelper::map(Methodreference::find()->all(),'method_reference_i
 <div class="testnamemethod-form">
     <?php $form = ActiveForm::begin(); ?>
     <div class="input-group">
+        <?= $form->field($model,'lab_id')->widget(Select2::classname(),[
+                        'data' => ArrayHelper::map(Lab::find()->all(),'lab_id','labname'),
+                        'id'=>'lab_id',
+                        'theme' => Select2::THEME_KRAJEE,
+                        'options' => ['id'=>'sample-lab_id'],
+                        'pluginOptions' => ['allowClear' => true,'placeholder' => 'Select Lab'],
+                ])
+        ?>
+        
+    </div>
+
+
+    <div class="input-group">
     <?= $form->field($model,'testname_id')->widget(Select2::classname(),[
                     'data' => $testnamelist,
                     'id'=>'testname_id',
@@ -47,7 +60,7 @@ $methodlist= ArrayHelper::map(Methodreference::find()->all(),'method_reference_i
 
         </div>
 
-        <div id="methodreference">
+    <div id="methodreference">
     </div>
 <div class="row">
 <div class="col-md-6">

@@ -6,6 +6,7 @@ use common\models\lab\Methodreference;
 use common\models\lab\Testname;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Url;
+use common\models\lab\Lab;
 
 /* @var $this yii\web\View */
 /* @var $searchModel common\models\lab\TestnamemethodSearch */
@@ -48,6 +49,28 @@ $this->params['breadcrumbs'][] = $this->title;
             //         }
                     
             // ],
+
+            [
+                'attribute' => 'lab_id',
+                'contentOptions' => ['style' => 'width: 8.7%'],
+                'label' => 'Lab',
+                'format' => 'raw',
+                'width'=>'20%',
+                'value' => function($model) {
+                   if ($model->lab){
+                      return $model->lab->labname;
+                   }else{
+                        return "";
+                   }
+                   
+                },
+                'filterType' => GridView::FILTER_SELECT2,
+                'filter' => ArrayHelper::map(Lab::find()->all(),'lab_id','labname'),
+                'filterWidgetOptions' => [
+                    'pluginOptions' => ['allowClear' => true],
+               ],
+               'filterInputOptions' => ['placeholder' => 'Lab',]
+            ],
             [
                 'attribute' => 'testname_id',
                 'label' => 'Test Name',

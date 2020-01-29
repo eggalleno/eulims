@@ -18,7 +18,7 @@ class TestnamemethodSearch extends Testnamemethod
     public function rules()
     {
         return [
-            [['testname_method_id', 'testname_id', 'method_id'], 'integer'],
+            [['testname_method_id', 'testname_id', 'method_id', 'lab_id'], 'integer'],
             [['create_time', 'update_time'], 'safe'],
         ];
     }
@@ -64,6 +64,7 @@ class TestnamemethodSearch extends Testnamemethod
             'method_id' => $this->method_id,
             'create_time' => $this->create_time,
             'update_time' => $this->update_time,
+            'lab_id'=>$this->lab_id,
         ]);
 
         return $dataProvider;
