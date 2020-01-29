@@ -33,9 +33,9 @@ use common\models\lab\Samplecode;//used to point to old referral
 class ReferralComponent extends Component {
 
     // public $source = 'https://eulimsapi.onelab.ph';
-    public $source = 'https://referral.onelab.ph/';
+    // public $source = 'https://referral.onelab.ph/';
     //public $source = 'http://localhost/eulimsapi.onelab.ph';
-    // public $source = 'http://192.168.1.213/referral.onelab.ph/';
+    public $source = 'http://192.168.1.213/referral.onelab.ph/';
     /**
      * FindOne testname
      * @param integer $testnameId

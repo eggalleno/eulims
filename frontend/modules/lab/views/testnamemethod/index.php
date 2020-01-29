@@ -84,6 +84,22 @@ $this->params['breadcrumbs'][] = $this->title;
                ],
                'filterInputOptions' => ['placeholder' => 'Method', 'testcategory_id' => 'grid-products-search-category_type_id']
             ],
+            [
+                'header' => 'Fee',
+                'value' => function($model) {
+                     if($model->method){
+                      return $model->method->fee;
+                    }else{
+                        return "";
+                 }    
+                },
+                'filterType' => GridView::FILTER_SELECT2,
+                'filter' => $methodlist,
+                'filterWidgetOptions' => [
+                    'pluginOptions' => ['allowClear' => true],
+               ],
+               'filterInputOptions' => ['placeholder' => 'Method', 'testcategory_id' => 'grid-products-search-category_type_id']
+            ],
             'create_time',
             'update_time',
 
