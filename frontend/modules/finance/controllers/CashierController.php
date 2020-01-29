@@ -472,7 +472,8 @@ class CashierController extends \yii\web\Controller
             ->from('eulims_finance.tbl_receipt')
             ->where(['deposit_type_id' => $deposit_type_id])
             ->andWhere(['or_series_id' => $or_series_id]) 
-            ->andWhere(['deposit_id'=>null]) 
+            ->andWhere(['deposit_id'=>null])
+            ->andWhere(['cancelled'=>0]) 
             ->andWhere(['between', 'or_number',$start_or,$end_or])
             ->sum('total');
         if($id == '' ){
