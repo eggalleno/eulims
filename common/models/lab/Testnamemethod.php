@@ -13,6 +13,7 @@ use Yii;
  * @property string $create_time
  * @property string $update_time
  * @property int $lab_id
+ * @property int $sampletype_id
  *
  * @property Testname $testname
  */
@@ -40,8 +41,8 @@ class Testnamemethod extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['testname_id', 'method_id', 'lab_id'], 'required'],
-            [['testname_id', 'method_id', 'lab_id'], 'integer'],
+            [['testname_id', 'method_id', 'lab_id', 'sampletype_id'], 'required'],
+            [['testname_id', 'method_id', 'lab_id', 'sampletype_id'], 'integer'],
             [['create_time', 'update_time'], 'safe'],
             [['testname_id'], 'exist', 'skipOnError' => true, 'targetClass' => Testname::className(), 'targetAttribute' => ['testname_id' => 'testname_id']],
         ];
@@ -58,7 +59,8 @@ class Testnamemethod extends \yii\db\ActiveRecord
             'method_id' => 'Method',
             'create_time' => 'Create Time',
             'update_time' => 'Update Time',
-             'lab_id' => 'Lab ID',
+            'lab_id' => 'Lab ID',
+            'sampletype_id'=> 'Sampletype',
         ];
     }
 
@@ -75,8 +77,13 @@ class Testnamemethod extends \yii\db\ActiveRecord
         return $this->hasOne(Methodreference::className(), ['method_reference_id' => 'method_id']);
     }
 
-       public function getLab()
+    public function getLab()
     {
         return $this->hasOne(Lab::className(), ['lab_id' => 'lab_id']);
+    }
+
+    public function getSampletype()
+    {
+        return $this->hasOne(Sampletype::className(), ['sampletype_id' => 'sampletype_id']);
     }
 }

@@ -7,6 +7,7 @@ use common\models\lab\Testname;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Url;
 use common\models\lab\Lab;
+use common\models\lab\Sampletype;
 
 /* @var $this yii\web\View */
 /* @var $searchModel common\models\lab\TestnamemethodSearch */
@@ -72,6 +73,27 @@ $this->params['breadcrumbs'][] = $this->title;
                'filterInputOptions' => ['placeholder' => 'Lab',]
             ],
             [
+                'attribute' => 'sampletype_id',
+                'contentOptions' => ['style' => 'width: 8.7%'],
+                'label' => 'Lab',
+                'format' => 'raw',
+                'width'=>'20%',
+                'value' => function($model) {
+                   if ($model->sampletype){
+                      return $model->sampletype->type;
+                   }else{
+                        return "";
+                   }
+                   
+                },
+                'filterType' => GridView::FILTER_SELECT2,
+                'filter' => ArrayHelper::map(Sampletype::find()->where(['status_id'=>1])->all(),'sampletype_id','type'),
+                'filterWidgetOptions' => [
+                    'pluginOptions' => ['allowClear' => true],
+               ],
+               'filterInputOptions' => ['placeholder' => 'Sampletype',]
+            ],
+            [
                 'attribute' => 'testname_id',
                 'label' => 'Test Name',
                 'value' => function($model) {
@@ -123,29 +145,29 @@ $this->params['breadcrumbs'][] = $this->title;
                ],
                'filterInputOptions' => ['placeholder' => 'Method', 'testcategory_id' => 'grid-products-search-category_type_id']
             ],
-            'create_time',
-            'update_time',
+            // 'create_time',
+            // 'update_time',
 
-        //     ['class' => 'kartik\grid\ActionColumn',
-        //     'contentOptions' => ['style' => 'width: 8.7%'],
-        //    'template' => '{view}{update}{delete}{workflow}',
-        //     'buttons'=>[
-        //         'view'=>function ($url, $model) {
-        //             return Html::button('<span class="glyphicon glyphicon-eye-open"></span>', ['value'=>Url::to(['/lab/testnamemethod/view','id'=>$model->testname_method_id]), 'onclick'=>'LoadModal(this.title, this.value);', 'class' => 'btn btn-primary','title' => Yii::t('app', "View Test Name Method")]);
-        //         },
-        //         'update'=>function ($url, $model) {
-        //             return Html::button('<span class="glyphicon glyphicon-pencil"></span>', ['value'=>Url::to(['/lab/testnamemethod/update','id'=>$model->testname_method_id]),'onclick'=>'LoadModal(this.title, this.value);', 'class' => 'btn btn-success','title' => Yii::t('app', "Update Test Name Method")]);
-        //         },
-        //         'delete'=>function ($url, $model) {
-        //             $urls = '/lab/testnamemethod/delete?id='.$model->testname_method_id;
-        //             return Html::a('<span class="glyphicon glyphicon-trash"></span>', $urls,['data-confirm'=>"Are you sure you want to delete this record?<b></b>", 'data-method'=>'post', 'class'=>'btn btn-danger','title'=>'Delete Test Name Method','data-pjax'=>'0']);
-        //         },
-        //         // 'workflow'=>function ($url, $model) {
-        //         //   $t = '/lab/testnamemethod/createworkflow?test_id='.$model->testname_method_id;
-        //         //     return Html::button('<span class="glyphicon glyphicon-plus"></span><span class="glyphicon glyphicon-file"></span>', ['value'=>$t, 'class' => 'btn btn-warning btn-modal','onclick'=>'LoadModal(this.title, this.value, true, 900);','name' => Yii::t('app', "Manage Workflow"),'title' => Yii::t('app', "Create Workflow")]);
-        //         // },
-        //         ],
-        //     ],
+            ['class' => 'kartik\grid\ActionColumn',
+            'contentOptions' => ['style' => 'width: 8.7%'],
+           'template' => '{view}{update}{delete}{workflow}',
+            'buttons'=>[
+                'view'=>function ($url, $model) {
+                    return Html::button('<span class="glyphicon glyphicon-eye-open"></span>', ['value'=>Url::to(['/lab/testnamemethod/view','id'=>$model->testname_method_id]), 'onclick'=>'LoadModal(this.title, this.value);', 'class' => 'btn btn-primary','title' => Yii::t('app', "View Test Name Method")]);
+                },
+                'update'=>function ($url, $model) {
+                    return Html::button('<span class="glyphicon glyphicon-pencil"></span>', ['value'=>Url::to(['/lab/testnamemethod/update','id'=>$model->testname_method_id]),'onclick'=>'LoadModal(this.title, this.value);', 'class' => 'btn btn-success','title' => Yii::t('app', "Update Test Name Method")]);
+                },
+                'delete'=>function ($url, $model) {
+                    $urls = '/lab/testnamemethod/delete?id='.$model->testname_method_id;
+                    return Html::a('<span class="glyphicon glyphicon-trash"></span>', $urls,['data-confirm'=>"Are you sure you want to delete this record?<b></b>", 'data-method'=>'post', 'class'=>'btn btn-danger','title'=>'Delete Test Name Method','data-pjax'=>'0']);
+                },
+                // 'workflow'=>function ($url, $model) {
+                //   $t = '/lab/testnamemethod/createworkflow?test_id='.$model->testname_method_id;
+                //     return Html::button('<span class="glyphicon glyphicon-plus"></span><span class="glyphicon glyphicon-file"></span>', ['value'=>$t, 'class' => 'btn btn-warning btn-modal','onclick'=>'LoadModal(this.title, this.value, true, 900);','name' => Yii::t('app', "Manage Workflow"),'title' => Yii::t('app', "Create Workflow")]);
+                // },
+                ],
+            ],
           
         ],
     ]); ?>

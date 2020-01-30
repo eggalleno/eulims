@@ -39,6 +39,17 @@ $methodlist= ArrayHelper::map(Methodreference::find()->all(),'method_reference_i
         
     </div>
 
+    <div class="input-group">
+        <?= $form->field($model,'sampletype_id')->widget(Select2::classname(),[
+                        'data' => ArrayHelper::map(Sampletype::find()->where(['status_id'=>1])->all(),'sampletype_id','type'),
+                        'id'=>'sampletype_id',
+                        'theme' => Select2::THEME_KRAJEE,
+                        'options' => ['id'=>'sample-sampletype_id'],
+                        'pluginOptions' => ['allowClear' => true,'placeholder' => 'Select Sample Type'],
+                ])
+        ?>
+        
+    </div>
 
     <div class="input-group">
     <?= $form->field($model,'testname_id')->widget(Select2::classname(),[
