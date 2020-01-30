@@ -46,9 +46,9 @@ use kartik\money\MaskMoney;
     
     }
 ?>
+<div class="row">
+  <div class="col-sm-12">
 
-  <div class="row">
-    <div class="col-sm-6">
       <?php echo Html::activeLabel($model,'sample'); ?>
       <?= Select2::widget([
           'name' => 'base_samples',
@@ -60,6 +60,25 @@ use kartik\money\MaskMoney;
             'tags'=>true
           ]
       ]);?>
+ 
+
+  </div>
+</div>
+
+  <div class="row">
+    <div class="col-sm-6">
+      <?php echo Html::label('Sample Type'); ?>
+      <?= Select2::widget([
+          'name'=>'thesampletypes',
+          'data' => ArrayHelper::map(Sampletype::find()->where(['status_id'=>1])->all(),'sampletype_id','type'),
+          'options' => [
+            'placeholder' => 'Select sample type...',
+            'id'=>'the-sample-type',
+          ]
+      ]);?>
+
+
+
     </div>
     <div class="col-sm-6" id="testname">
 
@@ -69,7 +88,7 @@ use kartik\money\MaskMoney;
             'options'=>['id'=>'sample-sample_type_id'],
             'select2Options'=>['pluginOptions'=>['allowClear'=>true]],
             'pluginOptions'=>[
-                'depends'=>['base-sample'],
+                'depends'=>['the-sample-type'],
                 'placeholder'=>'Select Test Name',
                 'url'=>Url::to(['/lab/analysis/listsampletype']),
                 'loadingText' => 'Loading Test Names...',
@@ -133,7 +152,8 @@ use kartik\money\MaskMoney;
             url: '/lab/analysis/gettestnamemethod',
             method: "GET",
             dataType: 'html',
-            data: { sampletype_id: $('#base-sample').val(),
+            data: { sample: $('#base-sample').val(),
+            sampletype_id: $('#the-sample-type').val(),
             testname_id: $(this).val()},
             beforeSend: function(xhr) {
                $('.image-loader').addClass("img-loader");

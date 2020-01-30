@@ -157,11 +157,11 @@ class AnalysisController extends Controller
       
         $testname_id = $_GET['testname_id'];
         $sampletype_id = $_GET['sampletype_id'];
-
+        $sample = $_GET['sample'];
 
         //get the information of the sample
-        $sample = Sample::findOne($sampletype_id[0]);
-        $sampletype_id = $sample->sampletype_id;
+        $sample = Sample::findOne($sample[0]);
+        //$sampletype_id = $sample->sampletype_id;
 
         //get the lab_id of the request
         $lab_id= $sample->request->lab_id;
@@ -197,23 +197,27 @@ class AnalysisController extends Controller
     public function actionListsampletype() {
         $out = [];
         if (isset($_POST['depdrop_parents'])) {
-            $sampleids = end($_POST['depdrop_parents']);
+            //$sampleids = end($_POST['depdrop_parents']);
+            $sampletypeId = end($_POST['depdrop_parents']);
 
+
+            //**********************************************************
+            //unused but important later
             //check if all the selected values are of the same sample type 
 
-            $sampletypeId="";
-            foreach($sampleids as $id){
-                $sample = Sample::findOne($id);
-                if($sampletypeId=="")
-                    $sampletypeId=$sample->sampletype_id;
-                else{
-                    if($sampletypeId!==$sample->sampletype_id){
-                        //return if empty data because sampleype_id are not the same
-                        echo Json::encode(['output' => '', 'selected'=>'']);
-                        return;
-                    }
-                }
-            }
+            // $sampletypeId="";
+            // foreach($sampleids as $id){
+            //     $sample = Sample::findOne($id);
+            //     if($sampletypeId=="")
+            //         $sampletypeId=$sample->sampletype_id;
+            //     else{
+            //         if($sampletypeId!==$sample->sampletype_id){
+            //             //return if empty data because sampleype_id are not the same
+            //             echo Json::encode(['output' => '', 'selected'=>'']);
+            //             return;
+            //         }
+            //     }
+            // }
 
             //************************************************
             $list =  Testname::find()
@@ -223,7 +227,7 @@ class AnalysisController extends Controller
             ->all();
 
             $selected  = null;
-            if ($id != null && count($list) > 0) {
+            if ($sampletypeId != null && count($list) > 0) {
                 $selected = '';
                 foreach ($list as $i => $sampletype) {
                     $out[] = ['id' => $sampletype['testname_id'], 'name' => $sampletype['testName']];
