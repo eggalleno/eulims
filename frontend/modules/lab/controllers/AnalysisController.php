@@ -175,9 +175,9 @@ class AnalysisController extends Controller
         // ->where(['tbl_testname_method.testname_id'=>$testname_id, 'tbl_lab_sampletype.testcategory_id'=>$testcategory_id, 'tbl_lab_sampletype.sampletype_id'=>$sampletype_id ])->all();
 
         //dapat naka left join ito.. considering yung mga sample type and test category
+
         $testnamemethod = Testnamemethod::find()
-        ->innerJoin('tbl_sampletype_testname', 'tbl_sampletype_testname.testname_id=tbl_testname_method.testname_id')
-        ->where(['tbl_testname_method.testname_id'=>$testname_id,'tbl_sampletype_testname.sampletype_id'=>$sampletype_id,'tbl_testname_method.lab_id'=>$lab_id])->all();
+        ->where(['tbl_testname_method.testname_id'=>$testname_id,'tbl_testname_method.sampletype_id'=>$sampletype_id,'tbl_testname_method.lab_id'=>$lab_id])->all();
 
         
         $testnamedataprovider = new ArrayDataProvider([
