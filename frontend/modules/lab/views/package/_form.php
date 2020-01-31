@@ -52,20 +52,19 @@ $sampletypelist= ArrayHelper::map(Sampletype::find()->all(),'sampletype_id','typ
             ])->label("Test Category")
         ?>
         </div>
+
         <div class="col-sm-6">
-        <?= $form->field($model, 'sampletype_id')->widget(DepDrop::classname(), [
-            'type'=>DepDrop::TYPE_SELECT2,
-            'data'=>$sampletype,
-            'options'=>['id'=>'sample-type_id'],
-            'select2Options'=>['pluginOptions'=>['allowClear'=>true]],
-            'pluginOptions'=>[
-                'depends'=>['sample-category_id'],
-                'placeholder'=>'Select Sample Type',
-                'url'=>Url::to(['/lab/analysis/listtype']),
-                'loadingText' => 'Loading Sample Types...',
-            ]
-        ])->label("Sample Type")
+
+
+        <?= $form->field($model,'sampletype_id')->widget(Select2::classname(),[
+                        'data' => ArrayHelper::map(Sampletype::find()->where(['status_id'=>1])->all(),'sampletype_id','type'),
+                        'id'=>'sampletype_id',
+                        'theme' => Select2::THEME_KRAJEE,
+                        'options' => ['id'=>'sample-type_id'],
+                        'pluginOptions' => ['allowClear' => true,'placeholder' => 'Select Sample Type'],
+                ])
         ?>
+
         </div>
     </div>
 

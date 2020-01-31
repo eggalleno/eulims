@@ -145,7 +145,7 @@ class PackageController extends Controller
         $labid = $_GET['lab_id'];
         $sampletype_id = $_GET['sampletype_id'];
 
-         $sampletypetestname = Sampletypetestname::find()->where(['sampletype_id'=>$sampletype_id])->all();
+         //$sampletypetestname = Sampletypetestname::find()->where(['sampletype_id'=>$sampletype_id])->all();
 
         //  $testnamemethod = Testnamemethod::find()
         //  ->leftJoin('tbl_sampletype_testname', 'tbl_sampletype_testname.testname_id=tbl_testname_method.testname_id')

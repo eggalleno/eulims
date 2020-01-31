@@ -134,7 +134,7 @@ use kartik\money\MaskMoney;
 
 
     <div class="row" style="float: right;padding-right: 30px">
-    <?= Html::submitButton($model->isNewRecord ? 'Create' : 'Update', ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary', 'id'=>'analysis_create']) ?>
+    <?= Html::submitButton($model->isNewRecord ? 'Create' : 'Update', ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary', 'id'=>'analysis_create','disabled'=>true]) ?>
         <?php if($model->isNewRecord){ ?>
         <?php } ?>
     <?= Html::Button('Cancel', ['class' => 'btn btn-default', 'id' => 'modalCancel', 'data-dismiss' => 'modal']) ?>
@@ -164,4 +164,17 @@ use kartik\money\MaskMoney;
                 $('.image-loader').removeClass("img-loader");  
             });
     });
+
+
+
+
+    $('#base-sample').on('change',function() {
+        var samples = $(this).val();
+        if(samples == '')
+          $('#analysis_create').prop('disabled',true);
+        else
+          $('#analysis_create').prop('disabled',false);
+    });
+
+
 </script>

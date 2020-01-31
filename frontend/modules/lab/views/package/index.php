@@ -42,24 +42,6 @@ $this->params['breadcrumbs'][] = $this->title;
         'columns' => [
             ['class' => 'yii\grid\SerialColumn'],  
             [
-                'attribute' => 'testcategory_id',
-                'label' => 'Test Category',
-                'width'=>'20%',
-                'value' => function($model) {
-                    if ($model->testcategory){
-                        return $model->testcategory->category;
-                    }else{
-                        return "";
-                    }          
-                },
-                'filterType' => GridView::FILTER_SELECT2,
-                'filter' => $testcategorylist,
-                'filterWidgetOptions' => [
-                    'pluginOptions' => ['allowClear' => true],
-               ],
-               'filterInputOptions' => ['placeholder' => 'Test Category', 'testcategory_id' => 'grid-products-search-category_type_id']
-            ],  
-            [
                 'attribute' => 'sampletype_id',
                 'label' => 'Sample Type',
                 'format' => 'raw',
