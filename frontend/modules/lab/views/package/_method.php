@@ -83,7 +83,20 @@ $this->registerJs($js);
         'toolbar' => false,
         'columns' => [
             ['class' => '\kartik\grid\CheckboxColumn'],
-          
+            [     
+                'label' => 'Sample Type',
+                'format' => 'raw',
+                'contentOptions' => ['style' => 'width: 15%;word-wrap: break-word;white-space:pre-line;'],  
+                'value' => function($model) {
+                    $sampletype_query = Sampletype::find()->where(['sampletype_id'=>$model->sampletype_id])->one();
+        
+                    if ($sampletype_query){
+                        return $sampletype_query->type;
+                    }else{
+                        return "";
+                    }
+                 }                        
+            ],
             [     
                 'label' => 'Test Name',
                 'format' => 'raw',
