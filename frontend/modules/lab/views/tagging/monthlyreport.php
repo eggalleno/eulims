@@ -145,19 +145,22 @@ echo "<h1>Monthly Report for <b>".$month." ".$year."</b></h1>";
                         'width' => '210px',
                         'enableSorting' => false,
                         'value' => function($model) {
-                            $ids = "";
+                            $ids="";
                             $samplesquery = Sample::find()->where(['request_id' => $model->request_id])->all();
                             foreach($samplesquery as $samples){
                                 $ids .= $samples['sample_id'].",";
-                        }  
+                            }  
                             $len = strlen($ids);
-                            $x = $len-2;  
+                            $x = $len-1;  
                             $testname_id = substr($ids,0,$x);
                             $testnames = "";
+
+                            if($ids){
                                 $analysisquery = Analysis::find()->where(['IN', 'sample_id', [$testname_id]])->all();
                                 foreach($analysisquery as $analysis){
-                                    $testnames .= $analysis['testname']."<br />";
-                            }  
+                                        $testnames .= $analysis['testname']."<br />";
+                                }
+                            }
                             return $testnames;
                         },
                         'contentOptions' => ['style' => 'width:40px; white-space: normal;'],                 
@@ -168,7 +171,22 @@ echo "<h1>Monthly Report for <b>".$month." ".$year."</b></h1>";
                         'width' => '100px',
                         'enableSorting' => false,
                         'value' => function($model) {
-                            return $model->total;
+                            $ids="";
+                            $samplesquery = Sample::find()->where(['request_id' => $model->request_id])->all();
+                            foreach($samplesquery as $samples){
+                                $ids .= $samples['sample_id'].",";
+                            }  
+                            $len = strlen($ids);
+                            $x = $len-1;  
+                            $ids = substr($ids,0,$x);
+                            $sql = "SELECT SUM(fee) as subtotal FROM tbl_analysis WHERE sample_id IN ('$ids')";     
+                        
+                             $Connection = Yii::$app->labdb;
+                             $command = $Connection->createCommand($sql);
+                             $row = $command->queryOne();
+                             $subtotal = $row['subtotal'];
+
+                            return $subtotal;
                         },
                         'contentOptions' => ['style' => 'width:40px; white-space: normal;'],                 
                     ],
@@ -224,7 +242,7 @@ echo "<h1>Monthly Report for <b>".$month." ".$year."</b></h1>";
                             $rate =  $discountquery->rate;
                             $t = $model->total;
                             $d = $t*"0.".$rate;
-                           return $rate;
+                           return $rate.' %';
                         },
                         'contentOptions' => ['style' => 'width:40px; white-space: normal;'],                 
                     ],
