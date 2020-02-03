@@ -226,7 +226,7 @@ class FinancialreportsController extends \yii\web\Controller
     public function actionIndex()
     {
         $model = new YearMonth();
-        $listYear =['2018','2017','2016','2015'];
+        $listYear = range(date('Y'), 2015);
         $listMonth = ["0" => "All",
                     "1" => "January", "2" => "February", "3" => "March", "4" => "April",
                     "5" => "May", "6" => "June", "7" => "July", "8" => "August",
