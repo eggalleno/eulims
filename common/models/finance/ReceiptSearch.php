@@ -55,6 +55,8 @@ class ReceiptSearch extends Receipt
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
             'sort'=> ['defaultOrder' => ['receipt_id'=>SORT_DESC]],
+            'pagination' => [
+            'pageSize' => 10,],
         ]);
 
         

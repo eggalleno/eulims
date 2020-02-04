@@ -41,81 +41,98 @@ $this->params['breadcrumbs'][] = $moduleTitle;
        // 'filterModel' => $searchModel,
             'columns' => [
                   //  ['class'=>'kartik\grid\SerialColumn'],
-                        [
-                        'attribute' => 'betweenOR',
-                        'header' => 'Receipt Date',
-                        'group' => true, // enable grouping
-                        'groupedRow'=>true,                    // move grouped column to a single grouped row
-                        'groupOddCssClass'=>'kv-grouped-row',  // configure odd group cell css class
-                        'groupEvenCssClass'=>'kv-grouped-row', // configure even group cell css class
-                      // 'header'=>'OR Series :',
-                        'groupFooter'=>function ($model, $key, $index, $widget) { // Closure method
-                            return [
-                                    'mergeColumns'=>[[1,3]], // columns to merge in summary
-                                    'content'=>[             // content to show in each summary cell
-                                        4=>'Deposits : ',
-                                        5=>GridView::F_SUM,
-                                        6=>GridView::F_SUM,
-                                        
-                                    ],
-                                    'contentFormats'=>[      // content reformatting for each summary cell
-                                        5=>['format'=>'number', 'decimals'=>2],
-                                        6=>['format'=>'number', 'decimals'=>2],
-                                       
-                                    ],
-                                    'contentOptions'=>[      // content html attributes for each summary cell
-                                       // 1=>['style'=>'font-variant:small-caps'],
-                                        4=>['style'=>'text-align:right'],
-                                        5=>['style'=>'text-align:right'],
-                                        6=>['style'=>'text-align:right'],
-                                    ],
-                                    // html attributes for group summary row
-                                    'options'=>['class'=>'danger','style'=>'font-weight:bold;']
-                                ];
-                            }
-                        ],
+                        
                         [
                         'attribute' => 'receiptDate',
-                        'header' => 'Receipt Date',
+                        'header' => 'Date',
 
                         ],
 
                         [
                             'attribute' =>  'or_number',
-                            'header' => 'Receipt Number',
+                            'header' => 'Number',
                             'subGroupOf'=>0
                         ],
+                         [
+                           
+                            'header' => 'Responsibility',
+                          
+                        ],
+                
+                                
                        [
                         'attribute' => 'payor',
                         'header' => 'Payor',
+                         'width'=>'100px',
 
                         ],
                          [
-                        'attribute' => 'nature',
-                        'header' => 'Collection Type',
+                        'attribute' => 'particular',
+                        'header' => 'Particulars',
 
+                        ],
+                  [
+                           
+                            'header' => 'MFO PAP',
+                          
                         ],
                          [
                         'attribute' => 'btrAmount',
-                        'header' => 'Collection BTR',
+                        'header' => 'Total per OR ',
                         'contentOptions'=>['style'=>'text-align:right'],
 
+                        ],
+                
+                [
+                        'attribute' => 'total',
+                        'header' => 'Bureau of Treasury',
+                      //  'width'=>'5px',
+                        'contentOptions'=>['style'=>'vertical-align: bottom;'],
+                        'group' => true, // enable grouping
+                       // 'groupedRow'=>true,                    // move grouped column to a single grouped row
+                      //  'groupOddCssClass'=>'kv-grouped-row',  // configure odd group cell css class
+                     //   'groupEvenCssClass'=>'kv-grouped-row', // configure even group cell css class
+                      // 'header'=>'OR Series :',
+//                        'groupFooter'=>function ($model, $key, $index, $widget) { // Closure method
+//                            return [
+//                                    'mergeColumns'=>[[1,3]], // columns to merge in summary
+//                                    'content'=>[             // content to show in each summary cell
+//                                        4=>'Deposits : ',
+//                                        5=>GridView::F_SUM,
+//                                        6=>GridView::F_SUM,
+//                                        
+//                                    ],
+//                                    'contentFormats'=>[      // content reformatting for each summary cell
+//                                        5=>['format'=>'number', 'decimals'=>2],
+//                                        6=>['format'=>'number', 'decimals'=>2],
+//                                       
+//                                    ],
+//                                    'contentOptions'=>[      // content html attributes for each summary cell
+//                                       // 1=>['style'=>'font-variant:small-caps'],
+//                                        4=>['style'=>'text-align:right'],
+//                                        5=>['style'=>'text-align:right'],
+//                                        6=>['style'=>'text-align:right'],
+//                                    ],
+//                                    // html attributes for group summary row
+//                                    'options'=>['class'=>'danger','style'=>'font-weight:bold;']
+//                                ];
+//                            }
                         ],
 
                         [
                         'attribute' => 'prjAmount',
-                        'header' => 'Collection Project',
+                        'header' => 'Trust Fund',
                         'contentOptions'=>['style'=>'text-align:right'],
                         ],
                         
-                        [
-                        'attribute' => 'pmode',
-                        'header' => 'Payment Mode',
-                        ],
-                        [
-                        'attribute' => 'checknumber',
-                        'header' => 'Check No.',
-                        ],
+//                        [
+//                        'attribute' => 'pmode',
+//                        'header' => 'Payment Mode',
+//                        ],
+//                        [
+//                        'attribute' => 'checknumber',
+//                        'header' => 'Check No.',
+//                        ],
 
 
                         
