@@ -233,16 +233,16 @@ class SampleController extends Controller
             //exit;
             $transaction = $connection->beginTransaction();
             if($oldSampletypeId != $_POST['Sample']['sampletype_id']){
-                if($analysisCount > 0){
-                    $analysisDelete = Analysis::deleteAll('sample_id = :sampleId',[':sampleId'=>$id]);
-                    if($analysisDelete){
-                        $analysisSave = 1;
-                    } else {
-                        $analysisSave = 0;
-                    }
-                } else {
+                // if($analysisCount > 0){
+                //     $analysisDelete = Analysis::deleteAll('sample_id = :sampleId',[':sampleId'=>$id]);
+                //     if($analysisDelete){
+                //         $analysisSave = 1;
+                //     } else {
+                //         $analysisSave = 0;
+                //     }
+                // } else {
                     $analysisSave = 1;
-                }
+                // }
             } else {
 				$analysisSave = 1;
 			}
@@ -452,7 +452,7 @@ class SampleController extends Controller
 
     protected function listSampletype($labId)
     {
-        $sampletype = ArrayHelper::map(Sampletype::find()->joinWith('labSampletypes')->andWhere(['lab_id'=>$labId,'status_id'=>1])->all(), 'sampletype_id', 
+        $sampletype = ArrayHelper::map(Sampletype::find()->joinWith('labSampletypes')->andWhere(['lab_id'=>$labId])->all(), 'sampletype_id', 
             function($sampletype, $defaultValue) {
                 return $sampletype->type;
         });
