@@ -89,11 +89,21 @@ class RequestSearch extends exRequest
         $query->andFilterWhere(['like','request_ref_num', $this->request_ref_num])
             ->andFilterWhere(['like', 'conforme', $this->conforme])
             ->andFilterWhere(['like', 'receivedBy', $this->receivedBy]);
-        // Checks for Lab Permissions
-        if(Yii::$app->user->can("lab-manager")){//Lab Manager
-           $labid=Yii::$app->user->identity->profile->lab_id;
-           $query->andFilterWhere(['lab_id'=>$labid]);     
+
+        //get the roles of the current logged in user
+        $roles = \Yii::$app->authManager->getRolesByUser(\Yii::$app->user->id);
+        $isopen = false;
+        foreach ($roles as $role) {
+            //if the user has the role of an admin then no restriction will happen
+            if($role->name == "super-administrator")
+                $isopen=true;
         }
+        //if not logged in as admin then only the requests of their corresponding lab is pulled
+        if(!$isopen){
+            $labid=Yii::$app->user->identity->profile->lab_id;
+            $query->andFilterWhere(['lab_id'=>$labid]);    
+        }
+       
 
         return $dataProvider;
     }
