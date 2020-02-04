@@ -34,230 +34,118 @@ echo "<h1>Monthly Report for <b>".$month." ".$year."</b></h1>";
                // 'footer'=>Html::button('<i class="glyphicon glyphicon-ok"></i> Start Analysis', ['disabled'=>false,'value' => Url::to(['tagging/startanalysis','id'=>1]), 'onclick'=>'startanalysis()','title'=>'Start Analysis', 'class' => 'btn btn-success','id' => 'btn_start_analysis'])." ".
                 Html::button('<i class="glyphicon glyphicon-ok"></i> Completed', ['disabled'=>false,'value' => Url::to(['tagging/completedanalysis','id'=>1]),'title'=>'Completed', 'onclick'=>'completedanalysis()', 'class' => 'btn btn-success','id' => 'btn_complete_analysis']),
             ],
-            'pjaxSettings' => [
-                'options' => [
-                    'enablePushState' => false,
-                ]
+        'pjaxSettings' => [
+            'options' => [
+                'enablePushState' => false,
+            ]
+        ],
+        'floatHeaderOptions' => ['scrollingTop' => true],
+        'columns' => [
+            'request_ref_num',
+            'customer.customer_name',
+            'customer.Completeaddress',
+            [
+                'header'=>'Setup',
+                'format' => 'raw',
+                'width' => '80px',
+                'enableSorting' => false,
+                'value' => function($model) {
+                    if ($model->customer->customer_type_id==1){
+                        return "Yes";
+                    }else{
+                        return "No";
+                    }
+                    
+                },
+                'contentOptions' => ['style' => 'width:40px; white-space: normal;'],                 
             ],
-            'floatHeaderOptions' => ['scrollingTop' => true],
-            'columns' => [
-                     [
-                        'header'=>'Request Reference Number',
-                        'format' => 'raw',
-                        'width' => '140px',
-                        'enableSorting' => false,
-                        'value' => function($model) {
-                            return $model->request_ref_num;
-                        },
-                        'contentOptions' => ['style' => 'width:40px; white-space: normal;'],                 
-                    ],
-                    [
-                        'header'=>'Name of Client',
-                        'format' => 'raw',
-                        'width' => '150px',
-                        'enableSorting' => false,
-                        'value' => function($model) {
-
-                            $client = Customer::find()->where(['customer_id'=>$model->customer_id ])->one();
-                            return $client->customer_name;
-                        },
-                        'contentOptions' => ['style' => 'width:40px; white-space: normal;'],                 
-                    ],
-                    [
-                        'header'=>'Address',
-                        'format' => 'raw',
-                        'width' => '200px',
-                        'enableSorting' => false,
-                        'value' => function($model) {
-                            
-                            $client = Customer::find()->where(['customer_id'=>$model->customer_id ])->one();
-                            return $client->address;
-                        },
-                        'contentOptions' => ['style' => 'width:40px; white-space: normal;'],                 
-                    ],
-                    [
-                        'header'=>'Non setup',
-                        'format' => 'raw',
-                        'width' => '80px',
-                        'enableSorting' => false,
-                        'value' => function($model) {
-                            $client = Customer::find()->where(['customer_id'=>$model->customer_id ])->one();
-
-                            if ($client->customer_type_id==2){
-                                return "1";
-                            }else{
-                                return "0";
+             [
+                'header'=>'Sample Name',
+                'format' => 'html',
+                'width' => '400px',
+                'headerOptions' => ['style' => 'width:400px'],
+                'enableSorting' => false,
+                'value' => function($model) {
+                    $value="";
+                    foreach($model->samples as $sample){
+                        $value .= $sample->samplename;
+                         foreach ($sample->analyses as $analysis) {
+                            $value .= "<br/>";
+                        }
+                    }
+                    return $value;
+                },
+                'contentOptions' => ['style' => 'width:400px; white-space: normal;'],                 
+            ],
+            [
+                'header'=>'Sample Code',
+                'format' => 'html',
+                'width' => '200px',
+                'headerOptions' => ['style' => 'width:200px'],
+                'enableSorting' => false,
+                'value' => function($model) {
+                    $value="";
+                    foreach($model->samples as $sample){
+                        $value .= $sample->sample_code;
+                         foreach ($sample->analyses as $analysis) {
+                            $value .= "<br/>";
+                        }
+                    }
+                    return $value;
+                },
+                'contentOptions' => ['style' => 'width:200px; white-space: normal;'],                 
+            ],
+            [
+                'header'=>'Test Name',
+                'format' => 'raw',
+                'width' => '200px',
+                'headerOptions' => ['style' => 'width:200px'],
+                'enableSorting' => false,
+                'value' => function($model) {
+                    $value="";
+                    foreach($model->samples as $sample){
+                        foreach ($sample->analyses as $analysis) {
+                            $value .= $analysis->testname."<br/>";
+                        }
+                    }
+                    return $value;
+                },
+                'contentOptions' => ['style' => 'width:200px; white-space: normal;'],                 
+            ],
+            [
+                'header'=>'SubTotal',
+                'format' => 'raw',
+                'width' => '100px',
+                'enableSorting' => false,
+                'value' => function($model) {
+                    $ids="";
+                    $amount =0;
+                    $samplesquery = Sample::find()->where(['request_id' => $model->request_id])->all();
+                    foreach($samplesquery as $samples){
+                        $ids .= $samples['sample_id'].",";
+                        if($samples->analyses){
+                            foreach ($samples->analyses as $analysis) {
+                               $amount += $analysis->fee; 
                             }
-                            
-                        },
-                        'contentOptions' => ['style' => 'width:40px; white-space: normal;'],                 
-                    ],
-                    [
-                        'header'=>'Setup',
-                        'format' => 'raw',
-                        'width' => '80px',
-                        'enableSorting' => false,
-                        'value' => function($model) {
-                            $client = Customer::find()->where(['customer_id'=>$model->customer_id ])->one();
-
-                            if ($client->customer_type_id==1){
-                                return "1";
-                            }else{
-                                return "0";
-                            }
-                        },
-                        'contentOptions' => ['style' => 'width:40px; white-space: normal;'],                 
-                    ],
-                    [
-                        'header'=>'Sample Code',
-                        'format' => 'raw',
-                        'width' => '100px',
-                        'enableSorting' => false,
-                        'value' => function($model) {
-
-                            $samplesquery = Sample::find()->where(['request_id' => $model->request_id])->all();
-                            $listsamples = "";
-                            foreach($samplesquery as $sample){
-                                $listsamples .= $sample['sample_code']."<br />";
-                            }  
-                            return $listsamples;
-                        },
-                        'contentOptions' => ['style' => 'width:40px; white-space: normal;'],                 
-                    ],
-                    [
-                        'header'=>'Sample Name',
-                        'format' => 'raw',
-                        'width' => '120px',
-                        'enableSorting' => false,
-                        'value' => function($model) {
-                            $samplesquery = Sample::find()->where(['request_id' => $model->request_id])->all();
-                            $listsamples = "";
-                            foreach($samplesquery as $sample){
-                                $listsamples .= $sample['samplename']."<br />";
-                            }  
-                            return $listsamples;
-                        },
-                        'contentOptions' => ['style' => 'width:40px; white-space: normal;'],                 
-                    ],
-                    [
-                        'header'=>'Test Name',
-                        'format' => 'raw',
-                        'width' => '210px',
-                        'enableSorting' => false,
-                        'value' => function($model) {
-                            $ids="";
-                            $samplesquery = Sample::find()->where(['request_id' => $model->request_id])->all();
-                            foreach($samplesquery as $samples){
-                                $ids .= $samples['sample_id'].",";
-                            }  
-                            $len = strlen($ids);
-                            $x = $len-1;  
-                            $testname_id = substr($ids,0,$x);
-                            $testnames = "";
-
-                            if($ids){
-                                $analysisquery = Analysis::find()->where(['IN', 'sample_id', [$testname_id]])->all();
-                                foreach($analysisquery as $analysis){
-                                        $testnames .= $analysis['testname']."<br />";
-                                }
-                            }
-                            return $testnames;
-                        },
-                        'contentOptions' => ['style' => 'width:40px; white-space: normal;'],                 
-                    ],
-                    [
-                        'header'=>'Request Total',
-                        'format' => 'raw',
-                        'width' => '100px',
-                        'enableSorting' => false,
-                        'value' => function($model) {
-                            $ids="";
-                            $samplesquery = Sample::find()->where(['request_id' => $model->request_id])->all();
-                            foreach($samplesquery as $samples){
-                                $ids .= $samples['sample_id'].",";
-                            }  
-                            $len = strlen($ids);
-                            $x = $len-1;  
-                            $ids = substr($ids,0,$x);
-                            $sql = "SELECT SUM(fee) as subtotal FROM tbl_analysis WHERE sample_id IN ('$ids')";     
-                        
-                             $Connection = Yii::$app->labdb;
-                             $command = $Connection->createCommand($sql);
-                             $row = $command->queryOne();
-                             $subtotal = $row['subtotal'];
-
-                            return $subtotal;
-                        },
-                        'contentOptions' => ['style' => 'width:40px; white-space: normal;'],                 
-                    ],
-                    [
-                        'header'=>'Paid Non Setup',
-                        'format' => 'raw',
-                        'width' => '100px',
-                        'enableSorting' => false,
-                        'value' => function($model) {
-                            return "";
-                        },
-                        'contentOptions' => ['style' => 'width:40px; white-space: normal;'],                 
-                    ],
-                    [
-                        'header'=>'Paid Setup',
-                        'format' => 'raw',
-                        'width' => '100px',
-                        'enableSorting' => false,
-                        'value' => function($model) {
-                            return "";
-                        },
-                        'contentOptions' => ['style' => 'width:40px; white-space: normal;'],                 
-                    ],
-                    [
-                        'header'=>'Gratis Non Setup',
-                        'format' => 'raw',
-                        'width' => '100px',
-                        'enableSorting' => false,
-                        'value' => function($model) {
-                            return "";
-                        },
-                        'contentOptions' => ['style' => 'width:40px; white-space: normal;'],                 
-                    ],
-                    [
-                        'header'=>'Gratis Setup',
-                        'format' => 'raw',
-                        'width' => '100px',
-                        'enableSorting' => false,
-                        'value' => function($model) {
-                            return "";
-                        },
-                        'contentOptions' => ['style' => 'width:40px; white-space: normal;'],                 
-                    ],
-                    [
-                        'header'=>'Discount',
-                        'format' => 'raw',
-                        'width' => '100px',
-                        'enableSorting' => false,
-                        'value' => function($model) {
-                           
-                            $discountquery = Discount::find()->where(['discount_id' => $model->discount_id])->one();
-                            $samplesquery = Sample::find()->where(['request_id' => $model->request_id])->one();
-                            $rate =  $discountquery->rate;
-                            $t = $model->total;
-                            $d = $t*"0.".$rate;
-                           return $rate.' %';
-                        },
-                        'contentOptions' => ['style' => 'width:40px; white-space: normal;'],                 
-                    ],
-                    [
-                        'header'=>'Total Fees Collected',
-                        'format' => 'raw',
-                        'width' => '100px',
-                        'enableSorting' => false,
-                        'value' => function($model) {
-                            return $model->total;
-                        },
-                        'contentOptions' => ['style' => 'width:40px; white-space: normal;'],                 
-                    ],
-                  
-            
+                        }
+                    }
+                    return number_format((float)$amount, 2, '.', '');
+                },
+                'contentOptions' => ['style' => 'width:40px; white-space: normal;'],                 
+            ],
+            [
+                'header'=>'Discount',
+                'format' => 'raw',
+                'width' => '100px',
+                'enableSorting' => false,
+                'value' => function($model) {
+                    $discountquery = Discount::find()->where(['discount_id' => $model->discount_id])->one();
+                    $rate =  $discountquery->rate;
+                    return $rate.' %';
+                },
+                'contentOptions' => ['style' => 'width:40px; white-space: normal;'],                 
+            ],
+            'total'
         ],
     ]); 
     ?>
