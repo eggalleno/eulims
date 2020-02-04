@@ -27,12 +27,15 @@ $this->params['breadcrumbs'][] = $this->title;
 $func=new Functions();
 $Header="Department of Science and Technology<br>";
 $Header.="Laboratory Request";
-if(Yii::$app->user->can('allow-cancel-request')){
-    $Button="{view}{update}{delete}";
-}else{
-    $Button="{view}{update}";
-}
 
+//get the roles of the current logged user
+$roles = \Yii::$app->authManager->getRolesByUser(\Yii::$app->user->id);
+foreach ($roles as $role) {
+    //if the user has the role of these two then actioncgridview will not display the specific action buttons 
+    if(($role->name == "lab-manager")or($role->name == "super-administrator"))
+        $Button="{view}{update}{delete}";
+
+}
 ?>
 
 <div class="request-index">
