@@ -103,8 +103,6 @@ class RequestSearch extends exRequest
             $labid=Yii::$app->user->identity->profile->lab_id;
             $query->andFilterWhere(['lab_id'=>$labid]);    
         }
-       
-
         return $dataProvider;
     }
 }
