@@ -32,6 +32,17 @@ use kartik\money\MaskMoney;
 
 <div class="analysis-form">
 
+  <div class="alert alert-danger" style="background: #ffc0cb !important;margin-top: 1px !important;">
+   <a href="#" class="close" data-dismiss="alert" >×</a>
+  <p class="note" style="color:#d73925"><b>Always check if you have chosen the right Laboratory in this Request: </b><br/> Test Methods won't load if it is meant for other Laboratory.</p>
+   
+  </div>
+
+  <div class="alert alert-info" style="background: #d4f7e8 !important;margin-top: 1px !important;">
+   <a href="#" class="close" data-dismiss="alert" >×</a>
+  <p class="note" style="color:#265e8d"><b>Note:</b> Please contact the Administrator or the Lab-Manager if the Test that you're looking for cannot be found.</p>
+   
+  </div>
     <?php $form = ActiveForm::begin(); ?>
  
     <?php
