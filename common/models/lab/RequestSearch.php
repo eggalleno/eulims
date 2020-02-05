@@ -95,7 +95,7 @@ class RequestSearch extends exRequest
         $isopen = false;
         foreach ($roles as $role) {
             //if the user has the role of an admin then no restriction will happen
-            if(($role->name == "super-administrator")&&($role->name == "CRO"))
+            if(($role->name == "super-administrator")||($role->name == "CRO"))
                 $isopen=true;
         }
         //if not logged in as admin then only the requests of their corresponding lab is pulled
