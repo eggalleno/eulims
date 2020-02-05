@@ -298,7 +298,7 @@ class TestreportController extends Controller
     public function actionGetlistsamples($id)
     {
         $model= new Sample();
-        $query = Sample::find()->where(['request_id' => $id]);
+        $query = Sample::find()->where(['request_id' => $id,'active'=> 1]); //need to get the active samples only
         
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
