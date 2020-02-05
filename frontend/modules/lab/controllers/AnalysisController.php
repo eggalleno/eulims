@@ -220,19 +220,19 @@ class AnalysisController extends Controller
             // }
 
             //************************************************
-            $list =  Testname::find()
-            ->innerJoin('tbl_sampletype_testname', 'tbl_testname.testname_id=tbl_sampletype_testname.testname_id')
-            ->Where(['tbl_sampletype_testname.sampletype_id'=>$sampletypeId])
-            ->asArray()
-            ->all();
+
+            //this line belows removes the purpose of the sampletype _testname table , gets all the testnamemethod join with testname under certain sampletype_id
+            $list = Testnamemethod::find()->with('testname')->where(['sampletype_id'=>$sampletypeId])->asArray()->all();
 
             $selected  = null;
             if ($sampletypeId != null && count($list) > 0) {
                 $selected = '';
-                foreach ($list as $i => $sampletype) {
-                    $out[] = ['id' => $sampletype['testname_id'], 'name' => $sampletype['testName']];
-                    if ($i == 0) {
-                        $selected = $sampletype['testname_id'];
+                foreach ($list as $i) {
+                    if($i['testname']){
+                        $out[] = ['id' => $i['testname']['testname_id'], 'name' => $i['testname']['testName']];
+                        if ($i == 0) {
+                            $selected = $testname['testname_id'];
+                        }
                     }
                 }
                 \Yii::$app->response->data = Json::encode(['output'=>$out, 'selected'=>'']);
