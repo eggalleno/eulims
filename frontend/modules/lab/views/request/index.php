@@ -28,6 +28,7 @@ $func=new Functions();
 $Header="Department of Science and Technology<br>";
 $Header.="Laboratory Request";
 
+$Button="{view}"; 
 //get the roles of the current logged user
 $roles = \Yii::$app->authManager->getRolesByUser(\Yii::$app->user->id);
 foreach ($roles as $role) {
