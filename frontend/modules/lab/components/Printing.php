@@ -1424,7 +1424,7 @@ class Printing {
              //Report Due
             $RequestTemplate .= "<tr>";
             $RequestTemplate .= "<td class='text-left border-bottom-line border-left-line border-top-line padding-left-5'>Report Due On:</td>";
-            $RequestTemplate .= "<td style='color:#0f17c4' class='text-left border-bottom-line border-top-line padding-left-5' colspan='4'>".date('F d, Y', strtotime($RequestHeader->report_due))."</td>";
+            $RequestTemplate .= "<td style='color:#0f17c4' class='text-left border-bottom-line border-top-line padding-left-5' colspan='4'>".date('F d, Y', strtotime($RequestHeader->report_due))." 4:00 pm</td>";
            
          //   $RequestTemplate .= "<td class='text-right border-bottom-line border-top-line padding-left-5' colspan='3'>MODE OF RELEASE:</td>";
          //   $RequestTemplate .= "<td colspan='2' class='text-right border-bottom-line border-top-line padding-left-5 border-right-line padding-right-5'>$RequestHeader->ModeOfRelease</td>";
