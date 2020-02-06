@@ -166,16 +166,6 @@ class AnalysisController extends Controller
         //get the lab_id of the request
         $lab_id= $sample->request->lab_id;
 
-        // $testname_id = $_GET['testcategory_id'];
-        // $testname_id = $_GET['sampletype_id'];
-      
-            // $testnamemethod = Testnamemethod::find()
-        // ->leftJoin('tbl_sampletype_testname', 'tbl_sampletype_testname.testname_id=tbl_testname_method.testname_id')
-        // ->leftJoin('tbl_lab_sampletype', 'tbl_lab_sampletype.sampletype_id=tbl_sampletype_testname.sampletype_id')
-        // ->where(['tbl_testname_method.testname_id'=>$testname_id, 'tbl_lab_sampletype.testcategory_id'=>$testcategory_id, 'tbl_lab_sampletype.sampletype_id'=>$sampletype_id ])->all();
-
-        //dapat naka left join ito.. considering yung mga sample type and test category
-
         $testnamemethod = Testnamemethod::find()
         ->where(['tbl_testname_method.testname_id'=>$testname_id,'tbl_testname_method.sampletype_id'=>$sampletype_id,'tbl_testname_method.lab_id'=>$lab_id])->all();
 
@@ -278,7 +268,6 @@ class AnalysisController extends Controller
     public function actionCreate($id)
     {
         $model = new Analysis;
-        $model->category_id=0; 
         $session = Yii::$app->session;
         $searchModel = new AnalysisSearch();
         $samplesearchmodel = new SampleSearch();
@@ -310,7 +299,6 @@ class AnalysisController extends Controller
                     $analysis->type_fee_id = 1;
                     $analysis->rstl_id = $GLOBALS['rstl_id'];
                     $analysis->test_id = (int) $post['Analysis']['test_id'];
-                    // $analysis->category_id = (int) $post['Analysis']['category_id']; //default 0
                     //$analysis->sample_type_id = (int) $post['Analysis']['sample_type_id'];
                     $analysis->testcategory_id = $method->method_reference_id;
                     $analysis->is_package = (int) $post['Analysis']['is_package'];
