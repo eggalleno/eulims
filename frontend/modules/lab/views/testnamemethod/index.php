@@ -34,23 +34,10 @@ $this->params['breadcrumbs'][] = $this->title;
         'panel' => [
                 'type' => GridView::TYPE_PRIMARY,
                 'heading' => '<span class="glyphicon glyphicon-book"></span>  ' . Html::encode($this->title),
-               'before'=>  Html::button('<span class="glyphicon glyphicon-plus"></span> Create Test Name Method', ['value'=>'/lab/testnamemethod/create', 'class' => 'btn btn-success modal_method','title' => Yii::t('app', "Create New Test Name Method")]),
+                'before'=>"<button type='button' onclick='openModal(\"/lab/testnamemethod/create\",\"Create New TestName Method\")' class=\"btn btn-success\"><i class=\"fa fa-plus-o\"></i> Create New TestName Method</button>",
             ],
         'columns' => [
             ['class' => 'yii\grid\SerialColumn'],
-            // [
-            //     'attribute' => 'testname_id',
-            //     'label' => 'Test Name',
-            //     'value' => function($model) {
-
-            //         if ($model->testname){
-            //             return $model->testname_method_id;
-            //         }else{
-            //             return "";
-            //         }
-                    
-            // ],
-
             [
                 'attribute' => 'lab_id',
                 'contentOptions' => ['style' => 'width: 8.7%'],
@@ -172,3 +159,8 @@ $this->params['breadcrumbs'][] = $this->title;
         ],
     ]); ?>
 </div>
+<script>
+    function openModal(url,title){
+        LoadModal(title,url,'true','900px');
+    }
+</script>

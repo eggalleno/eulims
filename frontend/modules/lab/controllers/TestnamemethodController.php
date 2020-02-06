@@ -9,6 +9,10 @@ use common\models\lab\Workflow;
 use common\models\lab\ProcedureSearch;
 use common\models\lab\Procedure;
 use common\models\lab\TestnamemethodSearch;
+use common\models\lab\Testname;
+use common\models\lab\Lab;
+use common\models\lab\Sampletype;
+use yii\helpers\ArrayHelper;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -47,7 +51,7 @@ class TestnamemethodController extends Controller
         $searchModel = new TestnamemethodSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
         $dataProvider->sort->defaultOrder = ['testname_method_id' => SORT_DESC];
-
+        
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
@@ -133,32 +137,39 @@ class TestnamemethodController extends Controller
 
     /**
      * Creates a new Testnamemethod model.
-     * If creation is successful, the browser will be redirected to the 'view' page.
+     * If creation is successful, the browser will be redirected to the 'index' page.
+     
+      Created By: Bergel T. Cutara
+      Contacts:
+
+      Email: b.cutara@gmail.com
+      Tel. Phone: (062) 991-1024
+      Mobile Phone: (639) 956200353
+
+      Description: Action Create should cater all the needs to manage the lab, sampletype, testname and methods, all queries should go here.
+
      * @return mixed
      */
     public function actionCreate()
     {
         $model = new Testnamemethod();
+        $testnamelist= ArrayHelper::map(Testname::find()->orderBy(['testname_id' => SORT_DESC])->all(),'testname_id','testName');
+        $labs = ArrayHelper::map(Lab::find()->all(),'lab_id','labname');
+        $sampletypes = ArrayHelper::map(Sampletype::find()->where(['status_id'=>1])->all(),'sampletype_id','type');
 
-        $post= Yii::$app->request->post();
         if ($model->load(Yii::$app->request->post())) {
-
-            // $testnamemethod = Testnamemethod::find()->where(['testname_id'=> $post['Testnamemethod']['testname_id'], 'method_id'=>$post['Testnamemethod']['method_id']])->one();
-            // if ($testnamemethod){
-                           //   Yii::$app->session->setFlash('warning', "The system has detected a duplicate record. You are not allowed to perform this operation."); 
-                               // return $this->runAction('index');
-                          // }else{
-                              $model->save();
-                             // Yii::$app->session->setFlash('success', 'Test Name Method Successfully Created'); 
-                              return $this->runAction('index');
-                          // }   
-                        }
+          $model->save();
+          return $this->redirect(['index']);
+        }
 
         if(Yii::$app->request->isAjax){
             $model->create_time=date("Y-m-d h:i:s");
             $model->update_time=date("Y-m-d h:i:s");
             return $this->renderAjax('_form', [
-                'model' => $model,
+              'model' => $model,
+              'testnamelist' => $testnamelist,
+              'labs' => $labs,
+              'sampletypes'=>$sampletypes,
             ]);
        }
     }
@@ -377,7 +388,15 @@ class TestnamemethodController extends Controller
 
     /**
      * Updates an existing Testnamemethod model.
-     * If update is successful, the browser will be redirected to the 'view' page.
+     * If update is successful, the browser will be redirected to the 'index' page.
+      Created By: Bergel T. Cutara
+      Contacts:
+
+      Email: b.cutara@gmail.com
+      Tel. Phone: (062) 991-1024
+      Mobile Phone: (639) 956200353
+
+      Description: all queries should go here.
      * @param integer $id
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
@@ -385,16 +404,21 @@ class TestnamemethodController extends Controller
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
-        
-                if ($model->load(Yii::$app->request->post()) && $model->save()) {
-                //    Yii::$app->session->setFlash('success', 'Test Name Method Successfully Updated'); 
-                    return $this->redirect(['index']);
+        $testnamelist= ArrayHelper::map(Testname::find()->orderBy(['testname_id' => SORT_DESC])->all(),'testname_id','testName');
+        $labs = ArrayHelper::map(Lab::find()->all(),'lab_id','labname');
+        $sampletypes = ArrayHelper::map(Sampletype::find()->where(['status_id'=>1])->all(),'sampletype_id','type');
 
-                } else if (Yii::$app->request->isAjax) {
-                    return $this->renderAjax('update', [
-                        'model' => $model,
-                    ]);
-                 }
+        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+            return $this->redirect(['index']);
+
+        } else if (Yii::$app->request->isAjax) {
+            return $this->renderAjax('_form', [
+                'model' => $model,
+                'testnamelist' => $testnamelist,
+                'labs' => $labs,
+                'sampletypes'=>$sampletypes,
+            ]);
+         }
     }
 
     /**
