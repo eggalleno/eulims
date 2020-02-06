@@ -62,7 +62,7 @@ $this->params['breadcrumbs'][] = $this->title;
             [
                 'attribute' => 'sampletype_id',
                 'contentOptions' => ['style' => 'width: 8.7%'],
-                'label' => 'Lab',
+                'label' => 'Sample Type',
                 'format' => 'raw',
                 'width'=>'20%',
                 'value' => function($model) {

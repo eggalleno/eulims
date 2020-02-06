@@ -84,8 +84,7 @@ Description: All lookup table should meet here, a single interface to manage the
             </div>
         </div>
         <div class="form-group pull-right">
-  
-            <button onclick="LoadModal('Create New Method Reference', '/lab/methodreference/createmethod');"class="btn btn-warning" type="button"><i class="fa fa-plus"></i> Method Reference</button>
+            <button onclick="LoadModal('Create New Method Reference', '/lab/methodreference/createbytestnamemethod');"class="btn btn-warning" type="button"><i class="fa fa-plus"></i> Method Reference</button>
             <?= Html::submitButton($model->isNewRecord ? 'Create' : 'Update', ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
             <?php if(Yii::$app->request->isAjax){ ?>
                 <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
