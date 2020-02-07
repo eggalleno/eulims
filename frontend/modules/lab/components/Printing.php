@@ -1205,8 +1205,9 @@ class Printing {
         
         $request = Request::find()->where(['request_id' => $id])->one();
         $completeaddress = $request->customer->completeaddress;
-        $discount = $request->total * ($request->discount /100); //request->total is already discounted so it is an overall total
-        $subtotal = $request->total + $discount; //to get the subtotal we need to add the discount to the total
+        $totalfee =0;
+
+        
         $rstl_id = $request->rstl_id;
        
         $RstlDetails = RstlDetails::find()->where(['rstl_id' => $rstl_id])->one();
@@ -1307,6 +1308,9 @@ class Printing {
                 $analysisfirst = 0;
                 //loops every analyses in the sample
                 foreach($sample->analyses as $analysis){
+                    //get the fee
+                    $totalfee += $totalfee;
+
                     if($analysisfirst==0){
                         $analysisfirst++; //increment so that it will just run on the first try
                     }else{
@@ -1324,6 +1328,9 @@ class Printing {
                 }
                 $PrevSampleCode = $CurSampleCode;
             }
+
+            $discount = $totalfee * ($request->discount /100); //request->total is already discounted so it is an overall total
+            $subtotal = $totalfee; //to get the subtotal we need to add the discount to the total
 
             $RequestTemplate .= "<tr>";
             $RequestTemplate .= "<td style='color:#0f17c4' class='text-left border-left-line border-top-line border-bottom-line padding-left-5' colspan='2'></td>";
