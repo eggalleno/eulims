@@ -1409,14 +1409,15 @@ class Printing {
                     //get the receipt
                     $receipt = Receipt::find($payment->receipt_id);
                     if($receipt){
+                        var_dump($receipt); exit;
                         if($OR_NUMBERS!=="")
                         $OR_NUMBERS .=",";
 
                         if($OR_DATES!=="")
                             $OR_DATES .=",";  
 
-                         $OR_NUMBERS .= $receipt->or_number;
-                         $OR_DATES .= $receipt->receiptDate;
+                         // $OR_NUMBERS .= $receipt->or_number;
+                         // $OR_DATES .= $receipt->receiptDate;
                     }
                  }
              }
