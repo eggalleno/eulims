@@ -1408,14 +1408,16 @@ class Printing {
                 foreach ($payments as $payment) {
                     //get the receipt
                     $receipt = Receipt::find($payment->receipt_id);
-                    if($OR_NUMBERS!=="")
+                    if($receipt){
+                        if($OR_NUMBERS!=="")
                         $OR_NUMBERS .=",";
 
-                    if($OR_DATES!=="")
-                        $OR_DATES .=",";  
+                        if($OR_DATES!=="")
+                            $OR_DATES .=",";  
 
-                     $OR_NUMBERS .= $receipt->or_number;
-                     $OR_DATES .= $receipt->receiptDate;
+                         $OR_NUMBERS .= $receipt->or_number;
+                         $OR_DATES .= $receipt->receiptDate;
+                    }
                  }
              }
             //Footer
