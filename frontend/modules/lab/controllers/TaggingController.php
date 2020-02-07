@@ -137,7 +137,7 @@ class TaggingController extends Controller
         
         $request_query = Request::find()
         ->where(['between', 'request_datetime', $year."-".$nmonth."-01", $year."-".$nmonth.-"31" ])
-        ->andWhere(['lab_id'=>Yii::$app->user->identity->profile->lab_id]);
+        ->andWhere(['lab_id'=>Yii::$app->user->identity->profile->lab_id,'status_id'=>1]);
 
         $requestdataprovider = new ActiveDataProvider([
                 'query' => $request_query,
