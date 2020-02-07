@@ -1373,7 +1373,7 @@ class Printing {
                 $CurSampleCode2 = $sample->sample_code;
                 if ($CurSampleCode2 != $PrevSampleCode2) {
                     $RequestTemplate .= "<tr>";
-                    $RequestTemplate .= "<td style='color:#0f17c4;' class='text-left border-left-line border-right-line padding-left-5' colspan='10'> ".$sample->sample_code." :".$sample->customer_description." ".$sample->description."</td>";
+                    $RequestTemplate .= "<td style='color:#0f17c4;' class='text-left border-left-line border-right-line padding-left-5' colspan='10'> ".$sample->sample_code." : <i>".$sample->customer_description."</i>, ".$sample->description."</td>";
                     $RequestTemplate .= "</tr>";
                 }
                 $PrevSampleCode2 = $CurSampleCode2;
@@ -1409,13 +1409,14 @@ class Printing {
                     //get the receipt
                     $receipt = Receipt::find($payment->receipt_id);
                     if($receipt){
-                        var_dump($receipt); exit;
+
                         if($OR_NUMBERS!=="")
                         $OR_NUMBERS .=",";
 
                         if($OR_DATES!=="")
                             $OR_DATES .=",";  
-
+                         //this is just temporary still need to see the receipt structure
+                        //no or for now
                          // $OR_NUMBERS .= $receipt->or_number;
                          // $OR_DATES .= $receipt->receiptDate;
                     }
