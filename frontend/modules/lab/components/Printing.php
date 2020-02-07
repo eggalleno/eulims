@@ -1309,7 +1309,7 @@ class Printing {
                 //loops every analyses in the sample
                 foreach($sample->analyses as $analysis){
                     //get the fee
-                    $totalfee += $totalfee;
+                    $totalfee += $analysis->fee;
 
                     if($analysisfirst==0){
                         $analysisfirst++; //increment so that it will just run on the first try
