@@ -1294,13 +1294,19 @@ class Printing {
             //loop for everysamples the request has
             foreach ($request->samples as $sample) {
                
-                
- 
+                //************************************
+                //temporary
+                //lab personnel wants to only have 4 digit figure in sample code
                 $CurSampleCode = $sample->sample_code;
+                $word = explode("-", $CurSampleCode);
+
+                $CurSampleCode = $word[0] ."-".substr($word[1],1);
+                //*********************************
+
                 $RequestTemplate .= "<tr>";
                 if ($CurSampleCode != $PrevSampleCode) {
                     $RequestTemplate .= "<td style='color:#0f17c4' class='text-left border-left-line border-top-line border-bottom-line padding-left-5' colspan='2'>$sample->samplename</td>";
-                    $RequestTemplate .= "<td style='color:#0f17c4' class='text-left border-left-line border-top-line border-right-line border-bottom-line padding-left-5'>$sample->sample_code</td>";
+                    $RequestTemplate .= "<td style='color:#0f17c4' class='text-left border-left-line border-top-line border-right-line border-bottom-line padding-left-5'>$CurSampleCode</td>";
                 } else {
                     $RequestTemplate .= "<td class='text-left border-left-line border-top-line border-bottom-line' colspan='2'></td>";
                     $RequestTemplate .= "<td class='text-left border-right-line border-top-line border-left-line border-bottom-line'></td>";
