@@ -11,7 +11,7 @@ use rmrevin\yii\fontawesome\FA;
 use common\models\lab\Sample;
 use common\models\lab\Request;
 use common\models\lab\Analysis;
-use common\models\lab\LabMAnager;
+use common\models\lab\LabManager;
 use common\models\finance\Paymentitem;
 use common\models\finance\Receipt;
 /**
