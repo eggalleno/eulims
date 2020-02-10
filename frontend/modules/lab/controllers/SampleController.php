@@ -229,43 +229,19 @@ class SampleController extends Controller
         $analysisCount = Analysis::find()->where('sample_id =:sampleId',[':sampleId'=>$id])->count();
 
         if ($model->load(Yii::$app->request->post())) {
-            //print_r(Yii::$app->request->post());
-            //exit;
-            $transaction = $connection->beginTransaction();
-            if($oldSampletypeId != $_POST['Sample']['sampletype_id']){
-                if($analysisCount > 0){
-                    $analysisDelete = Analysis::deleteAll('sample_id = :sampleId',[':sampleId'=>$id]);
-                    if($analysisDelete){
-                        $analysisSave = 1;
-                    } else {
-                        $analysisSave = 0;
-                    }
-                } else {
-                    $analysisSave = 1;
-                }
-            } else {
-				$analysisSave = 1;
-			}
+			
             if(isset($_POST['Sample']['sampling_date'])){
                 $model->sampling_date = date('Y-m-d H:i:s', strtotime($_POST['Sample']['sampling_date']));
             } else {
                 $model->sampling_date = date('Y-m-d H:i:s');
             }
-            if(isset($analysisSave) == 0){
-                $transaction->rollBack();
-                Yii::$app->session->setFlash('error', 'Error deleting analysis!');
+
+            if($model->save(false)){
                 return $this->redirect(['/lab/request/view', 'id' => $model->request_id]);
             } else {
-                if($model->save(false) && isset($analysisSave) == 1){
-                    $transaction->commit();
-    			//	Yii::$app->session->setFlash('success', $model->samplename." Successfully Updated.");
-                    return $this->redirect(['/lab/request/view', 'id' => $model->request_id]);
-                } else {
-                    $transaction->rollBack();
-                //    Yii::$app->session->setFlash('error', 'Error occured during update!');
-                    return $this->redirect(['view', 'id' => $model->request_id]);
-                }
+                return $this->redirect(['view', 'id' => $model->request_id]);
             }
+
         } elseif (Yii::$app->request->isAjax) {
                 return $this->renderAjax('_form', [
                     'model' => $model,
