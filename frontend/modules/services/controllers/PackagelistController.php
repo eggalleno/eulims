@@ -170,11 +170,9 @@ class PackagelistController extends Controller
                      $analysis->test_id = 0;
                      $analysis->user_id = 1;
                      $analysis->type_fee_id = 2;
-                     $analysis->sample_type_id = (int) $post['Packagelist']['sample_type_id'];
                      $analysis->testcategory_id = 0;
                      $analysis->is_package = 1;
                      $analysis->method = "-";
-                     $analysis->category_id = 1;
                      $analysis->fee = $r;
                      $analysis->testname = $modelpackage->name;
                      $analysis->references = "-";
@@ -202,13 +200,10 @@ class PackagelistController extends Controller
                         $analysis_package->test_id = $t_id;
                         $analysis_package->user_id = 1;
                         $analysis_package->type_fee_id = 2;
-                        $analysis_package->sample_type_id = (int) $post['Packagelist']['sample_type_id'];
-                        $analysis_package->category_id = 1;
                         $analysis_package->testcategory_id = $methodreference->method_reference_id;
                         $analysis_package->is_package = 1;
                         $analysis_package->method = $methodreference->method;
                        // $analysis->method = $modelmethod->method;
-                        $analysis->category_id = 1;
                         $analysis_package->fee = 0;
                         $analysis_package->testname = $modeltest->testName;
                         $analysis_package->references = $methodreference->reference;

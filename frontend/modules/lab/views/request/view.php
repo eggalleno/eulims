@@ -484,7 +484,7 @@ $this->registerJs($PrintEvent);
             $enableRequest = false;
         }
 
-        if($model->discount > 0 || !empty($Request_Ref) || $samplecount == 0){
+        if($model->discount > 0 || $samplecount == 0){
             $enablePackage = true;
         } else {
             $enablePackage = false;
