@@ -41,10 +41,13 @@ foreach ($roles as $role) {
 ?>
 
 <div class="request-index">
-    <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
-    <?php
-        echo $func->GenerateStatusLegend("Legend/Status",false);
-    ?>
+
+    <fieldset>
+        <legend>Legends</legend>
+        <div>
+            <span class="badge btn-warning">Report Nearly Due</span>
+        </div>
+    </fieldset>
     <?= GridView::widget([
         'dataProvider' => $dataProvider,
         'id'=>'RequestGrid',
@@ -164,7 +167,7 @@ foreach ($roles as $role) {
                     ->leftJoin('tbl_tagging', 'tbl_analysis.analysis_id=tbl_tagging.analysis_id') 
                     ->leftJoin('tbl_request', 'tbl_request.request_id=tbl_analysis.request_id')    
                     ->where(['tbl_tagging.tagging_status_id'=>2, 'tbl_request.request_id'=>$model->request_id ])
-                    ->all();                 
+                    ->all();
                     $scount = count($samples_count); 
                     $rcount = count($sampletagged); 
                     if ($rcount==0){
