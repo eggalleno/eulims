@@ -13,6 +13,7 @@ use common\models\lab\Customer;
 use common\models\lab\Sample;
 use common\models\lab\Analysis;
 use common\models\lab\RequestType;
+use common\models\lab\Status;
 use yii\bootstrap\Modal;
 use common\models\finance\Paymentitem;
 use yii\helpers\Url;
@@ -59,7 +60,6 @@ foreach ($roles as $role) {
         'panel' => [
             'type' => GridView::TYPE_PRIMARY,
             'heading' => '<i class="glyphicon glyphicon-book"></i>  Request',
-            //'before'=> (Yii::$app->user->identity->profile->rstl_id > 100) ? "<button type='button' onclick='LoadModal(\"Create Referral Request\",\"/lab/request/createreferral\")' class=\"btn btn-success\"><i class=\"fa fa-book-o\"></i> Create Referral Request</button>" : "<button type='button' onclick='LoadModal(\"Create Request\",\"/lab/request/create\")' class=\"btn btn-success\"><i class=\"fa fa-book-o\"></i> Create Request</button>&nbsp;&nbsp;&nbsp;<button type='button' onclick='LoadModal(\"Create Referral Request\",\"/lab/request/createreferral\")' class=\"btn btn-success\"><i class=\"fa fa-book-o\"></i> Create Referral Request</button>",
 			'before'=> (Yii::$app->user->identity->profile->rstl_id > 100) ? "<button type='button' onclick='LoadModal(\"Create Request\",\"/lab/request/create\")' class=\"btn btn-success\"><i class=\"fa fa-book-o\"></i> Create Request</button>" : "<button type='button' onclick='LoadModal(\"Create Request\",\"/lab/request/create\")' class=\"btn btn-success\"><i class=\"fa fa-book-o\"></i> Create Request</button>&nbsp;&nbsp;&nbsp;<button type='button' onclick='LoadModal(\"Create Referral Request\",\"/lab/request/createreferral\")' class=\"btn btn-success\"><i class=\"fa fa-book-o\"></i> Create Referral Request</button>",
         ],
         'pjax' => true, // pjax is set to always true for this demo
@@ -69,15 +69,23 @@ foreach ($roles as $role) {
               ],
         ],
         'rowOptions' => function($model){
-            $Obj=$model->getPaymentStatusDetails($model->request_id);
-            if($Obj){
-                $class=$Obj[0]['class'];
-                $objClass= explode('-', $class);
-                $nClass=$objClass[1];
-            }else{
-                $nClass="btn-default";
-            }
-            return ['class'=>$nClass];
+            $stats = Status::findOne($model->status_id);
+
+            //Bergel Cutara, Sr. srs
+            //Description : returns the status of the request which defines what css the row appear on the cgridview 
+
+            //the sequence how the code is written is base on the superiority of the status
+
+            //STATUS : report nearly due
+            $date1=date_create(date('Y-m-d'));
+            $date2=date_create($model->report_due);
+            $diff=date_diff($date1,$date2);
+
+            if((int)$diff->format('%a') < 4)
+                return ['class'=>'warning']; 
+ 
+            //return whatever the status_id the request has
+            return ['class'=>$stats->class];
         },
         'exportConfig'=>$func->exportConfig("Laboratory Request", "laboratory request", $Header),
         'columns' => [
