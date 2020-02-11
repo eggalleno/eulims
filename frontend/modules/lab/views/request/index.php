@@ -47,6 +47,7 @@ foreach ($roles as $role) {
         <div>
             <span class="badge btn-success">Report Generated</span>
             <span class="badge btn-warning">Report Nearly Due</span>
+            <span class="badge btn-danger">Urgent Action Needed</span>
         </div>
     </fieldset>
     <?= GridView::widget([
@@ -86,6 +87,9 @@ foreach ($roles as $role) {
             $date1=date_create(date('Y-m-d'));
             $date2=date_create($model->report_due);
             $diff=date_diff($date1,$date2);
+
+            if($date2 <= $date1)
+                return ['class'=>'danger'];
 
             if((int)$diff->format('%a') < 4)
                 return ['class'=>'warning']; 
@@ -199,6 +203,9 @@ foreach ($roles as $role) {
                         $date1=date_create(date('Y-m-d'));
                         $date2=date_create($model->report_due);
                         $diff=date_diff($date1,$date2);
+
+                        if($date2 <= $date1)
+                            return Html::button('<span"><b>NONE</span>', ['value'=>Url::to(['/lab/request/reportstatus','id'=>$model->request_id]),'onclick'=>'LoadModal(this.title, this.value, true, 500);', 'class' => 'btn btn-danger','title' => Yii::t('app', "Report Status"), 'style'=>'width:100px']);
 
                         if((int)$diff->format('%a') < 4)
                             return Html::button('<span"><b>NONE</span>', ['value'=>Url::to(['/lab/request/reportstatus','id'=>$model->request_id]),'onclick'=>'LoadModal(this.title, this.value, true, 500);', 'class' => 'btn btn-warning','title' => Yii::t('app', "Report Status"), 'style'=>'width:100px']);
