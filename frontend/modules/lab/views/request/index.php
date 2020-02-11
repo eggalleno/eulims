@@ -45,6 +45,7 @@ foreach ($roles as $role) {
     <fieldset>
         <legend>Legends</legend>
         <div>
+            <span class="badge btn-success">Report Generated</span>
             <span class="badge btn-warning">Report Nearly Due</span>
         </div>
     </fieldset>
@@ -78,7 +79,9 @@ foreach ($roles as $role) {
             //Description : returns the status of the request which defines what css the row appear on the cgridview 
 
             //the sequence how the code is written is base on the superiority of the status
-
+            //STATUS: report Generated
+            if($model->testreports)
+                return ['class'=>'success'];
             //STATUS : report nearly due
             $date1=date_create(date('Y-m-d'));
             $date2=date_create($model->report_due);
@@ -192,7 +195,14 @@ foreach ($roles as $role) {
                         //return "<a class='badge badge-success' href='/reports/lab/testreport/view?id=".$req->testreports[0]->testreport_id."' style='width:80px!important;height:20px!important;'>View</a>";
                         return Html::button('<span"><b>VIEW</span>', ['value'=>Url::to(['/lab/request/reportstatus','id'=>$model->request_id]),'onclick'=>'LoadModal(this.title, this.value, true, 500);', 'class' => 'btn btn-success','title' => Yii::t('app', "Report Status"), 'style'=>'width:100px']);
                     }else{
-                        //return "<span class='badge badge-default' style='width:80px!important;height:20px!important;'>None</span>";
+                        //STATUS : report nearly due
+                        $date1=date_create(date('Y-m-d'));
+                        $date2=date_create($model->report_due);
+                        $diff=date_diff($date1,$date2);
+
+                        if((int)$diff->format('%a') < 4)
+                            return Html::button('<span"><b>NONE</span>', ['value'=>Url::to(['/lab/request/reportstatus','id'=>$model->request_id]),'onclick'=>'LoadModal(this.title, this.value, true, 500);', 'class' => 'btn btn-warning','title' => Yii::t('app', "Report Status"), 'style'=>'width:100px']);
+
                         return Html::button('<span"><b>NONE</span>', ['value'=>Url::to(['/lab/request/reportstatus','id'=>$model->request_id]),'onclick'=>'LoadModal(this.title, this.value, true, 500);', 'class' => 'btn btn-default','title' => Yii::t('app', "Report Status"), 'style'=>'width:100px']);
                     }
                     
