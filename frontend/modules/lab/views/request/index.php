@@ -43,7 +43,7 @@ foreach ($roles as $role) {
 <div class="request-index">
 
     <fieldset>
-        <legend>Legends</legend>
+        <legend>Legends - Report Status</legend>
         <div>
             <span class="badge btn-success">Report Generated</span>
             <span class="badge btn-warning">Report Nearly Due</span>
