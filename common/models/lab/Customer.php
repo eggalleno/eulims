@@ -26,9 +26,7 @@ use common\components\Functions;
  * @property int $industrytype_id
  * @property int $classification_id 
  * @property int $created_at
- * @property int $customer_old_id 
- * @property int $Oldcolumn_municipalitycity_id 
- * @property int $Oldcolumn_district
+
  * @property int $sync_status
  *
  * @property Customertype $customerType
@@ -116,9 +114,6 @@ class Customer extends \yii\db\ActiveRecord
             'industrytype_id' => 'Industry Type',
             'classification_id' => 'Classification',
             'created_at' => 'Created At',
-            'customer_old_id' => 'Customer Old ID', 
-            'Oldcolumn_municipalitycity_id' => 'Oldcolumn Municipalitycity ID', 
-            'Oldcolumn_district' => 'Oldcolumn District', 
             'sync_status'=> 'Sync Status'
 
         ];

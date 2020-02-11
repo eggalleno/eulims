@@ -41,7 +41,6 @@ use yii\db\ActiveRecord;
  * @property string $certificate_release_date 
  * @property string $released_by 
  * @property string $received_by 
- * @property int $customer_old_id 
  * $property int $payment_status_id
  * 
  * @property Analysis[] $analyses
@@ -87,8 +86,7 @@ class Request extends \yii\db\ActiveRecord
     }
      public function beforeSave($insert) {
         if ($insert) {
-            if(!$this->customer_old_id)
-                $this->request_ref_num=NULL;
+            //do something
         }else{
             //check if there are changes in discount
             if($this->_oldAttributes['discount_id']!=$this->attributes['discount_id']){
@@ -197,7 +195,6 @@ class Request extends \yii\db\ActiveRecord
             'released_by' => 'Released By',
             'received_by' => 'Received By',
             'payment_status_id'=>'Payment Status',
-            'customer_old_id'=>'customer_old_id',
             'contact_num'=>'Conforme Contact Number',
         ];
     }

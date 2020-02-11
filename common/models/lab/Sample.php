@@ -24,17 +24,6 @@ use Yii;
  * @property int $active
  * @property int $completed
  * @property int $referral_sample_id
- * @property int $sample_old_id
- * @property string $oldColumn_requestId
- * @property double $oldColumn_completed
- * @property string $oldColumn_datedisposal
- * @property string $oldColumn_mannerofdisposal
- * @property int $oldColumn_batch_num
- * @property int $oldColumn_package_count
- * @property int $old_request_id
- * @property int $local_sample_id
- * @property int $local_request_id
- * @property int $migrated
  *
  * @property Analysis[] $analyses
  * @property Sampletype $sampletype
@@ -65,14 +54,12 @@ class Sample extends \yii\db\ActiveRecord
     {
         return [
             [['rstl_id', 'sampletype_id', 'samplename', 'customer_description', 'request_id', 'sample_month', 'sample_year'], 'required'],
-            [['rstl_id', 'pstcsample_id', 'testcategory_id', 'sampletype_id', 'request_id', 'sample_month', 'sample_year', 'active', 'completed', 'referral_sample_id', 'sample_old_id', 'oldColumn_batch_num', 'oldColumn_package_count', 'old_request_id', 'local_sample_id', 'local_request_id', 'migrated'], 'integer'],
+            [['rstl_id', 'pstcsample_id', 'testcategory_id', 'sampletype_id', 'request_id', 'sample_month', 'sample_year', 'active', 'completed', 'referral_sample_id'], 'integer'],
             [['description', 'customer_description'], 'string'],
-            [['sampling_date', 'oldColumn_datedisposal'], 'safe'],
-            [['oldColumn_completed'], 'number'],
+            [['sampling_date'], 'safe'],
             [['sample_code'], 'string', 'max' => 100],
-            [['samplename', 'oldColumn_requestId'], 'string', 'max' => 50],
+            [['samplename'], 'string', 'max' => 50],
             [['remarks'], 'string', 'max' => 150],
-            [['oldColumn_mannerofdisposal'], 'string', 'max' => 200],
             [['sampletype_id'], 'exist', 'skipOnError' => true, 'targetClass' => Sampletype::className(), 'targetAttribute' => ['sampletype_id' => 'sampletype_id']],
             [['request_id'], 'exist', 'skipOnError' => true, 'targetClass' => Request::className(), 'targetAttribute' => ['request_id' => 'request_id']],
         ];
@@ -101,17 +88,6 @@ class Sample extends \yii\db\ActiveRecord
             'active' => 'Active',
             'completed' => 'Completed',
             'referral_sample_id' => 'Referral Sample ID',
-            'sample_old_id' => 'Sample Old ID',
-            'oldColumn_requestId' => 'Old Column Request ID',
-            'oldColumn_completed' => 'Old Column Completed',
-            'oldColumn_datedisposal' => 'Old Column Datedisposal',
-            'oldColumn_mannerofdisposal' => 'Old Column Mannerofdisposal',
-            'oldColumn_batch_num' => 'Old Column Batch Num',
-            'oldColumn_package_count' => 'Old Column Package Count',
-            'old_request_id' => 'Old Request ID',
-            'local_sample_id' => 'Local Sample ID',
-            'local_request_id' => 'Local Request ID',
-            'migrated' => 'Migrated',
         ];
     }
 
