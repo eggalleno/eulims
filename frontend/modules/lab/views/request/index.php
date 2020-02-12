@@ -162,7 +162,9 @@ foreach ($roles as $role) {
                 'format'=>'raw',
                 'width' => '110px',
                 'value'=>function($model){
-         
+                    if($model->status_id==0)
+                        return Html::button('<span"><b>CANCELLED</span>', ['class' => 'btn btn-warning', 'style'=>'width:110px;']);
+
                     $samples_count= Analysis::find()
                     ->leftJoin('tbl_sample', 'tbl_sample.sample_id=tbl_analysis.sample_id')
                     ->leftJoin('tbl_request', 'tbl_request.request_id=tbl_sample.request_id')
