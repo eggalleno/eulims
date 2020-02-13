@@ -18,6 +18,17 @@ use yii\helpers\Json;
 
 class AccomplishmentController extends \yii\web\Controller
 {
+	/*
+	Created By: Bergel T. Cutara
+	Contacts:
+
+	Email: b.cutara@gmail.com
+	Tel. Phone: (062) 991-1024
+	Mobile Phone: (639) 956200353
+
+	Description: looks up all the request made in a certain time
+	**/
+
     public function actionIndex()
     {
     	$model = new Requestextend;
@@ -26,46 +37,38 @@ class AccomplishmentController extends \yii\web\Controller
 		if (Yii::$app->request->get())
 		{
 			$labId = (int) Yii::$app->request->get('lab_id');
+			$year = (int) Yii::$app->request->get('year');
 			
-			if($this->checkValidDate(Yii::$app->request->get('from_date')) == true)
-			{
-		        $fromDate = Yii::$app->request->get('from_date');
-			} else {
-				$fromDate = date('Y-m-d');
-				Yii::$app->session->setFlash('error', "Not a valid date!");
-			}
-
-			if($this->checkValidDate(Yii::$app->request->get('to_date')) == true){
-				$toDate = Yii::$app->request->get('to_date');
-			} else {
-				$toDate = date('Y-m-d');
-				Yii::$app->session->setFlash('error', "Not a valid date!");
-			}
 		} else {
 			$labId = 1;
-			$fromDate = date('Y-01-01'); //first day of the year
-			$toDate = date('Y-m-d'); //as of today
+			$year = date('Y'); //current year
 		}
 
 		$modelRequest = Requestextend::find()
-					->where('rstl_id =:rstlId AND status_id > :statusId AND lab_id = :labId AND DATE_FORMAT(`request_datetime`, "%Y-%m-%d") BETWEEN :fromRequestDate AND :toRequestDate', [':rstlId'=>$rstlId,':statusId'=>0,':labId'=>$labId,':fromRequestDate'=>$fromDate,':toRequestDate'=>$toDate])
-					->groupBy(['DATE_FORMAT(request_datetime, "%Y-%m")'])
-					->orderBy('request_datetime DESC');
+		->select([
+			'monthnum'=>'DATE_FORMAT(`request_datetime`, "%m")',
+			'month'=>'DATE_FORMAT(`request_datetime`, "%M")',
+			'totalrequests' => 'count(request_id)',
+			'total'=>'SUM(total)',
+			'request_datetime'
+		])
+		->where('rstl_id =:rstlId AND status_id > :statusId AND lab_id = :labId AND DATE_FORMAT(`request_datetime`, "%Y") = :year', [':rstlId'=>$rstlId,':statusId'=>0,':labId'=>$labId,':year'=>$year])
+		->groupBy(['DATE_FORMAT(request_datetime, "%Y-%m")'])
+		->orderBy('request_datetime ASC');
 
+
+	
+		// var_dump($modelRequest); exit;
 		$dataProvider = new ActiveDataProvider([
             'query' => $modelRequest,
             'pagination' => false,
-            // 'pagination' => [
-            //     'pagesize' => 10,
-            // ],
         ]);
 
         if (Yii::$app->request->isAjax) {
             return $this->renderAjax('index', [
                 'dataProvider' => $dataProvider,
                 'lab_id' => $labId,
-                'from_date' => $fromDate,
-                'to_date' => $toDate,
+                'year' => $year,
                 'model'=>$modelRequest,
 	            'laboratories' => $this->listLaboratory(),
             ]);
@@ -74,8 +77,7 @@ class AccomplishmentController extends \yii\web\Controller
 	            'dataProvider' => $dataProvider,
 	            'lab_id' => $labId,
 	            'model'=>$modelRequest,
-                'from_date' => $fromDate,
-                'to_date' => $toDate,
+                'year' => $year,
 	            'laboratories' => $this->listLaboratory(),
 	        ]);
 		}
