@@ -66,7 +66,7 @@ class Requestextend extends Request
         }elseif($type==2){
             //total number of analysis
             $reqs =  Requestextend::find()->select(['request_id'])->where(['DATE_FORMAT(`request_datetime`, "%Y-%m")' => $yearmonth,'lab_id'=>$lab_id])->andWhere(['>','status_id',0])->with(['analyses' => function($query){
-                $query->andWhere(['<>','references','-']);
+                $query->andWhere(['<>','references','-'])->andWhere(['cancelled'=>'0']);
             }])->all();
 
             foreach ($reqs as $req) {
