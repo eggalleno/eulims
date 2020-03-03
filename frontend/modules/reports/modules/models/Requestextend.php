@@ -56,7 +56,9 @@ class Requestextend extends Request
         $total = 0;
         if($type==1){
             //total number of samples
-            $reqs =  Requestextend::find()->select(['request_id'])->where(['DATE_FORMAT(`request_datetime`, "%Y-%m")' => $yearmonth,'lab_id'=>$lab_id])->andWhere(['>','status_id',0])->all();
+            $reqs =  Requestextend::find()->select(['request_id'])->where(['DATE_FORMAT(`request_datetime`, "%Y-%m")' => $yearmonth,'lab_id'=>$lab_id])->andWhere(['>','status_id',0])->with(['samples' => function($query){
+                $query->andWhere(['active'=>'1']);
+            }])->all();
 
             foreach ($reqs as $req) {
                 $total += count($req->samples);
