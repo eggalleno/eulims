@@ -544,8 +544,8 @@ $this->registerJs($PrintEvent);
                 ],
                 'hAlign' => 'right', 
                 'vAlign' => 'left',
-                'width' => '7%',
                 'format' => 'raw',
+                'width' => '7%',
                   'pageSummary'=> function (){
                         $url = \Yii::$app->request->url;
                         $id = substr($url, 21);
@@ -561,7 +561,7 @@ $this->registerJs($PrintEvent);
                         $sample_ids = substr($sample_ids, 0, strlen($sample_ids)-1);
                        
                         if ($samplesquery){
-                            $sql = "SELECT SUM(fee) as subtotal FROM tbl_analysis WHERE sample_id IN ($sample_ids)";     
+                            $sql = "SELECT SUM(fee) as subtotal FROM tbl_analysis WHERE sample_id IN ($sample_ids) AND cancelled = 0";     
                             
                                  $Connection = Yii::$app->labdb;
                                  $command = $Connection->createCommand($sql);
@@ -604,6 +604,10 @@ $this->registerJs($PrintEvent);
                 //   }else{
                 //    return Html::button('<span"><b>PENDING</span>', ['value'=>Url::to(['/lab/tagging/status','id'=>$model->analysis_id]),'onclick'=>'LoadModal(this.title, this.value, true, 600);', 'class' => 'btn btn-default','title' => Yii::t('app', "Analysis Status")]);
                 // }
+
+                if($model->cancelled){
+                     return "<span class='badge btn-danger' style='width:90px;height:20px'>CANCELLED</span>";
+                }
 
                 $tagging = Tagging::findOne(['analysis_id' => $model->analysis_id]); 
                 if ($tagging){
