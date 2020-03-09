@@ -348,7 +348,8 @@ class AnalysisController extends Controller
                 'testcategory' => $testcategory,
                 'test' => $test,
                 'sampletype'=>$sampletype,
-                'base_sample'=>$samplesQuery
+                'base_sample'=>$samplesQuery,
+                'sampletypewithlab'=>$this->listSampletype($labId),
             ]);
        // }   
     }
@@ -503,5 +504,14 @@ class AnalysisController extends Controller
         throw new NotFoundHttpException('The requested page does not exist.');
     }
 
+    protected function listSampletype($labId)
+    {
+        $sampletype = ArrayHelper::map(Sampletype::find()->joinWith('labSampletypes')->andWhere(['lab_id'=>$labId,'status_id'=>1])->all(), 'sampletype_id', 
+            function($sampletype, $defaultValue) {
+                return $sampletype->type;
+        });
+
+        return $sampletype;
+    }
    
 }
