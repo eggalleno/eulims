@@ -147,7 +147,7 @@ $pdfFooter="{PAGENO}";
 			    	[
 			    		'header'=> 'Discount',
 			    		'contentOptions' => ['class' => 'text-right'],
-			    		'format'=>['decimal', 2],
+			    		//'format'=>['decimal', 2],
 			    		'value'=> function( $model ) use($year,$lab_id){
 			    			$monthyear = $year."-".$model->monthnum;
 			    			return $model->getStats($monthyear,$lab_id,3);
@@ -159,12 +159,15 @@ $pdfFooter="{PAGENO}";
 			    	[
 			    		'header'=> 'Gross',
 			    		'contentOptions' => ['class' => 'text-right'],
-			    		'format'=>['decimal', 2],
+			    		//'format'=>['decimal', 2],
 			    		'value'=> function( $model ) use($year,$lab_id){
 			    			$monthyear = $year."-".$model->monthnum;
 			    			$subtotal = $model->total;
 			    			$discount = $model->getStats($monthyear,$lab_id,3);
 			    			return ($subtotal + $discount);
+
+
+
 			    		},
 			    		'pageSummary'=>true,
         				'pageSummaryFunc'=>GridView::F_SUM,

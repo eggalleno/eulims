@@ -74,20 +74,31 @@ class Requestextend extends Request
             }
         }elseif($type==3){
             //total number of discount
-            //this fomula is derived from nolan's SP but still bugs out me how this works
-            $reqs =  Requestextend::find()
-            ->select(['total'=>'SUM((`total`/(1-(`discount`/100)))-`total`)'])
-            ->where(['DATE_FORMAT(`request_datetime`, "%Y-%m")' => $yearmonth,'lab_id'=>$lab_id,'payment_type_id'=>1])
-            ->andWhere(['>','status_id',0])
-            ->andWhere(['>','discount_id',0])
-            ->one();
 
-            // var_dump($reqs); exit;
-            $total = $reqs->total;
+            $reqs =  Requestextend::find()
+            ->where(['DATE_FORMAT(`request_datetime`, "%Y-%m")' => $yearmonth,'lab_id'=>$lab_id,'status_id'=>1])
+            ->all();
+            $amount =0;
+            $subtotal = 0;
+            foreach ($reqs as $req) {
+                //check the samples
+                $subtotal = 0;
+               if($req->samples){
+                    foreach ($req->samples as $sample) {
+                        if($sample->analyses){
+                            foreach ($sample->analyses as $analysis) {
+                               $subtotal += $analysis->fee; 
+                            }
+                        }
+                    }
+
+                    $amount += ($subtotal * ($req->discount / 100 ));
+               }
+            }
+            $total = $amount ;
         }
 
 
         return $total;
     }
-
 }
