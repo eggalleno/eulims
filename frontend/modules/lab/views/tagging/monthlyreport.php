@@ -126,7 +126,7 @@ echo "<h1>Monthly Report for <b>".$month." ".$year."</b></h1>";
                     $value="";
                     foreach($model->samples as $sample){
                         foreach ($sample->analyses as $analysis) {
-                            $value .= $analysis->testname."-".$analysis->fee."<br/>";
+                            $value .= $analysis->testname."<br/>";
                         }
                     }
                     return $value;
