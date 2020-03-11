@@ -38,6 +38,33 @@ $this->params['breadcrumbs'][] = $moduleTitle;
     <?= GridView::widget([
         'dataProvider' => $dataProvider,
          'panel'=>['type'=>'primary', 'heading'=>$moduleTitle],
+        
+//        'beforeHeader'=>
+//        [
+//                    [
+//                        'columns'=>[
+//                            ['content'=>'Official', 'options'=>['colspan'=>2, 'class'=>'text-center warning','style'=>'background-color:blue;']], 
+//                            ['content'=>'', 'options'=>['colspan'=>4, 'class'=>'text-center warning','style'=>'background-color:blue;']], 
+//                            ['content'=>'Amount', 'options'=>['colspan'=>4, 'class'=>'text-center warning','style'=>'background-color:blue;']], 
+//                        ],
+//                        'options'=>['class'=>'skip-export'] // remove this row from export
+//                    ],
+//                    [
+//                        'columns'=>[
+//                            ['content'=>'', 'options'=>['colspan'=>1, 'class'=>'text-center warning','style'=>'background-color:blue;']], 
+//                            ['content'=>'', 'options'=>['colspan'=>1, 'class'=>'text-center warning','style'=>'background-color:blue;']], 
+//                            ['content'=>'', 'options'=>['colspan'=>1, 'class'=>'text-center warning','style'=>'background-color:blue;']], 
+//                            ['content'=>'', 'options'=>['colspan'=>1, 'class'=>'text-center warning','style'=>'background-color:blue;']], 
+//                            ['content'=>'', 'options'=>['colspan'=>1, 'class'=>'text-center warning','style'=>'background-color:blue;']], 
+//                           //  ['content'=>'', 'options'=>['colspan'=>3, 'class'=>'text-center warning','style'=>'background-color:blue;']], 
+//                            ['content'=>'', 'options'=>['colspan'=>1, 'class'=>'text-center warning','style'=>'background-color:blue;']],
+//                             ['content'=>'', 'options'=>['colspan'=>1, 'class'=>'text-center warning','style'=>'background-color:blue;']],
+//                            ['content'=>'Breakdown of Collections', 'options'=>['colspan'=>3, 'class'=>'text-center warning','style'=>'background-color:blue;']],
+//
+//                        ],
+//                        'options'=>['class'=>'skip-export'] // remove this row from export
+//                    ]
+//        ],
        // 'filterModel' => $searchModel,
             'columns' => [
                   //  ['class'=>'kartik\grid\SerialColumn'],
@@ -54,8 +81,8 @@ $this->params['breadcrumbs'][] = $moduleTitle;
                             'subGroupOf'=>0
                         ],
                          [
-                           
-                            'header' => 'Responsibility',
+                             'attribute'=>'blankrow', 
+                            'header' => 'Responsibility Center Code',
                           
                         ],
                 
@@ -73,14 +100,14 @@ $this->params['breadcrumbs'][] = $moduleTitle;
                         ],
                   [
                            
-                            'header' => 'MFO PAP',
-                          
+                            'header' => 'MFO/PAP',
+                          'attribute'=>'blankrow', 
                         ],
                          [
-                        'attribute' => 'btrAmount',
+                        'attribute' => 'btramount',
                         'header' => 'Total per OR ',
                         'contentOptions'=>['style'=>'text-align:right'],
-
+                        'format' => ['decimal', 2],
                         ],
                 
                 [
@@ -88,6 +115,7 @@ $this->params['breadcrumbs'][] = $moduleTitle;
                         'header' => 'Bureau of Treasury',
                       //  'width'=>'5px',
                         'contentOptions'=>['style'=>'vertical-align: bottom;'],
+                         'format' => ['decimal', 2],
                         'group' => true, // enable grouping
                        // 'groupedRow'=>true,                    // move grouped column to a single grouped row
                       //  'groupOddCssClass'=>'kv-grouped-row',  // configure odd group cell css class
@@ -123,6 +151,15 @@ $this->params['breadcrumbs'][] = $moduleTitle;
                         'attribute' => 'prjAmount',
                         'header' => 'Trust Fund',
                         'contentOptions'=>['style'=>'text-align:right'],
+                        
+                        'format' => ['decimal', 2],
+                       
+                        ],
+                
+                        [
+                        'value' => 'deposit_id',
+                        'header' => 'Deposit ID',
+                        'contentOptions'=>['style'=>'display:none'],
                         ],
                         
 //                        [

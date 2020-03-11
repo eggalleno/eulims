@@ -52,22 +52,48 @@ class CsfController extends Controller
         ]);
     }
 
-    public function actionCsf()
-    {  
-        $csf = Csf::find()->all();
-        return $this->asJson([$csf]);             
-    }
+    
 
     public function actionReports()
     {
         $model = new Csf();
+        
+        $currentYear = date('Y');
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['view', 'id' => $model->id]);
         }
-
+        $arrMonthlyCSF = array();
+        
+//        for ($x = 1; $x <= 12; $x++) {
+//         $intCSF = Yii::$app->labdb->createCommand("CALL spGetCSIReportValue(" . $x . ",2020);")->queryAll();
+//         array_push($arrMonthlyCSF,$intCSF);
+//        } 
+        
+         $intCSF2 = Yii::$app->labdb->createCommand("CALL spGetCSIReportValue(1,2020);")->queryAll();
+         
+        $intArray=array();
+        foreach($arrMonthlyCSF as $csf)
+        {
+            array_push($intArray,$csf);
+        }
+        
+        $csf1 = Yii::$app->labdb->createCommand("CALL spGetCSIReportValue(1," . $currentYear . ");")->queryAll();
+        $csf2 = Yii::$app->labdb->createCommand("CALL spGetCSIReportValue(2," . $currentYear . ");")->queryAll();
+        $csf3 = Yii::$app->labdb->createCommand("CALL spGetCSIReportValue(3," . $currentYear . ");")->queryAll();
+        $csf4 = Yii::$app->labdb->createCommand("CALL spGetCSIReportValue(4," . $currentYear . ");")->queryAll();
+        $csf5 = Yii::$app->labdb->createCommand("CALL spGetCSIReportValue(5," . $currentYear . ");")->queryAll();
+        $csf6 = Yii::$app->labdb->createCommand("CALL spGetCSIReportValue(6," . $currentYear . ");")->queryAll();
+        $csf7 = Yii::$app->labdb->createCommand("CALL spGetCSIReportValue(7," . $currentYear . ");")->queryAll();
+        $csf8 = Yii::$app->labdb->createCommand("CALL spGetCSIReportValue(8," . $currentYear . ");")->queryAll();
+        $csf9 = Yii::$app->labdb->createCommand("CALL spGetCSIReportValue(9," . $currentYear . ");")->queryAll();
+        $csf10 = Yii::$app->labdb->createCommand("CALL spGetCSIReportValue(10," . $currentYear . ");")->queryAll();
+        $csf11 = Yii::$app->labdb->createCommand("CALL spGetCSIReportValue(11," . $currentYear . ");")->queryAll();
+        $csf12 = Yii::$app->labdb->createCommand("CALL spGetCSIReportValue(12," . $currentYear . ");")->queryAll();
+        // Yii::$app->labdb->createCommand("CALL spGetCSIValue(1,2020,@ival);")->execute();
         return $this->render('reports', [
-            'model' => $model,
+            'model' => $model,'jancsf'=>$intCSF2[0],'intArray'=>$intArray,'csf1'=>$csf1[0],'csf2'=>$csf2[0],'csf3'=>$csf3[0],'csf4'=>$csf4[0],'csf5'=>$csf5[0],'csf6'=>$csf6[0],
+            'csf7'=>$csf7[0],'csf8'=>$csf8[0],'csf9'=>$csf9[0],'csf10'=>$csf10[0],'csf11'=>$csf11[0],'csf12'=>$csf12[0],'currentYear'=>$currentYear
         ]);
     }
 
@@ -122,18 +148,27 @@ class CsfController extends Controller
             'dataProvider' => $dataProvider,
         ]);
     }
+    
+    public function actionCsf()
+    {  
+        $pMonth = Yii::$app->request->get('csfmonth');
+        $csf = Csf::find()->andWhere('Month(r_date) =' .  $pMonth)->andWhere('Year(r_date) = 2020')->all();
+        return $this->asJson([$csf]);             
+    }
 
     public function actionCsi()
     {
+        $pMonth = Yii::$app->request->get('csfmonth');
+        $monthName = date("F", mktime(0, 0, 0, $pMonth, 10));
         $searchModel = new CsfSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
-        $csf = Csf::find()->all();
+        $csf = Csf::find()->andWhere('Month(r_date) =' .  $pMonth)->andWhere('Year(r_date) = 2020')->all();
         $count = count($csf);
         return $this->render('csi', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
-            'csf'=>$csf,
+            'csf'=>$csf,'monthName'=>$monthName,'pMonth'=>$pMonth,
             'count'=>$count
         ]);
     }

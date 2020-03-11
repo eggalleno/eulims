@@ -107,7 +107,7 @@ use yii\helpers\Html;
                 <tbody>
                   <tr>
                     <td>For the period of</td>
-                    <td>: <strong>December</strong></td>
+                    <td>: <strong><?php echo $monthName;?></strong></td>
                   </tr>
                   <tr>
                     <td>Total no. of Respondents</td>
@@ -270,8 +270,10 @@ use yii\helpers\Html;
         let part1 = {};
         let part2 = {};
         let part2_totalIS = 0;
+        let part2_totalIS2 = 0;
         let part2_totalWF = 0;
         let part2_totalWS = 0;
+        let newtotal=0;
         let items = {
           deliverytime: "Delivery Time",
           accuracy: "Correctness and Accuracy of Results",
@@ -286,8 +288,9 @@ use yii\helpers\Html;
           promoters: 0
         };
 
-        $.get('/lab/csf/csf', function (data) {
+        $.get('/lab/csf/csf?csfmonth=' + <?php echo $pMonth?> , function (data) {
           respondents = data[0]
+         
 
           respondents.forEach(respondent => {
             Object.keys(respondent).forEach(key => {
@@ -309,6 +312,47 @@ use yii\helpers\Html;
               }
             });
           });
+          
+       //   --------------------------------------
+          
+           Object.keys(items).forEach(key => {
+            let part1_totalScore =
+              part1["d_" + key][5] * 5 +
+              part1["d_" + key][4] * 4 +
+              part1["d_" + key][3] * 3 +
+              part1["d_" + key][2] * 2 +
+              part1["d_" + key][1] * 1;
+          
+
+            let part2_totalScore =
+              part2["i_" + key][5] * 5 +
+              part2["i_" + key][4] * 4 +
+              part2["i_" + key][3] * 3 +
+              part2["i_" + key][2] * 2 +
+              part2["i_" + key][1] * 1;
+     
+            let part2_is = parseFloat(
+              Math.round((part2_totalScore / respondents.length) * 100) / 100
+            ).toFixed(2);
+           
+           // console.log(part2_totalIS2) + 'test';
+
+          
+        if (key !== "overall") {
+              part2_totalIS2 += Number(part2_is);
+            console.log(part2_totalIS2)
+            }
+            
+         
+            
+           let newtotal = part2_totalIS;
+           
+          });
+          
+       //   ---------------------------------------
+           
+         
+console.log(part2_totalIS2);
 
           Object.keys(items).forEach(key => {
             let part1_totalScore =
@@ -318,7 +362,7 @@ use yii\helpers\Html;
               part1["d_" + key][2] * 2 +
               part1["d_" + key][1] * 1;
             let part1_ss = parseFloat(
-              Math.round((part1_totalScore / respondents.length) * 100) / 100
+             (part1_totalScore / respondents.length) * 100 / 100
             ).toFixed(2);
 
             let part2_totalScore =
@@ -327,38 +371,21 @@ use yii\helpers\Html;
               part2["i_" + key][3] * 3 +
               part2["i_" + key][2] * 2 +
               part2["i_" + key][1] * 1;
+     
             let part2_is = parseFloat(
-              Math.round((part2_totalScore / respondents.length) * 100) / 100
+              (part2_totalScore / respondents.length) * 100 / 100
             ).toFixed(2);
             let part2_wf = parseFloat(
-              Math.round((part2_is / part2_totalScore) * 100 * 100) / 100
-            ).toFixed(2);
+              (part2_is/part2_totalIS2) * 100 ).toFixed(2);
             let part2_ws = parseFloat(
-              Math.round(((part1_ss * part2_wf) / 100) * 100) / 100
+              ((part1_ss * part2_wf) / 100) * 100 / 100
             ).toFixed(2);
 
             let part1_gap = parseFloat(
-              Math.round((part2_is - part1_ss) * 100) / 100
+             (part2_is - part1_ss) * 100 / 100
             ).toFixed(2);
 
-            $(`
-            <tr>
-              <td>${items[key]}</td>
-              <td>${part1["d_" + key][5]}</td>
-              <td class="active">${part1["d_" + key][5] * 5}</td>
-              <td>${part1["d_" + key][4]}</td>
-              <td class="active">${part1["d_" + key][4] * 4}</td>
-              <td>${part1["d_" + key][3]}</td>
-              <td class="active">${part1["d_" + key][3] * 3}</td>
-              <td>${part1["d_" + key][2]}</td>
-              <td class="active">${part1["d_" + key][2] * 2}</td>
-              <td>${part1["d_" + key][1]}</td>
-              <td class="active">${part1["d_" + key][1] * 1}</td>
-              <td>${part1_totalScore}</td>
-              <td>${part1_ss}</td>
-              <td>${part1_gap}</td>
-            </tr>
-          `).appendTo("#part-1");
+            
 
             if (key !== "overall") {
               $(`
@@ -379,6 +406,7 @@ use yii\helpers\Html;
                   <td>${part2_wf}</td>
                   <td>${part1_ss}</td>
                   <td>${part2_ws}</td>
+               
                 </tr>
               `).appendTo("#part-2");
 
@@ -386,14 +414,39 @@ use yii\helpers\Html;
               part2_totalWF += Number(part2_wf);
               part2_totalWS += Number(part2_ws);
             }
+            
+             
+            
+            $(`
+            <tr>
+              <td>${items[key]}</td>
+              <td>${part1["d_" + key][5]}</td>
+              <td class="active">${part1["d_" + key][5] * 5}</td>
+              <td>${part1["d_" + key][4]}</td>
+              <td class="active">${part1["d_" + key][4] * 4}</td>
+              <td>${part1["d_" + key][3]}</td>
+              <td class="active">${part1["d_" + key][3] * 3}</td>
+              <td>${part1["d_" + key][2]}</td>
+              <td class="active">${part1["d_" + key][2] * 2}</td>
+              <td>${part1["d_" + key][1]}</td>
+              <td class="active">${part1["d_" + key][1] * 1}</td>
+              <td>${part1_totalScore}</td>
+              <td>${part1_ss}</td>
+              <td>${part1_gap}</td>
+            </tr>
+          `).appendTo("#part-1");
+            
+            
           });
+          
+          
 
           $(`
           <tr>
             <td colspan="12"></td>
             <td>${part2_totalIS}</td>
             <td>${parseFloat(
-                Math.round(part2_totalWF * 100) / 100
+                part2_totalWF * 100 / 100
               ).toFixed(2)}</td>
             <td></td>
             <td>${part2_totalWS.toFixed(2)}</td>
@@ -404,7 +457,7 @@ use yii\helpers\Html;
             </td>
             <td colspan="3"></td>
             <td>${parseFloat(
-                Math.round(((part2_totalWS / 5) * 100) * 100) / 100
+                ((part2_totalWS / 5) * 100) * 100 / 100
               ).toFixed(2)}</td>
           </tr>
         `).appendTo("#part-2");

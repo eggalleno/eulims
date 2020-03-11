@@ -4,7 +4,7 @@
       7px 7px 0px rgba(0, 0, 0, 0.2);text-align:center"><b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;REGIONAL STANDARDS AND TESTING LABORATORY</b></h3>
 
 <h1 style="color:#1a4c8f;font-family:Century Gothic;font-size:250%;, 
-      7px 7px 0px rgba(0, 0, 0, 0.2);text-align:center;"><b>&nbsp;&nbsp;&nbsp;&nbsp;Customer Satisfaction Index 2019 </b></h1><br>
+      7px 7px 0px rgba(0, 0, 0, 0.2);text-align:center;"><b>&nbsp;&nbsp;&nbsp;&nbsp;Customer Satisfaction Index <?php echo $currentYear ?> </b></h1><br>
 
 
 <!DOCTYPE html>
@@ -35,7 +35,7 @@
               <strong>January</strong>
             </div>
             <div class="panel-body">
-              <h1>0</h1>
+                <h1><a href="/lab/csf/csi?csfmonth=1" alt="Click to view details"> <?php echo $csf1['csf']?></a></h1>
             </div>
           </div>
         </div>
@@ -45,7 +45,7 @@
               <strong>February</strong>
             </div>
             <div class="panel-body">
-              <h1>0</h1>
+                <h1><a href="/lab/csf/csi?csfmonth=2" alt="Click to view details"> <?php echo $csf2['csf']?></a></h1>
             </div>
           </div>
         </div>
@@ -55,7 +55,7 @@
               <strong>March</strong>
             </div>
             <div class="panel-body">
-              <h1>0</h1>
+              <h1><a href="/lab/csf/csi?csfmonth=3" alt="Click to view details"> <?php echo $csf3['csf']?></a></h1>
             </div>
           </div>
         </div>
@@ -67,7 +67,7 @@
               <strong>April</strong>
             </div>
             <div class="panel-body">
-              <h1>0</h1>
+                 <h1><a href="/lab/csf/csi?csfmonth=4" alt="Click to view details"> <?php echo $csf4['csf']?></a></h1>
             </div>
           </div>
         </div>
@@ -77,7 +77,7 @@
               <strong>May</strong>
             </div>
             <div class="panel-body">
-              <h1>0</h1>
+                 <h1><a href="/lab/csf/csi?csfmonth=5" alt="Click to view details"> <?php echo $csf5['csf']?></a></h1>
             </div>
           </div>
         </div>
@@ -87,7 +87,7 @@
               <strong>June</strong>
             </div>
             <div class="panel-body">
-              <h1>0</h1>
+                 <h1><a href="/lab/csf/csi?csfmonth=6" alt="Click to view details"> <?php echo $csf6['csf']?></a></h1>
             </div>
           </div>
         </div>
@@ -99,7 +99,7 @@
               <strong>July</strong>
             </div>
             <div class="panel-body">
-              <h1>0</h1>
+                  <h1><a href="/lab/csf/csi?csfmonth=7" alt="Click to view details"> <?php echo $csf7['csf']?></a></h1>
             </div>
           </div>
         </div>
@@ -109,7 +109,7 @@
               <strong>August</strong>
             </div>
             <div class="panel-body">
-              <h1>0</h1>
+                 <h1><a href="/lab/csf/csi?csfmonth=8" alt="Click to view details"> <?php echo $csf8['csf']?></a></h1>
             </div>
           </div>
         </div>
@@ -119,7 +119,7 @@
               <strong>September</strong>
             </div>
             <div class="panel-body">
-              <h1>0</h1>
+                  <h1><a href="/lab/csf/csi?csfmonth=9" alt="Click to view details"> <?php echo $csf9['csf']?></a></h1>
             </div>
           </div>
         </div>
@@ -131,7 +131,7 @@
               <strong>October</strong>
             </div>
             <div class="panel-body">
-              <h1>0</h1>
+                  <h1><a href="/lab/csf/csi?csfmonth=10" alt="Click to view details"> <?php echo $csf10['csf']?></a></h1>
             </div>
           </div>
         </div>
@@ -141,7 +141,7 @@
               <strong>November</strong>
             </div>
             <div class="panel-body">
-              <h1>0</h1>
+                 <h1><a href="/lab/csf/csi?csfmonth=11" alt="Click to view details"> <?php echo $csf11['csf']?></a></h1>
             </div>
           </div>
         </div>
@@ -151,7 +151,7 @@
               <strong>December</strong>
             </div>
             <div class="panel-body">
-              <h1>0</h1>
+                  <h1><a href="/lab/csf/csi?csfmonth=12" alt="Click to view details"> <?php echo $csf12['csf']?></a></h1>
             </div>
           </div>
         </div>
