@@ -81,7 +81,7 @@ use kartik\money\MaskMoney;
       <?php echo Html::label('Sample Type'); ?>
       <?= Select2::widget([
           'name'=>'thesampletypes',
-          'data' => ArrayHelper::map(Sampletype::find()->where(['status_id'=>1])->all(),'sampletype_id','type'),
+          'data' => $sampletypewithlab,
           'options' => [
             'placeholder' => 'Select sample type...',
             'id'=>'the-sample-type',
@@ -135,6 +135,7 @@ use kartik\money\MaskMoney;
     <?php
         $requestquery = Request::find()->where(['request_id' => $request_id])->one();
     ?>
+
     <?= Html::textInput('lab_id', $requestquery->lab_id, ['class' => 'form-control', 'id'=>'lab_id', 'type'=>'hidden'], ['readonly' => true]) ?>
      
     <div id="methodreference">

@@ -278,7 +278,7 @@ class CashierController extends \yii\web\Controller
             ]);
 			$check_sum = Check::find()->where(['receipt_id' => $receiptid])
                  ->sum('amount');
-			$walletpay_sum= Customertransaction::find()->where(['source' => $receiptid])->sum('amount');	 
+			$walletpay_sum= Customertransaction::find()->where(['source' => $receiptid,'transactiontype'=>1])->sum('amount');	 
         }else{
             $checkDataProvider ="";
         }
@@ -476,6 +476,8 @@ class CashierController extends \yii\web\Controller
             ->andWhere(['cancelled'=>0]) 
             ->andWhere(['between', 'or_number',$start_or,$end_or])
             ->sum('total');
+		
+	
         if($id == '' ){
             echo '';
         }
@@ -640,6 +642,8 @@ class CashierController extends \yii\web\Controller
 					   $model_excess->check_id=$model->check_id;
 					   $model_excess->amount=$total;
 					   $model_excess->save();
+					   $receipt->total= $receipt->total + $total;
+                       $receipt->save();					   
 					  
                    } 
                 }
