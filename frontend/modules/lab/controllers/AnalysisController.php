@@ -437,7 +437,8 @@ class AnalysisController extends Controller
              'request_id'=>$request_id,
             'test' => $test,
             'sampletype'=>$sampletype,
-            'base_sample'=>$samplesQuery
+            'base_sample'=>$samplesQuery,
+            'sampletypewithlab'=>$this->listSampletype($labId),
         ]);
     }else{
         return $this->render('_form', [
