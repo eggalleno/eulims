@@ -131,13 +131,13 @@ class TaggingController extends Controller
       
     }
 
-    public function actionMonthlyreport($month, $year)
+    public function actionMonthlyreport($month, $year, $lab_id)
     {
       $nmonth = date('m', strtotime($month));
         
         $request_query = Request::find()
         ->where(['between', 'request_datetime', $year."-".$nmonth."-01", $year."-".$nmonth.-"31" ])
-        ->andWhere(['lab_id'=>Yii::$app->user->identity->profile->lab_id,'status_id'=>1]);
+        ->andWhere(['lab_id'=> $lab_id,'status_id'=>1]);
 
         $requestdataprovider = new ActiveDataProvider([
                 'query' => $request_query,
