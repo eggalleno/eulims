@@ -297,7 +297,7 @@ class AnalysisController extends Controller
                     $analysis->pstcanalysis_id = (int) $post['Analysis']['pstcanalysis_id'];
                     $analysis->request_id = $request_id;
                     $analysis->type_fee_id = 1;
-                    $analysis->rstl_id = $GLOBALS['rstl_id'];
+                    $analysis->rstl_id = Yii::$app->user->identity->profile->rstl_id;
                     $analysis->test_id = (int) $post['Analysis']['test_id'];
                     //$analysis->sample_type_id = (int) $post['Analysis']['sample_type_id'];
                     $analysis->testcategory_id = $method->method_reference_id;
