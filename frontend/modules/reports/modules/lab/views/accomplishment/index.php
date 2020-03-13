@@ -252,9 +252,7 @@ $pdfFooter="{PAGENO}";
 			    ]);
         	?>
     	</div>
-       <div class="row">
-           <?= Html::a('Sync Realtime Data', ['realtimedata'], ['class'=>'btn btn-primary']) ?>
-       </div>
+     
 </div>
 </div>
 
