@@ -79,7 +79,7 @@ class Customer extends \yii\db\ActiveRecord
     {
         return [
             [['rstl_id', 'customer_name', 'head', 'tel', 'fax', 'email', 'business_nature_id','classification_id'], 'required'],
-            [['rstl_id', 'barangay_id', 'customer_type_id', 'business_nature_id', 'industrytype_id', 'classification_id', 'created_at'], 'integer'],
+            [['rstl_id', 'barangay_id', 'customer_type_id', 'business_nature_id', 'industrytype_id', 'classification_id'], 'integer'],
             [['latitude', 'longitude'], 'number'],
             [['customer_code'], 'string', 'max' => 11],
             [['customer_name', 'address'], 'string', 'max' => 200],
@@ -92,6 +92,19 @@ class Customer extends \yii\db\ActiveRecord
             [['classification_id'], 'exist', 'skipOnError' => true, 'targetClass' => Classification::className(), 'targetAttribute' => ['classification_id' => 'classification_id']],
         ];
     }
+
+    public function beforeSave($insert)
+    {
+        if (!parent::beforeSave($insert)) {
+            return false;
+        }
+
+        // ...custom code here...
+        $this->created_at = date("Y-m-d");
+        
+        return true;
+    }
+
     /**
      * {@inheritdoc}
      */
