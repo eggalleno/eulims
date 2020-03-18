@@ -297,56 +297,26 @@ class PackagelistController extends Controller
         }
     }
 
+    /**
+     * @return string
+     */
     public function actionGetpackage() {
-
 
     if ($_GET['packagelist_id']){
         if(isset($_GET['packagelist_id'])){
             $id = (int) $_GET['packagelist_id'];
-            $modelpackagelist =  Package::findOne(['id'=>$id]);
+            $modelpackagelist =  Package::findOne($id);
             $tet = $modelpackagelist->tests;
 
-             
-                if(count($modelpackagelist)>0){
+                if($modelpackagelist){
                     $rate = number_format($modelpackagelist->rate,2);
-                             
-                    // $sql = "SELECT GROUP_CONCAT(testName) FROM tbl_testname WHERE testname_id IN ($tet)";     
-         
-                    // $Connection = Yii::$app->labdb;
-                    // $command = $Connection->createCommand($sql);
-                    // $row = $command->queryOne();    
-                    //     $tests = $row['GROUP_CONCAT(testName)'];   
-                    
-                    
-                  
-                        $sql = "SELECT GROUP_CONCAT(testname_id) FROM tbl_testname_method WHERE testname_method_id IN ($tet)";     
-             
-                        $Connection = Yii::$app->labdb;
-                        $command = $Connection->createCommand($sql);
-                        $row = $command->queryOne();    
-                        $tests = $row['GROUP_CONCAT(testname_id)'];  
+                    $space = explode(',', $tet);
 
-                        $space = explode(',', $tests);
-                        $d = '';
-                        $newline = ", ";
-                        foreach ($space as $s){
-                            $d.= $s.$newline;
+                    $tests = "";
+                    $testsNameMethods = Testnamemethod::find()->where(['in', 'testname_method_id',$space])->all();
+                        foreach($testsNameMethods as $method){
+                            $tests = $tests." ".$method->testname->testName;
                         }
-
-                        $len = strlen($d);
-
-                        $x = $len-2;
-
-                        $testname_id = substr($d ,0,$x);
-                        $sql_testname = "SELECT GROUP_CONCAT(testName) FROM tbl_testname WHERE testname_id IN ($testname_id)";     
-             
-                        $Connection = Yii::$app->labdb;
-                        $command_testname = $Connection->createCommand($sql_testname);
-                        $row_testname = $command_testname->queryOne();    
-                        $tests = $row_testname['GROUP_CONCAT(testName)'];  
-
-                      
-                 
 
                 } else {
                     $rate = "";
