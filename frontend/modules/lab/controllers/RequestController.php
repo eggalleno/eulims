@@ -731,13 +731,7 @@ class RequestController extends Controller
                     'modereleasereferral' => $modereleasereferral,
                 ]);
             }else{
-                return $this->renderAjax('createReferral', [
-                    'model' => $model,
-                    'labreferral' => $labreferral,
-                    'discountreferral' => $discountreferral,
-                    'purposereferral' => $purposereferral,
-                    'modereleasereferral' => $modereleasereferral,
-                ]);
+                return $this->render;
             }
         }
     }
