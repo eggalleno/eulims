@@ -484,7 +484,7 @@ $this->registerJs($PrintEvent);
             $enableRequest = false;
         }
 
-        if($samplecount == 0){
+        if( $samplecount == 0){
             $enablePackage = true;
         } else {
             $enablePackage = false;
@@ -668,7 +668,7 @@ $this->registerJs($PrintEvent);
                     'heading'=>'<h3 class="panel-title">Analysis</h3>',
                     'type'=>'primary',
                     'before'=>Html::button('<i class="glyphicon glyphicon-plus"></i> Add Analysis', ['disabled'=>$enableRequest,'value' => Url::to(['analysis/create','id'=>$model->request_id]),'title'=>'Add Analyses', 'onclick'=> $ClickButton, 'class' => 'btn btn-success','id' => 'btn_add_analysis'])."   ".
-                    Html::button('<i class="glyphicon glyphicon-plus"></i> Add Package', ['disabled'=>$enablePackage,'value' => $model->discount > 0 ? '' : Url::to(['/services/packagelist/createpackage','id'=>$model->request_id]),'title'=>'Add Package', 'onclick'=>$model->discount > 0 ? 'BootstrapDialog.alert({type:BootstrapDialog.TYPE_DANGER,title:"Warning",message:"Add package not allowed for request with discount!"})' : $ClickButton, 'class' => 'btn btn-success','id' => 'btn_add_package'])." ",
+                    Html::button('<i class="glyphicon glyphicon-plus"></i> Add Package', ['disabled'=>$enablePackage,'value' => $model->discount > 0 ? '' : Url::to(['/services/packagelist/createpackage','id'=>$model->request_id]),'title'=>'Add Package', 'onclick'=> $ClickButton, 'class' => 'btn btn-success','id' => 'btn_add_package'])." ",
                    'after'=>false,
                    'footer'=>"<div class='row' style='margin-left: 2px;padding-top: 5px'><button ".$disableButton." value='/lab/request/saverequestransaction' ".$btnID." class='btn btn-success'><i class='fa fa-save'></i> Save Request</button>".$EnablePrint."</div>",
                 ],
