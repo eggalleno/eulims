@@ -44,13 +44,12 @@ class Chat extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['chat_id', 'sender_userid', 'reciever_userid', 'message', 'status_id'], 'required'],
-            [['chat_id', 'sender_userid', 'reciever_userid', 'status_id', 'group_id'], 'integer'],
+            [['sender_userid', 'reciever_userid', 'message', 'status_id'], 'required'],
+            [['sender_userid', 'reciever_userid', 'status_id', 'group_id'], 'integer'],
             [['message'], 'string'],
             [['timestamp'], 'safe'],
             [['chat_id'], 'unique'],
-            [['group_id'], 'exist', 'skipOnError' => true, 'targetClass' => GroupMember::className(), 'targetAttribute' => ['group_id' => 'group_id']],
-            [['status_id'], 'exist', 'skipOnError' => true, 'targetClass' => ChatStatus::className(), 'targetAttribute' => ['status_id' => 'status_id']],
+           
         ];
     }
 
@@ -62,7 +61,7 @@ class Chat extends \yii\db\ActiveRecord
         return [
             'chat_id' => 'Chat ID',
             'sender_userid' => 'Sender Userid',
-            'reciever_userid' => 'Reciever Userid',
+            'reciever_userid' => 'To:',
             'message' => 'Message',
             'timestamp' => 'Timestamp',
             'status_id' => 'Status ID',
@@ -100,5 +99,16 @@ class Chat extends \yii\db\ActiveRecord
     public function getChatAttachments()
     {
         return $this->hasMany(ChatAttachment::className(), ['uploadedby_userid' => 'sender_userid']);
+    }
+	
+	public static function getPossibleRecipients()
+    {
+        $user = new Yii::$app->controller->module->userModelClass;
+		$users = $user::find();
+        $users->where(['!=', 'user_id', Yii::$app->user->id]);
+        
+        $users = $users->all();
+
+        return $users;
     }
 }

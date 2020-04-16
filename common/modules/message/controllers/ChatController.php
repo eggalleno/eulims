@@ -8,6 +8,7 @@ use common\modules\message\models\ChatSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\helpers\ArrayHelper;
 
 /**
  * ChatController implements the CRUD actions for Chat model.
@@ -64,12 +65,27 @@ class ChatController extends Controller
     public function actionCreate()
     {
         $model = new Chat();
-
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->chat_id]);
+       
+        $possible_recipients = Chat::getPossibleRecipients();
+		$recipients=ArrayHelper::map($possible_recipients, 'id', 'username');
+        if ($model->load(Yii::$app->request->post())) {
+		
+			try{
+			$model->save(false);
+			}
+			catch (Exception $e) {
+                   print_r($e);
+				   exit;
+             }
+            //return $this->redirect(['view', 'id' => $model->chat_id]);
         } else {
+			/*echo "<br>";
+			print_r($recipients);
+		    echo "</br>";
+			exit; */
             return $this->render('create', [
                 'model' => $model,
+				'possible_recipients' => $recipients,
             ]);
         }
     }

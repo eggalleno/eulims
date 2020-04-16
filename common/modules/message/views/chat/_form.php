@@ -1,5 +1,6 @@
 <?php
 
+use kartik\select2\Select2;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
@@ -12,19 +13,19 @@ use yii\widgets\ActiveForm;
 
     <?php $form = ActiveForm::begin(); ?>
 
-    <?= $form->field($model, 'chat_id')->textInput() ?>
+	
+    <?php 
 
-    <?= $form->field($model, 'sender_userid')->textInput() ?>
-
-    <?= $form->field($model, 'reciever_userid')->textInput() ?>
-
+		echo $form->field($model, 'reciever_userid')->widget(Select2::classname(), [
+		'data' => $possible_recipients,
+		'theme' => Select2::THEME_BOOTSTRAP,
+		'options' => ['placeholder' => 'Choose the recipient'],
+		'pluginOptions' => [
+		  'allowClear' => true
+		],
+		]);
+    ?> 
     <?= $form->field($model, 'message')->textarea(['rows' => 6]) ?>
-
-    <?= $form->field($model, 'timestamp')->textInput() ?>
-
-    <?= $form->field($model, 'status_id')->textInput() ?>
-
-    <?= $form->field($model, 'group_id')->textInput() ?>
 
     <div class="form-group">
         <?= Html::submitButton($model->isNewRecord ? 'Create' : 'Update', ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
