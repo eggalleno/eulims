@@ -3,7 +3,8 @@
 namespace common\modules\message\models;
 
 use Yii;
-
+use common\models\system\Profile;
+use common\models\system\User;
 /**
  * This is the model class for table "tbl_chat".
  *
@@ -111,4 +112,24 @@ class Chat extends \yii\db\ActiveRecord
 
         return $users;
     }
+	
+	 public function getProfile($userid){
+        $profile= Profile::find()->where(['user_id'=> $userid])->one();
+        /*if($profile){
+            return ([
+                'name'=>$personnel->fullname
+            ]);
+        }else{
+            return ([
+                'name'=>""
+             ]);
+        }*/
+		return $profile;
+    }
+	public function getUser($userid){
+        $user= User::find()->where(['user_id'=> $userid])->one();
+		return $user;
+    }
+	
+	
 }
