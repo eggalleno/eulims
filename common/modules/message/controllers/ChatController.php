@@ -75,18 +75,19 @@ class ChatController extends Controller
         if ($model->load(Yii::$app->request->post())) {
 		
 			try{
+			$model->sender_userid= Yii::$app->user->id;
+			$model->reciever_userid= Yii::$app->user->id; //For testing only
+			$model->status_id=1;//sent
 			$model->save(false);
+			
 			}
 			catch (Exception $e) {
                    print_r($e);
 				   exit;
              }
-            //return $this->redirect(['view', 'id' => $model->chat_id]);
+			 Yii::$app->session->setFlash('success', 'Message Sent!');
+            return $this->redirect(['/message/chat/index']);
         } else {
-			/*echo "<br>";
-			print_r($recipients);
-		    echo "</br>";
-			exit; */
             return $this->render('create', [
                 'model' => $model,
 				'possible_recipients' => $recipients,

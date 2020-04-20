@@ -45,7 +45,7 @@ class Chat extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['sender_userid', 'reciever_userid', 'message', 'status_id'], 'required'],
+            [['sender_userid', 'message', 'status_id'], 'required'],
             [['sender_userid', 'reciever_userid', 'status_id', 'group_id'], 'integer'],
             [['message'], 'string'],
             [['timestamp'], 'safe'],
@@ -115,20 +115,13 @@ class Chat extends \yii\db\ActiveRecord
 	
 	 public function getProfile($userid){
         $profile= Profile::find()->where(['user_id'=> $userid])->one();
-//        if($profile){
-//            return ([
-//                'name'=>$profile->fullname
-//            ]);
-//        }else{
-//            return ([
-//                'name'=>""
-//             ]);
-//        }
 		return $profile;
     }
+	
 	public function getUser($userid){
         $user= User::find()->where(['user_id'=> $userid])->one();
 		return $user;
     }
+
 	
 }
