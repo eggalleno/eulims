@@ -5,6 +5,7 @@ namespace common\modules\message\controllers;
 use Yii;
 use common\modules\message\models\Chat;
 use common\modules\message\models\ChatSearch;
+use yii\data\ActiveDataProvider;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -37,7 +38,10 @@ class ChatController extends Controller
     public function actionIndex()
     {
         $searchModel = new ChatSearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        //$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        $query = Chat::find()->where(['reciever_userid' => Yii::$app->user->id])
+                            ->orderBy('status_id ASC', 'timestamp ASC');
+        $dataProvider = New ActiveDataProvider(['query'=>$query]);
 
         return $this->render('index', [
             'searchModel' => $searchModel,
@@ -137,4 +141,5 @@ class ChatController extends Controller
             throw new NotFoundHttpException('The requested page does not exist.');
         }
     }
+
 }

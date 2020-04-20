@@ -115,21 +115,20 @@ class Chat extends \yii\db\ActiveRecord
 	
 	 public function getProfile($userid){
         $profile= Profile::find()->where(['user_id'=> $userid])->one();
-        /*if($profile){
-            return ([
-                'name'=>$personnel->fullname
-            ]);
-        }else{
-            return ([
-                'name'=>""
-             ]);
-        }*/
+//        if($profile){
+//            return ([
+//                'name'=>$profile->fullname
+//            ]);
+//        }else{
+//            return ([
+//                'name'=>""
+//             ]);
+//        }
 		return $profile;
     }
 	public function getUser($userid){
         $user= User::find()->where(['user_id'=> $userid])->one();
 		return $user;
     }
-	
 	
 }
