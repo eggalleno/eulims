@@ -13,7 +13,7 @@ $this->params['breadcrumbs'][] = $this->title;
 <div class="chat-index">
 <div class="panel panel-default col-xs-12">
         <!--<div class="panel-heading"><i class="fa fa-adn"></i> </div>-->
-        <div class="panel-body">
+        <div class="messagewrap">
     <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
    <!-- = GridView::widget([
         'dataProvider' => $dataProvider,
@@ -60,13 +60,13 @@ $this->params['breadcrumbs'][] = $this->title;
             ['class' => 'yii\grid\ActionColumn'],
         ],
     ]); -->
-            <div class="user-panel" style="height: 700px; width: 370px; background-color: #222d32">
-                <p>
+            <div class="messageleft">
+                <p align="left">
                     <?= Html::a('Create Message', ['create'], ['class' => 'btn btn-success']) ?>
                 </p>
                 <aside class="main-header">
-                    <section class="sidebar">
-                        <div class="user-panel" style="height: 700px; width: 340px">
+                    <section class="sidebar" align="left">
+                        <div class="user-panel" style="height: 700px; width: 350px">
                             <ul class="sidebar-menu tree" data-widget="tree">
                                 <li class="treeview">
                                     <a>
@@ -123,7 +123,10 @@ $this->params['breadcrumbs'][] = $this->title;
                     </section>
                 </aside>
             </div>
-
+			 <div class="messagecenter">
+			 hjfsgdfkjshd
+			 </div>
+		 
         </div>
 </div>
 </div>

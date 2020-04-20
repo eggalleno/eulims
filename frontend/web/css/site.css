@@ -258,6 +258,27 @@ fieldset>legend {
     font-size: 12px
 }
 
+.messagewrap{
+    text-align:center
+}
+.messageleft{
+	margin:0 auto !important; 
+    float: left;
+	height: 700px; 
+	width: 370px; 
+	background-color: #222d32 !important; 
+}
+
+.messagecenter{
+	text-align:left;
+	height: 700px;  
+	background-color: #B0C4DE !important;
+
+
+}
+
+  
+}
 /*.requests {
     overflow-y:auto;
 }
