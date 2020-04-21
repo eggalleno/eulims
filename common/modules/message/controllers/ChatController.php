@@ -49,7 +49,7 @@ class ChatController extends Controller
         ]);
     }
 
-    Public function GetMess($sendId){
+    Public function actionView($sendId){
         $searchmodel = new ChatSearch();
         $query = Chat::find()->where(['reciever_userid' => Yii::$app->user->id, 'sender_userid' => $sendId])
                             ->orderBy('timestamp');
@@ -65,12 +65,12 @@ class ChatController extends Controller
      * @param integer $id
      * @return mixed
      */
-    public function actionView($id)
+   /* public function actionView($id)
     {
-        return $this->render('view', [
+        return $this->render('index', [
             'model' => $this->findModel($id),
         ]);
-    }
+    }*/
 
     /**
      * Creates a new Chat model.

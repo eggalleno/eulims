@@ -2,14 +2,19 @@
 
 use yii\helpers\Html;
 use kartik\grid\GridView;
+use yii\widgets\DetailView;
 
 /* @var $this yii\web\View */
+/** @var $model common\modules\message\models\Chat */
 /* @var $searchModel common\modules\message\models\ChatSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
 $this->title = 'Chats';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
+<script>
+
+</script>
 <div class="chat-index">
 <div class="panel panel-default col-xs-12">
         <!--<div class="panel-heading"><i class="fa fa-adn"></i> </div>-->
@@ -134,7 +139,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 </aside>
             </div>
 			 <div class="messagecenter">
-                 <>
+
 			 </div>
 		 
         </div>

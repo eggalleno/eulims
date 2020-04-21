@@ -13,7 +13,7 @@ use yii\widgets\DetailView;
 /* @var $searchModel common\modules\message\models\ChatSearch */
 ?>
 <li>
-    <a href="<?php echo Url::to(['view', 'id' => $model->chat_id])?>">
+    <a id = "linkPark" href="<?php echo Url::to(['view', 'sendId' => $model->chat_id])?>" name="link1">
 <?php
                     echo "<i class='fa fa-' style='display:none;width: 0px; height: 15px'></i>";
                     echo "<span>";
