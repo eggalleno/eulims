@@ -134,7 +134,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 </aside>
             </div>
 			 <div class="messagecenter">
-
+                 <>
 			 </div>
 		 
         </div>
