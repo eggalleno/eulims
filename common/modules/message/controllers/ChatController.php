@@ -56,7 +56,7 @@ class ChatController extends Controller
         $dataProvider = New ActiveDataProvider(['query' => $query]);
         return $this->render('index',[
             'searchModel' => $searchmodel,
-            'dataProvider' => $dataProvider
+            'dataProvider' => $dataProvider,
         ]);
     }
 
@@ -65,9 +65,9 @@ class ChatController extends Controller
      * @param integer $id
      * @return mixed
      */
-   /* public function actionView($id)
+/*    public function actionView($id)
     {
-        return $this->render('index', [
+        return $this->render('view', [
             'model' => $this->findModel($id),
         ]);
     }*/

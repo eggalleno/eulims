@@ -95,9 +95,6 @@ $this->params['breadcrumbs'][] = $this->title;
                                                     ?>
                                         </div>
                                     </ul>
-
-
-
                                 </li>
                                 <li class="treeview">
                                     <a>
@@ -139,7 +136,12 @@ $this->params['breadcrumbs'][] = $this->title;
                 </aside>
             </div>
 			 <div class="messagecenter">
-
+                 <?= \yii\widgets\ListView::widget([
+                     'dataProvider' => $dataProvider,
+                     'summary' => '',
+                     'itemView' => 'convo_view'
+                 ]);
+                 ?>
 			 </div>
 		 
         </div>
