@@ -39,8 +39,8 @@ class ChatController extends Controller
     {
         $searchModel = new ChatSearch();
         //$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
-        $query = Chat::find()->where(['reciever_userid' => Yii::$app->user->id])
-                            ->orderBy('status_id ASC', 'timestamp ASC');
+        $query = $this->Getallmessage();
+		
         $dataProvider = New ActiveDataProvider(['query'=>$query]);
 
         return $this->render('index', [
@@ -53,7 +53,8 @@ class ChatController extends Controller
         $searchmodel = new ChatSearch();
         $query = Chat::find()->where(['reciever_userid' => Yii::$app->user->id, 'sender_userid' => $sendId])
                             ->orderBy('timestamp');
-        $dataProvider = New ActiveDataProvider(['query' => $query]);
+        
+		$dataProvider = New ActiveDataProvider(['query' => $query]);
         return $this->render('index',[
             'searchModel' => $searchmodel,
             'dataProvider' => $dataProvider,
@@ -153,5 +154,27 @@ class ChatController extends Controller
             throw new NotFoundHttpException('The requested page does not exist.');
         }
     }
+	
+	public function Getallmessage(){
+		$query = Chat::find()->where(['reciever_userid' => Yii::$app->user->id])
+							->groupBy('sender_userid')
+                            ->orderBy(['timestamp'=>SORT_DESC]);
+		return $query;					
+	}
+	
+	public function actionGetsendermessage($id)
+    {
+		$query = Chat::find()->where(['reciever_userid' => Yii::$app->user->id, 'sender_userid' => $id])
+                            ->orderBy('timestamp');
+        
+		$dataProvider = New ActiveDataProvider(['query' => $query]);
+     
+        if(Yii::$app->request->isAjax){
+			//return $id;
+			return $this->renderAjax('convo_view', ['dataProvider'=>$dataProvider]);
+        }
+       
+		
+	}
 
 }

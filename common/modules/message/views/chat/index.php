@@ -135,13 +135,8 @@ $this->params['breadcrumbs'][] = $this->title;
                     </section>
                 </aside>
             </div>
-			 <div class="messagecenter">
-                 <?= \yii\widgets\ListView::widget([
-                     'dataProvider' => $dataProvider,
-                     'summary' => '',
-                     'itemView' => 'convo_view'
-                 ]);
-                 ?>
+			 <div class="messagecenter" id="idconvo">
+                
 			 </div>
 		 
         </div>

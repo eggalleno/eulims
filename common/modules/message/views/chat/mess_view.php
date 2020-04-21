@@ -13,7 +13,7 @@ use yii\widgets\DetailView;
 /* @var $searchModel common\modules\message\models\ChatSearch */
 ?>
 <li>
-    <a id = "link" href="<?php echo Url::to(['view', 'sendId' => $model->sender_userid])?>link=1" name="link1">
+<a class="thismessage" id="<?=$model->sender_userid?>">
 <?php
 
                         echo "<i class='fa fa-' style='display:none;width: 0px; height: 15px'></i>";
@@ -31,5 +31,25 @@ use yii\widgets\DetailView;
 ?>
     </a>
 </li>
-
-
+<script type="text/javascript">
+$(document).ready(function(){
+   $("a.thismessage").on('click',function (ee) {
+	var id=($(this).attr("id"));
+	//alert(id);
+		
+	 $.ajax({
+		url: '/message/chat/getsendermessage',
+		//dataType: 'json',
+		method: 'GET',
+		data: {id:id},
+		success: function (data, textStatus, jqXHR) {
+		   $('#idconvo').html(data);
+		}
+	});
+	
+    });
+	
+	
+   
+});
+</script>
