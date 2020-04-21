@@ -1,6 +1,8 @@
 <?php
 use yii\helpers\Html;
 use \yii\helpers\StringHelper;
+use \yii\helpers\Url;
+use yii\widgets\DetailView;
 /**
  * Created by PhpStorm.
  * User: OneLab
@@ -8,9 +10,11 @@ use \yii\helpers\StringHelper;
  * Time: 21:52
  */
 /** @var $model common\modules\message\models\Chat */
-
-                    echo "<li>";
-                    echo "<a href=''>";
+/* @var $searchModel common\modules\message\models\ChatSearch */
+?>
+<li>
+    <a href="<?php echo Url::to(['view', 'id' => $model->chat_id])?>">
+<?php
                     echo "<i class='fa fa-' style='display:none;width: 0px; height: 15px'></i>";
                     echo "<span>";
                     if ($model->status_id == 1){
@@ -21,11 +25,8 @@ use \yii\helpers\StringHelper;
                     echo "</span></b><br>";
                     echo StringHelper::truncateWords(($model->message),5);
                     echo "</span><br><br>";
-                    echo "</a>";
-                    echo "</li>";
-
-
 ?>
-
+    </a>
+</li>
 
 

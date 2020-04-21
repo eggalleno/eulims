@@ -66,7 +66,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 </p>
                 <aside class="main-header">
                     <section class="sidebar" align="left">
-                        <div class="user-panel" style="height: 700px; width: 350px">
+                        <div class="user-panel" style="height: 550px; width: 350px">
                             <ul class="sidebar-menu tree" data-widget="tree">
                                 <li class="treeview">
                                     <a>
@@ -105,6 +105,11 @@ $this->params['breadcrumbs'][] = $this->title;
                                                 <i class="fa fa-angle-left pull-right"></i>
                                             </span>
                                     </a>
+                                    <ul class='treeview-menu'>
+                                        <div class="pre-scrollable" style="height: 200px">
+
+                                        </div>
+                                    </ul>
                                 </li>
                                 <li class="treeview">
                                     <a>
@@ -117,6 +122,11 @@ $this->params['breadcrumbs'][] = $this->title;
                                             <i class="fa fa-angle-left pull-right"></i>
                                         </span>
                                     </a>
+                                    <ul class='treeview-menu'>
+                                        <div class="pre-scrollable" style="height: 200px">
+
+                                        </div>
+                                    </ul>
                                 </li>
                             </ul>
                         </div>
@@ -124,7 +134,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 </aside>
             </div>
 			 <div class="messagecenter">
-			 hjfsgdfkjshd
+
 			 </div>
 		 
         </div>

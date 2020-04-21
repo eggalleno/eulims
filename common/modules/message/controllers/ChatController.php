@@ -49,6 +49,17 @@ class ChatController extends Controller
         ]);
     }
 
+    Public function GetMess($sendId){
+        $searchmodel = new ChatSearch();
+        $query = Chat::find()->where(['reciever_userid' => Yii::$app->user->id, 'sender_userid' => $sendId])
+                            ->orderBy('timestamp');
+        $dataProvider = New ActiveDataProvider(['query' => $query]);
+        return $this->render('index',[
+            'searchModel' => $searchmodel,
+            'dataProvider' => $dataProvider
+        ]);
+    }
+
     /**
      * Displays a single Chat model.
      * @param integer $id
