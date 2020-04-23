@@ -49,7 +49,7 @@ class ChatController extends Controller
         ]);
     }
 
-    Public function actionView($sendId){
+/*    Public function actionView($sendId){
         $searchmodel = new ChatSearch();
         $query = Chat::find()->where(['reciever_userid' => Yii::$app->user->id, 'sender_userid' => $sendId])
                             ->orderBy('timestamp');
@@ -59,19 +59,19 @@ class ChatController extends Controller
             'searchModel' => $searchmodel,
             'dataProvider' => $dataProvider,
         ]);
-    }
+    }*/
 
     /**
      * Displays a single Chat model.
      * @param integer $id
      * @return mixed
      */
-/*    public function actionView($id)
+    public function actionView($sendId)
     {
         return $this->render('view', [
-            'model' => $this->findModel($id),
+            'model' => $this->findModel($sendId),
         ]);
-    }*/
+    }
 
     /**
      * Creates a new Chat model.
@@ -166,7 +166,7 @@ class ChatController extends Controller
     {
 		$query = Chat::find()->where(['reciever_userid' => Yii::$app->user->id, 'sender_userid' => $id])
                             ->orderBy('timestamp');
-        
+
 		$dataProvider = New ActiveDataProvider(['query' => $query]);
      
         if(Yii::$app->request->isAjax){
