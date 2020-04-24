@@ -12,21 +12,9 @@ $this->params['breadcrumbs'][] = $this->title;
 ?>
 <?php
 
-        echo '<div class="chat-header clearfix">';
-            echo '<img src="/images/icons/customer.png" alt="avatar" />';
-
-            echo '<div class="chat-about">';
-                echo '<div class="chat-with">';
-                echo Html::encode($model->getProfile($model->sender_userid)->firstname);
-                echo '</div>';
-                echo '<div class="chat-num-messages">';
-                echo "";
-                echo '</div>';
-            echo "</div>";
-            echo '<i class="fa fa-phone"></i>';
-        echo '</div>'; /*<!-- end chat-header -->*/
-    echo '<div class="chat-history">';
-    echo '<ul>';
+         /*<!-- end chat-header -->*/
+/*    echo '<div class="chat-history">';
+    echo '<ul>';*/
     echo '<li class="clearfix">';
             echo "<div class='message-data'>";
 
@@ -43,10 +31,10 @@ $this->params['breadcrumbs'][] = $this->title;
                     echo Html::encode($model->message);
                     echo "</div>";
     echo '</li>';
-    echo '</ul>';
-    echo '</div>'; /*<!-- end chat-history -->*/
+/*    echo '</ul>';
+    echo '</div>';*/ /*<!-- end chat-history -->*/
 ?>
-<div class="chat-message clearfix">
+<!--<div class="chat-message clearfix">
     <textarea name="message-to-send" id="message-to-send" placeholder ="Type your message" rows="3"></textarea>
 
     <i class="fa fa-file-o"></i> &nbsp;&nbsp;&nbsp;
@@ -54,7 +42,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <button>Send</button>
 
-</div>
+</div>-->
 
 
 

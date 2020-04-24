@@ -35,7 +35,7 @@ $this->params['breadcrumbs'][] = $this->title;
         </ul>
     </div>
 
-    <div class="chat" id="idconvo">
+    <div class="chat" >
         <div class="chat-header clearfix">
 
 
@@ -46,8 +46,8 @@ $this->params['breadcrumbs'][] = $this->title;
 
         </div> <!-- end chat-header -->
 
-        <div class="chat-history" >
-            <ul>
+        <div class="chat-history">
+            <ul id="idconvo">
 
             </ul>
 
