@@ -52,14 +52,14 @@ $this->params['breadcrumbs'][] = $this->title;
             </ul>
 
         </div> <!-- end chat-history -->
-
+        <input type="text" id="senderid" value="" hidden>
         <div class="chat-message clearfix">
-            <textarea name="message-to-send" id="message-to-send" placeholder ="Type your message" rows="3"></textarea>
+            <textarea name="message-to-send" id="messagetosend" placeholder ="Type your message" rows="3"></textarea>
 
             <i class="fa fa-file-o"></i> &nbsp;&nbsp;&nbsp;
             <i class="fa fa-file-image-o"></i>
 
-            <button>Send</button>
+            <button id="send" onclick="sendfunc()">Send</button>
 
         </div> <!-- end chat-message -->
 
@@ -97,3 +97,23 @@ $this->params['breadcrumbs'][] = $this->title;
 
 </body>
 </html>
+
+<script type="text/javascript">
+function sendfunc() {
+  var senderid=document.getElementById("senderid").value;
+  var message=document.getElementById("messagetosend").value;
+  //alert(message);
+
+	
+	  $.ajax({
+                url: '/message/chat/sendmessage',
+                //dataType: 'json',
+                method: 'GET',
+                data: {senderid:senderid,message:message},
+                success: function (data, textStatus, jqXHR) {
+                   // $('#idconvo').html(data);
+				   alert('sdsfs');
+                }
+      });
+}
+</script>

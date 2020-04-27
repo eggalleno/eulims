@@ -17,7 +17,7 @@ use yii\widgets\DetailView;
         $("a.thismessage").on('click',function (ee) {
             var id=($(this).attr("id"));
             //alert(id);
-
+            document.getElementById("senderid").value=id;
             $.ajax({
                 url: '/message/chat/getsendermessage',
                 //dataType: 'json',
@@ -50,5 +50,5 @@ use yii\widgets\DetailView;
 ?>
     </div>
 </li>
-   </a>
+</a>
 

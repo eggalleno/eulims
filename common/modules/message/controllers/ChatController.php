@@ -176,5 +176,16 @@ class ChatController extends Controller
        
 		
 	}
+	
+	public function actionSendmessage($senderid,$message)
+    {
+		$model = new Chat();
+		$model->sender_userid= Yii::$app->user->id;
+		$model->reciever_userid= $senderid; //
+		$model->status_id=1;//sent
+		$model->message=$message;
+		$model->save();
+		return $senderid;
+	}
 
 }
