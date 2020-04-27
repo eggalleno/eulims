@@ -3,6 +3,7 @@ use yii\helpers\Html;
 use \yii\helpers\StringHelper;
 use \yii\helpers\Url;
 use yii\widgets\DetailView;
+
 /**
  * Created by PhpStorm.
  * User: OneLab
@@ -51,4 +52,3 @@ use yii\widgets\DetailView;
     </div>
 </li>
 </a>
-
