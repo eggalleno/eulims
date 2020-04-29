@@ -3,7 +3,7 @@
 use yii\helpers\Html;
 use kartik\grid\GridView;
 use yii\widgets\DetailView;
-
+use kartik\file\FileInput;
 
 /* @var $this yii\web\View */
 /** @var $model common\modules\message\models\Chat */
@@ -55,9 +55,22 @@ $this->params['breadcrumbs'][] = $this->title;
         <input type="text" id="senderid" value="" hidden>
         <div class="chat-message clearfix">
             <textarea name="message-to-send" id="messagetosend" placeholder ="Type your message" rows="3"></textarea>
-
-            <i class="fa fa-file-o"></i> &nbsp;&nbsp;&nbsp;
-            <i class="fa fa-file-image-o"></i>
+			<div class="file-loading">
+				<?php
+				echo '<label class="control-label">Upload Document</label>';
+				echo FileInput::widget([
+				    'model' => $file,
+                    'attribute' => 'filename',
+					'options' => ['multiple' => true],
+					'pluginOptions' => [
+						'showPreview' => true,
+						'showCaption' => true,
+						'showUpload' => false,
+						'showRemove'=>true
+					]
+				]);
+				?>
+			</div>
 
             <button id="send" onclick="sendfunc()">Send</button>
 
@@ -102,17 +115,24 @@ $this->params['breadcrumbs'][] = $this->title;
 function sendfunc() {
   var senderid=document.getElementById("senderid").value;
   var message=document.getElementById("messagetosend").value;
-  //alert(message);
 
-	
-	  $.ajax({
+	  /*$.ajax({
                 url: '/message/chat/sendmessage',
-                //dataType: 'json',
+      
                 method: 'GET',
                 data: {senderid:senderid,message:message},
                 success: function (data, textStatus, jqXHR) {
-                   // $('#idconvo').html(data);
 				   alert('sdsfs');
+                }
+      }); */
+	  
+	  $.ajax({
+                url: '/message/chat/saveattachment',
+      
+                method: 'GET',
+                data: {senderid:senderid},
+                success: function (data, textStatus, jqXHR) {
+				   alert(data);
                 }
       });
 }

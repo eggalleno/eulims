@@ -38,10 +38,11 @@ class ChatAttachment extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['uploadedby_userid'], 'integer'],
+            [['uploadedby_userid','receiver_userid'], 'integer'],
             [['upload_datetime'], 'safe'],
             [['filename'], 'string', 'max' => 100],
             [['uploadedby_userid'], 'exist', 'skipOnError' => true, 'targetClass' => Chat::className(), 'targetAttribute' => ['uploadedby_userid' => 'sender_userid']],
+			
         ];
     }
 
