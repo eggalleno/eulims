@@ -10,15 +10,12 @@ use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use yii\helpers\ArrayHelper;
-use common\modules\message\models\ChatAttachment;
-use yii\web\UploadedFile;
 
 /**
  * ChatController implements the CRUD actions for Chat model.
  */
 class ChatController extends Controller
 {
-
     /**
      * @inheritdoc
      */
@@ -46,11 +43,9 @@ class ChatController extends Controller
 		
         $dataProvider = New ActiveDataProvider(['query'=>$query]);
 
-        $file= new ChatAttachment();
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
-			'file'=>$file
         ]);
     }
 
@@ -191,21 +186,6 @@ class ChatController extends Controller
 		$model->message=$message;
 		$model->save();
 		return $senderid;
-	}
-	
-	public function actionSaveattachment($senderid)
-    {
-		/*$model = new ChatAttachment();
-		$model->sender_userid= Yii::$app->user->id;
-		$model->reciever_userid= $senderid; //
-		$model->status_id=1;//sent
-		$model->message=$message;
-		$model->save(); */
-		//$sds = UploadedFile::getInstance();
-		//$model = new ChatAttachment();
-		
-		return ;
-		
 	}
 
 }
