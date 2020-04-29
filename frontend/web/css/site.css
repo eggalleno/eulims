@@ -1,6 +1,10 @@
 html,
 body {
     height: 100%;
+    background: #C5DDEB;
+    font: 14px/20px "Lato", Arial, sans-serif;
+    padding: 40px 0;
+    color: #0f0f0f;
 }
 @media (max-width: 767px) {
     .skin-blue .main-header .navbar .dropdown-menu li a {
@@ -283,16 +287,9 @@ fieldset>legend {
     box-sizing: border-box;
 }
 
-body {
-    background: #C5DDEB;
-    font: 14px/20px "Lato", Arial, sans-serif;
-    padding: 40px 0;
-    color: white;
-}
-
 .container {
     margin: 0 auto;
-    width: 780px;
+    width: 1200px;
     background: #444753;
     border-radius: 5px;
 }
@@ -339,7 +336,7 @@ body {
 }
 
 .chat {
-    width: 490px;
+    width: 900px;
     float: left;
     background: #F2F5F8;
     border-top-right-radius: 5px;
