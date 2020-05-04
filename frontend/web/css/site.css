@@ -3,7 +3,6 @@ body {
     height: 100%;
     background: #C5DDEB;
     font: 14px/20px "Lato", Arial, sans-serif;
-    padding: 40px 0;
     color: #0f0f0f;
 }
 @media (max-width: 767px) {
@@ -19,7 +18,7 @@ body {
     box-shadow: 5px 5px;
 }
 .modal-header>h4{
-    color: white;
+    color: #0f0f0f;
     position: absolute;
     top: 8px
 }
