@@ -301,7 +301,7 @@ $payment_status_id=$model->payment_status_id;
                     'editableOptions' => [
                         'header' => 'Amount', 
                         'size'=>'s',
-                        'inputType' => kartik\editable\Editable::INPUT_TEXT,
+                        'inputType' => Editable::INPUT_TEXT,
                         'options' => [
                             'pluginOptions' => ['min' => 1]
                         ],

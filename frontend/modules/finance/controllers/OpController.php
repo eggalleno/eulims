@@ -452,7 +452,7 @@ class OpController extends Controller
                  ->andWhere(['status' => 1])
                  ->sum('amount');
             $this->updateTotalOP($op_id, $sum);
-            echo $out;
+            //echo $out;
             return;
         }
     }
