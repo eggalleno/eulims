@@ -285,7 +285,7 @@ $payment_status_id=$model->payment_status_id;
                     'pageSummary' => '<span style="float:right;">Total:</span>',
                 ],
                 [
-                    'class' => 'kartik\grid\EditableColumn',
+                   'class' => 'kartik\grid\EditableColumn',
                     'refreshGrid'=>true,
                     //'asPopover' => true,
                     'attribute' => 'amount', 
@@ -300,8 +300,8 @@ $payment_status_id=$model->payment_status_id;
                      },
                     'editableOptions' => [
                         'header' => 'Amount', 
+						'inputType' => \kartik\editable\Editable::INPUT_TEXT,
                         'size'=>'s',
-                        'inputType' => Editable::INPUT_TEXT,
                         'options' => [
                             'pluginOptions' => ['min' => 1]
                         ],
