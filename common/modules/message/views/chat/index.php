@@ -14,56 +14,16 @@ use kartik\file\FileInput;
 $this->title = 'Chats';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<script type="text/javascript">
-    function sendfunc() {
-        var senderid=document.getElementById("senderid").value;
-        var message=document.getElementById("messagetosend").value;
-        //alert(message);
-
-
-        $.ajax({
-            url: '/message/chat/sendmessage',
-            //dataType: 'json',
-            method: 'GET',
-            data: {senderid:senderid,message:message},
-            success: function (data, textStatus, jqXHR) {
-                // $('#idconvo').html(data);
-                alert('sdsfs');
-            }
-        });
-
-        $.ajax({
-            url: '/message/chat/saveattachment',
-
-            method: 'GET',
-            data: {senderid:senderid},
-            success: function (data, textStatus, jqXHR) {
-                alert(data);
-            }
-        });
-    }
-    function contName(){
-        if (event.keyCode === 13) {
-            document.getElementById("contactName").value='James';
-        }
-    }
-    var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
-    (function(){
-        var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
-        s1.async=true;
-        s1.src='https://embed.tawk.to/5eb52bb681d25c0e5849fc61/default';
-        s1.charset='UTF-8';
-        s1.setAttribute('crossorigin','*');
-        s0.parentNode.insertBefore(s1,s0);
-    })();
-</script>
-
-
 <html lang="en" >
+<head>
+    <meta charset="UTF-8">
+    <title>CodePen - Chat Widget</title>
+
+</head>
 <div class="container clearfix">
     <div class="people-list" id="people-list">
         <div class="search">
-            <input type="text" id="contName" placeholder="search" onkeypress="contName()"/>
+            <input type="text" placeholder="search" />
             <i class="fa fa-search"></i>
         </div>
         <ul class="list">
@@ -78,20 +38,21 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <div class="chat" >
         <div class="chat-header clearfix">
-                <div class="chat-about">
-                    <div class="chat-with" id="sendername"></div>
-                    <div class="chat-num-messages"></div>
-                </div>
-            <i class="fa fa-phone"></i>
 
-        </div><!-- end chat-header -->
 
-        <div class="chat-history" >
+            <div class="chat-about">
+                <div class="chat-with"></div>
+                <div class="chat-num-messages"></div>
+            </div>
+
+        </div> <!-- end chat-header -->
+
+        <div class="chat-history">
             <ul id="idconvo">
 
             </ul>
-        </div><!-- end chat-history -->
 
+        </div> <!-- end chat-history -->
         <input type="text" id="senderid" value="" hidden>
         <div class="chat-message clearfix">
             <textarea name="message-to-send" id="messagetosend" placeholder ="Type your message" rows="3"></textarea>
@@ -110,7 +71,7 @@ $this->params['breadcrumbs'][] = $this->title;
 					]
 				]);
 				?>
-			</div><br><br>
+			</div>
             <button id="send" onclick="sendfunc()">Send</button>
 
         </div> <!-- end chat-message -->
@@ -150,3 +111,32 @@ $this->params['breadcrumbs'][] = $this->title;
 </body>
 </html>
 
+<script type="text/javascript">
+function sendfunc() {
+  var senderid=document.getElementById("senderid").value;
+  var message=document.getElementById("messagetosend").value;
+  //alert(message);
+
+	
+	  $.ajax({
+                url: '/message/chat/sendmessage',
+                //dataType: 'json',
+                method: 'GET',
+                data: {senderid:senderid,message:message},
+                success: function (data, textStatus, jqXHR) {
+                   // $('#idconvo').html(data);
+				   alert('sdsfs');
+                }
+      });
+	  
+	  $.ajax({
+                url: '/message/chat/saveattachment',
+      
+                method: 'GET',
+                data: {senderid:senderid},
+                success: function (data, textStatus, jqXHR) {
+				   alert(data);
+                }
+      });
+}
+</script>

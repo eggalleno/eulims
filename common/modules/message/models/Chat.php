@@ -15,7 +15,6 @@ use common\models\system\User;
  * @property string $timestamp
  * @property int $status_id
  * @property int $group_id
- * @property int $contact_id
  *
  * @property GroupMember $group
  * @property ChatStatus $status
@@ -47,7 +46,7 @@ class Chat extends \yii\db\ActiveRecord
     {
         return [
             [['sender_userid', 'message', 'status_id'], 'required'],
-            [['sender_userid', 'reciever_userid', 'status_id', 'group_id', 'contact_id'], 'integer'],
+            [['sender_userid', 'reciever_userid', 'status_id', 'group_id'], 'integer'],
             [['message'], 'string'],
             [['timestamp'], 'safe'],
             [['chat_id'], 'unique'],
@@ -68,7 +67,6 @@ class Chat extends \yii\db\ActiveRecord
             'timestamp' => 'Timestamp',
             'status_id' => 'Status ID',
             'group_id' => 'Group ID',
-            'contact_id' => 'Contact ID'
         ];
     }
 
@@ -102,14 +100,6 @@ class Chat extends \yii\db\ActiveRecord
     public function getChatAttachments()
     {
         return $this->hasMany(ChatAttachment::className(), ['uploadedby_userid' => 'sender_userid']);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getChatContacts()
-    {
-        return $this->hasMany(ChatContacts::className(), ['contact_id' => 'contact_id']);
     }
 	
 	public static function getPossibleRecipients()

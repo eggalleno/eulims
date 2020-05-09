@@ -2,12 +2,10 @@
 
 namespace common\modules\message\controllers;
 
-use common\modules\profile\models\Profile;
 use Yii;
 use common\modules\message\models\Chat;
 use common\modules\message\models\ChatSearch;
 use yii\data\ActiveDataProvider;
-use yii\db\Query;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -162,23 +160,15 @@ class ChatController extends Controller
     }
 	
 	public function Getallmessage(){
-		/*$query = Chat::find()->where(['reciever_userid' => Yii::$app->user->id])
+		$query = Chat::find()->where(['reciever_userid' => Yii::$app->user->id])
 							->groupBy('sender_userid')
-                            ->orderBy(['timestamp'=>SORT_DESC]);*/
-		/*$query = new Query();*/
-		$subquery = Chat::find()->select('max(timestamp)')
-                                ->from('tbl_chat')
-                                ->where(['reciever_userid' => Yii::$app->user->id])
-                                ->groupBy('contact_id');
-
-		$query = Chat::find()->select('*')->from('tbl_chat')->where(['in', 'timestamp', $subquery]);
-
+                            ->orderBy(['timestamp'=>SORT_DESC]);
 		return $query;					
 	}
 	
 	public function actionGetsendermessage($id)
     {
-		$query = Chat::find()->where(['contact_id' => $id])
+		$query = Chat::find()->where(['reciever_userid' => Yii::$app->user->id, 'sender_userid' => $id])
                             ->orderBy('timestamp');
 
 		$dataProvider = New ActiveDataProvider(['query' => $query]);
@@ -190,23 +180,6 @@ class ChatController extends Controller
        
 		
 	}
-    public function actionGetsendermess($id)
-    {
-        $query = Profile::find()->where(['user_id'=> $id])->one();
-
-        if(Yii::$app->request->isAjax){
-            return ($query->fullname);
-        }
-    }
-
-    public function actionUpdateNewMess($id){
-        $model = Chat::find()->where(['contact_id'=>$id]);
-        if(Yii::$app->request->isAjax){
-            $model->status_id=2;
-            $model->save();
-            return $id;
-        }
-    }
 	
 	public function actionSendmessage($senderid,$message)
     {
