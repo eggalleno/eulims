@@ -2,12 +2,15 @@
 common/config/db.php
 common/config/db.php
 vendor/kartik-v/yii2-datecontrol/
+vendor/kartik-v/yii2-editable/
+vendor/kartik-v/yii2-widget-datepicker/
 common/config/db.php
 backend/web/uploads/user/photo/88cd72e20f7c9efd6b1f4db195ddf446d3bf5cfb.png
 frontend/web/88cd72e20f7c9efd6b1f4db195ddf446d3bf5cfb.png
 nbproject/private/private.xml
 frontend/modules/lab/views/request/view.php
 nbproject/private/private.xml
+vendor/kartik-v/yii2-editable/
 vendor/kartik-v/yii2-sortable-input/
 nbproject/private/private.xml
 nbproject/private/private.xml
