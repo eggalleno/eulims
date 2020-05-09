@@ -8,10 +8,7 @@ use common\models\finance\CancelledOp;
 use common\components\Functions;
 use common\models\finance\PaymentStatus;
 use yii\web\View;
-
 use yii\helpers\Url;
-
-use kartik\editable\Editable;
 /* @var $this yii\web\View */
 /* @var $model common\models\finance\Op */
 
@@ -285,7 +282,7 @@ $payment_status_id=$model->payment_status_id;
                     'pageSummary' => '<span style="float:right;">Total:</span>',
                 ],
                 [
-                   'class' => 'kartik\grid\EditableColumn',
+                    'class' => 'kartik\grid\EditableColumn',
                     'refreshGrid'=>true,
                     //'asPopover' => true,
                     'attribute' => 'amount', 
@@ -300,8 +297,8 @@ $payment_status_id=$model->payment_status_id;
                      },
                     'editableOptions' => [
                         'header' => 'Amount', 
-						'inputType' => \kartik\editable\Editable::INPUT_TEXT,
                         'size'=>'s',
+                        'inputType' => \kartik\editable\Editable::INPUT_TEXT,
                         'options' => [
                             'pluginOptions' => ['min' => 1]
                         ],
