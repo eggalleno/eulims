@@ -421,13 +421,18 @@ class RequestController extends Controller
   
     public function actionSaverequestransaction(){
         $post= Yii::$app->request->post();
-        // echo $post['request_id'];
-        //exit;
+
         $return="Failed";
         $request_id=(int) $post['request_id'];
         $lab_id=(int) $post['lab_id'];
         $rstl_id=(int) $post['rstl_id'];
         $year=(int) $post['year'];
+		
+		//Checking for reference number
+		$chkref=Request::findOne($request_id);
+		if ($chkref->request_ref_num){
+			return $this->redirect(['view', 'id' => $request_id]); 
+		}
         // Generate Reference Number
         $func=new Functions();
         $Proc="spGetNextGeneratedRequestCode(:RSTLID,:LabID)";
