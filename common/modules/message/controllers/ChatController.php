@@ -46,11 +46,38 @@ class ChatController extends Controller
         $dataProvider = New ActiveDataProvider(['query'=>$query]);
 		
 		$file= new ChatAttachment();
-        return $this->render('index', [
+		$chat=new Chat();
+		if ($chat->load(Yii::$app->request->post()) and $file->load(Yii::$app->request->post())) {
+			$sds = UploadedFile::getInstance($file, 'filename');
+
+			//save message
+			$chat->reciever_userid=$chat->sender_userid; //
+			$chat->sender_userid= Yii::$app->user->id;
+			$chat->status_id=1;//sent
+			$chat->message=$chat->message;
+			$chat->save();
+			//-end of save message-----
+			
+			//for file attachment
+			if (!empty($sds) && $sds !== 0) {                
+                $sds->saveAs('uploads/message/' . $chat->chat_id.'.'.$sds->extension);
+                $file->filename ='uploads/message/'.$chat->chat_id.'.'.$sds->extension;
+            }
+			$this->Saveattachment($file->filename);
+			//end
+			
+			Yii::$app->session->setFlash('success', 'Message Sent!'); 
+			return $this->redirect(['/message/chat/index']);
+			
+		}else{
+			return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
-			'file'=>$file
-        ]);
+			'file'=>$file,
+			'chat'=>$chat
+			]);
+		}
+        
     }
 
 /*    Public function actionView($sendId){
@@ -84,7 +111,7 @@ class ChatController extends Controller
      */
     public function actionCreate()
     {
-        $model = new Chat();
+        /*$model = new Chat();
        
         $possible_recipients = Chat::getPossibleRecipients();
 		$recipients=ArrayHelper::map($possible_recipients, 'id', 'username');
@@ -108,7 +135,7 @@ class ChatController extends Controller
                 'model' => $model,
 				'possible_recipients' => $recipients,
             ]);
-        }
+        }*/
     }
 
     /**
@@ -181,7 +208,7 @@ class ChatController extends Controller
 		
 	}
 	
-	public function actionSendmessage($senderid,$message)
+	public function Sendmessage($senderid,$message)
     {
 		$model = new Chat();
 		$model->sender_userid= Yii::$app->user->id;
@@ -189,20 +216,15 @@ class ChatController extends Controller
 		$model->status_id=1;//sent
 		$model->message=$message;
 		$model->save();
-		return $senderid;
+		return;
 	}
 	
-	public function actionSaveattachment($senderid)
+	public function Saveattachment($filename)
     {
-		/*$model = new ChatAttachment();
-		$model->sender_userid= Yii::$app->user->id;
-		$model->reciever_userid= $senderid; //
-		$model->status_id=1;//sent
-		$model->message=$message;
-		$model->save(); */
-		//$sds = UploadedFile::getInstance();
-		//$model = new ChatAttachment();
-		
+		$model = new ChatAttachment();
+		$model->uploadedby_userid= Yii::$app->user->id;
+		$model->filename= $filename; 
+		$model->save(); 
 		return ;
 		
 	}

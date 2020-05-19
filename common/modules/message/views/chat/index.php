@@ -4,8 +4,12 @@ use yii\helpers\Html;
 use kartik\grid\GridView;
 use yii\widgets\DetailView;
 use kartik\file\FileInput;
+use yii\helpers\Url;
+use common\components\Functions;
 
+$func= new Functions();
 
+use yii\widgets\ActiveForm;
 /* @var $this yii\web\View */
 /** @var $model common\modules\message\models\Chat */
 /* @var $searchModel common\modules\message\models\ChatSearch */
@@ -55,31 +59,34 @@ $this->params['breadcrumbs'][] = $this->title;
         </div> <!-- end chat-history -->
         <input type="text" id="senderid" value="" hidden>
         <div class="chat-message clearfix">
-            <textarea name="message-to-send" id="messagetosend" placeholder ="Type your message" rows="3"></textarea>
-			<div class="file-loading">
-				<?php
-				echo '<label class="control-label">Upload Document</label>';
-				echo FileInput::widget([
-				    'model' => $file,
-                    'attribute' => 'filename',
-					'options' => ['multiple' => true],
-					'pluginOptions' => [
+            <?php $form = ActiveForm::begin(); ?>
+			<?= $form->field($chat, 'sender_userid')->hiddenInput()->label(false) ?>
+
+			<?= $form->field($chat, 'message')->textarea(['rows' => 6]) ?>
+
+            <?= $form->field($file, 'filename')->widget(FileInput::classname(), 
+			[ 
+			'options' => ['multiple' => true],
+			'pluginOptions' => [
 						'showPreview' => true,
 						'showCaption' => true,
 						'showUpload' => false,
 						'showRemove'=>true
 					]
-				]);
-				?>
+			
+			]);
+			?>
+			<div class="form-group">
+				<?= Html::submitButton($chat->isNewRecord ? 'Send' : 'Update', ['class' => $chat->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
 			</div>
-            <button id="send" onclick="sendfunc()">Send</button>
 
+			<?php ActiveForm::end(); ?>
         </div> <!-- end chat-message -->
 
     </div> <!-- end chat -->
-
+    
 </div> <!-- end container -->
-
+  
 <script id="message-template" type="text/x-handlebars-template">
     <li class="clearfix">
         <div class="message-data align-right">
@@ -110,33 +117,3 @@ $this->params['breadcrumbs'][] = $this->title;
 
 </body>
 </html>
-
-<script type="text/javascript">
-function sendfunc() {
-  var senderid=document.getElementById("senderid").value;
-  var message=document.getElementById("messagetosend").value;
-  //alert(message);
-
-	
-	  $.ajax({
-                url: '/message/chat/sendmessage',
-                //dataType: 'json',
-                method: 'GET',
-                data: {senderid:senderid,message:message},
-                success: function (data, textStatus, jqXHR) {
-                   // $('#idconvo').html(data);
-				   alert('sdsfs');
-                }
-      });
-	  
-	  $.ajax({
-                url: '/message/chat/saveattachment',
-      
-                method: 'GET',
-                data: {senderid:senderid},
-                success: function (data, textStatus, jqXHR) {
-				   alert(data);
-                }
-      });
-}
-</script>
