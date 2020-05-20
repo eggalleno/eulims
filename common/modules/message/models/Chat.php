@@ -46,7 +46,7 @@ class Chat extends \yii\db\ActiveRecord
     {
         return [
             [['sender_userid', 'message', 'status_id'], 'required'],
-            [['sender_userid', 'reciever_userid', 'status_id', 'group_id'], 'integer'],
+            [['sender_userid', 'reciever_userid', 'status_id', 'group_id', 'convo_id'], 'integer'],
             [['message'], 'string'],
             [['timestamp'], 'safe'],
             [['chat_id'], 'unique'],

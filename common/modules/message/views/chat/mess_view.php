@@ -1,4 +1,5 @@
 <?php
+
 use yii\helpers\Html;
 use \yii\helpers\StringHelper;
 use \yii\helpers\Url;
@@ -11,6 +12,14 @@ use yii\widgets\DetailView;
  */
 /** @var $model common\modules\message\models\Chat */
 /* @var $searchModel common\modules\message\models\ChatSearch */
+$id="";
+if($model->sender_userid == Yii::$app->user->id){
+	$id=$model->reciever_userid;
+}
+else{
+	$id=$model->sender_userid;
+}
+
 ?>
 <script type="text/javascript">
     $(document).ready(function(){
@@ -33,13 +42,13 @@ use yii\widgets\DetailView;
 </script>
 
 
-<a class="thismessage" id="<?=$model->sender_userid?>">
+<a class="thismessage" id="<?=$model->convo_id?>">
 <li class="clearfix">
 <img src="/images/icons/customer.png" alt="avatar" style="width: 40px"/>
     <div class="about">
 <?php
                     echo "<div class='name'>";
-                    echo Html::encode($model->getProfile($model->sender_userid)->fullname);
+                    echo Html::encode($model->getProfile($id)->fullname);
                     echo "</div>";
                     echo "<div class='status'>";
                             if ($model->status_id == 1) {

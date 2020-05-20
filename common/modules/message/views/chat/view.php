@@ -26,7 +26,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         echo Yii::$app->formatter->asRelativeTime($model->timestamp);
                         echo"</span> &nbsp &nbsp";
 
-                    echo "</div>";
+            echo "</div>";
                     echo "<div class='message my-message'>";
                     echo Html::encode($model->message);
                     echo "</div>";

@@ -12,7 +12,7 @@ use yii\filters\VerbFilter;
 use yii\helpers\ArrayHelper;
 use common\modules\message\models\ChatAttachment;
 use yii\web\UploadedFile;
-
+use common\modules\message\models\Convo;
 /**
  * ChatController implements the CRUD actions for Chat model.
  */
@@ -56,7 +56,7 @@ class ChatController extends Controller
 			$chat->status_id=1;//sent
 			$chat->message=$chat->message;
 			$chat->save();
-			//-end of save message-----
+			//end of save message-----
 			
 			//for file attachment
 			if (!empty($sds) && $sds !== 0) {                
@@ -111,31 +111,51 @@ class ChatController extends Controller
      */
     public function actionCreate()
     {
-        /*$model = new Chat();
+        $model = new Chat();
        
         $possible_recipients = Chat::getPossibleRecipients();
 		$recipients=ArrayHelper::map($possible_recipients, 'id', 'username');
         if ($model->load(Yii::$app->request->post())) {
+	
+			$userid=Yii::$app->user->id;
+			$recipientid=$model->reciever_userid;
 		
-			try{
-			$model->sender_userid= Yii::$app->user->id;
-			$model->reciever_userid= Yii::$app->user->id; //For testing only
-			$model->status_id=1;//sent
-			$model->save(false);
-			
+			$convoid = Convo::find()
+			   ->andWhere(['and',
+				   ['userid'=>$userid],
+				   ['userid_two'=>$recipientid]
+			   ])
+			   ->orWhere(['and',
+				   ['userid'=>$recipientid],
+				   ['userid_two'=>$userid]
+			   ])
+			   ->one();
+			$id="";   
+			if (!$convoid){
+				$convo= new Convo();
+				$convo->userid=$userid;
+				$convo->userid_two=$recipientid;
+				$convo->save();
+				$id=$convo->convo_id;
+			}else{
+				$id=$convoid->convo_id;
 			}
-			catch (Exception $e) {
-                   print_r($e);
-				   exit;
-             }
-			 Yii::$app->session->setFlash('success', 'Message Sent!');
+			//Send message
+			$model->sender_userid= Yii::$app->user->id;
+			$model->status_id=1;//sent
+			$model->convo_id=$id;
+			$model->save(false); 
+			
+			//////
+			
+			Yii::$app->session->setFlash('success', 'Message Sent!');
             return $this->redirect(['/message/chat/index']);
         } else {
             return $this->render('create', [
                 'model' => $model,
 				'possible_recipients' => $recipients,
             ]);
-        }*/
+        }
     }
 
     /**
@@ -187,15 +207,24 @@ class ChatController extends Controller
     }
 	
 	public function Getallmessage(){
-		$query = Chat::find()->where(['reciever_userid' => Yii::$app->user->id])
-							->groupBy('sender_userid')
+		$query = Chat::find()
+							->andWhere(['or',
+								   ['reciever_userid'=>Yii::$app->user->id],
+								   ['sender_userid'=>Yii::$app->user->id]
+							   ])
+							->groupBy('convo_id')
                             ->orderBy(['timestamp'=>SORT_DESC]);
 		return $query;					
 	}
 	
 	public function actionGetsendermessage($id)
     {
-		$query = Chat::find()->where(['reciever_userid' => Yii::$app->user->id, 'sender_userid' => $id])
+		$query = Chat::find()
+		//->where(['reciever_userid' => Yii::$app->user->id, 'sender_userid' => $id])
+							->andWhere(['or',
+								   ['convo_id'=>$id],
+								   ['group_id'=>$id]
+							   ])
                             ->orderBy('timestamp');
 
 		$dataProvider = New ActiveDataProvider(['query' => $query]);
@@ -228,5 +257,6 @@ class ChatController extends Controller
 		return ;
 		
 	}
+	
 
 }

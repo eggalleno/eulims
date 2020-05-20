@@ -26,6 +26,8 @@ $this->params['breadcrumbs'][] = $this->title;
 </head>
 <div class="container clearfix">
     <div class="people-list" id="people-list">
+	    <label style="color:white"> <h4>Chats </h4></label> 
+		<span style=><?=Html::button('<span class="glyphicon glyphicon-edit"></span>', ['value' => '/message/chat/create','onclick'=>'location.href=this.value', 'class' => 'btn btn-primary']);?>
         <div class="search">
             <input type="text" placeholder="search" />
             <i class="fa fa-search"></i>
@@ -62,7 +64,7 @@ $this->params['breadcrumbs'][] = $this->title;
             <?php $form = ActiveForm::begin(); ?>
 			<?= $form->field($chat, 'sender_userid')->hiddenInput()->label(false) ?>
 
-			<?= $form->field($chat, 'message')->textarea(['rows' => 6]) ?>
+			<?= $form->field($chat, 'message')->textarea(['rows' => 2]) ?>
 
             <?= $form->field($file, 'filename')->widget(FileInput::classname(), 
 			[ 
