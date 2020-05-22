@@ -2,6 +2,7 @@
 
 namespace common\modules\message\controllers;
 
+use common\modules\message\models\Contacts;
 use Yii;
 use common\modules\message\models\Chat;
 use common\modules\message\models\ChatSearch;
@@ -235,13 +236,20 @@ class ChatController extends Controller
 		
 	}
 	
-	public function Sendmessage($senderid,$message)
+	public function Sendmessage($senderid,$message,$contactid)
     {
 		$model = new Chat();
-		$model->sender_userid= Yii::$app->user->id;
+		$model->sender_userid= Yii::$app->profile->id;
 		$model->reciever_userid= $senderid; //
 		$model->status_id=1;//sent
-		$model->message=$message;
+        $arr = [Yii::$app->user->id,$senderid];
+        sort($arr);
+        $str = implode(",", $arr);
+        $contact = Contacts::find()->where(['user_id'=>$str])->one();
+        if($contact !=null) {
+            $model->contact_id = $contact->user_id;
+        }
+        $model->message=$message;
 		$model->save();
 		return;
 	}

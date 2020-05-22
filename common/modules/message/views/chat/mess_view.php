@@ -42,7 +42,7 @@ else{
 </script>
 
 
-<a class="thismessage" href="#" id="<?=$model->contact_id?>">
+<a class="thismessage" href="#" id="<?=$model->contact_id?>, <?=$model->reciever_userid?>">
 <li class="clearfix">
 <img src="/images/icons/customer.png" alt="avatar" style="width: 30px"/>
     <div class="about">
