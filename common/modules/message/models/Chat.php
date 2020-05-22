@@ -14,10 +14,12 @@ use common\models\system\User;
  * @property string $message
  * @property string $timestamp
  * @property int $status_id
+ * @property int $contact_id
  * @property int $group_id
  *
  * @property GroupMember $group
  * @property ChatStatus $status
+ * @property Contacts $contact
  * @property ChatActivityDetails[] $chatActivityDetails
  * @property ChatAttachment[] $chatAttachments
  */
@@ -46,7 +48,7 @@ class Chat extends \yii\db\ActiveRecord
     {
         return [
             [['sender_userid', 'message', 'status_id'], 'required'],
-            [['sender_userid', 'reciever_userid', 'status_id', 'group_id', 'convo_id'], 'integer'],
+            [['sender_userid', 'reciever_userid', 'status_id', 'contact_id', 'group_id', 'convo_id'], 'integer'],
             [['message'], 'string'],
             [['timestamp'], 'safe'],
             [['chat_id'], 'unique'],
@@ -66,6 +68,7 @@ class Chat extends \yii\db\ActiveRecord
             'message' => 'Message',
             'timestamp' => 'Timestamp',
             'status_id' => 'Status ID',
+            'contact_id' => 'Contact ID',
             'group_id' => 'Group ID',
         ];
     }
@@ -84,6 +87,14 @@ class Chat extends \yii\db\ActiveRecord
     public function getStatus()
     {
         return $this->hasOne(ChatStatus::className(), ['status_id' => 'status_id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getContact()
+    {
+        return $this->hasMany(Contacts::className(), ['contact_id' => 'contact_id']);
     }
 
     /**

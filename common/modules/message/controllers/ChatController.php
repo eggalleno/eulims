@@ -209,10 +209,9 @@ class ChatController extends Controller
 	public function Getallmessage(){
 		$query = Chat::find()
 							->andWhere(['or',
-								   ['reciever_userid'=>Yii::$app->user->id],
-								   ['sender_userid'=>Yii::$app->user->id]
+								   ['reciever_userid'=>Yii::$app->user->id]
 							   ])
-							->groupBy('convo_id')
+							->groupBy('contact_id')
                             ->orderBy(['timestamp'=>SORT_DESC]);
 		return $query;					
 	}
@@ -222,8 +221,7 @@ class ChatController extends Controller
 		$query = Chat::find()
 		//->where(['reciever_userid' => Yii::$app->user->id, 'sender_userid' => $id])
 							->andWhere(['or',
-								   ['convo_id'=>$id],
-								   ['group_id'=>$id]
+								   ['contact_id'=>$id]
 							   ])
                             ->orderBy('timestamp');
 
