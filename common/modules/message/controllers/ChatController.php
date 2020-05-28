@@ -52,7 +52,18 @@ class ChatController extends Controller
 			$sds = UploadedFile::getInstance($file, 'filename');
 
 			//save message
-			$chat->reciever_userid=$chat->sender_userid; //
+			$contact = Contacts::find()->where(['contact_id'=>$chat->sender_userid])->one();
+			$contact_id=$contact->user_id;
+			$str_total = explode(',', $contact_id);
+            $arr_length = count($str_total); 
+			$receiverid="";
+            for($i=0;$i<$arr_length;$i++){
+                 if(Yii::$app->user->id != $str_total[$i]){
+					$receiverid= $str_total[$i];
+				 }
+            }
+			$chat->reciever_userid=$receiverid;
+			/////////////////////////////////////////////////////////
 			$chat->contact_id=$chat->sender_userid;
 			$chat->sender_userid= Yii::$app->user->id;
 			$chat->status_id=1;//sent
