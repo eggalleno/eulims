@@ -47,7 +47,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
 
             <div class="chat-about">
-                <div class="chat-with"></div>
+                <div class="chat-with">james</div>
                 <div class="chat-num-messages"></div>
             </div>
 
@@ -62,7 +62,7 @@ $this->params['breadcrumbs'][] = $this->title;
      
         <div class="chat-message clearfix">
             <?php $form = ActiveForm::begin(); ?>
-			<?= $form->field($chat, 'sender_userid')->label(false) ?>
+			<?= $form->field($chat, 'sender_userid')->hiddenInput()->label(false) ?>
 			<?= $form->field($chat, 'message')->textarea(['rows' => 2]) ?>
 
 

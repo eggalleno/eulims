@@ -75,8 +75,10 @@ class ChatController extends Controller
 			if (!empty($sds) && $sds !== 0) {                
                 $sds->saveAs('uploads/message/' . $chat->chat_id.'.'.$sds->extension);
                 $file->filename ='uploads/message/'.$chat->chat_id.'.'.$sds->extension;
+				
+				$this->Saveattachment($file->filename,$chat->contact_id);
             }
-			$this->Saveattachment($file->filename);
+			
 			//end
 			
 			Yii::$app->session->setFlash('success', 'Message Sent!'); 
@@ -263,11 +265,12 @@ class ChatController extends Controller
 		return;
 	}
 	
-	public function Saveattachment($filename)
+	public function Saveattachment($filename,$id)
     {
 		$model = new ChatAttachment();
 		$model->uploadedby_userid= Yii::$app->user->id;
 		$model->filename= $filename; 
+		$model->contact_group_id=$id;
 		$model->save(); 
 		return ;
 		
