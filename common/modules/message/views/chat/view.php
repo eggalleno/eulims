@@ -16,11 +16,11 @@ $this->params['breadcrumbs'][] = $this->title;
 /*    echo '<div class="chat-history">';
     echo '<ul>';*/
 echo '<li class="clearfix">';
-if (Yii::$app->user->id == $model->sender_userid){
+if (Yii::$app->user->id == $model->reciever_userid){
     echo "<div class='message-data'>";
 
     echo "<span class='message-data-name' >";
-    echo Html::encode($model->getProfile($model->reciever_userid)->firstname);
+    echo Html::encode($model->getProfile($model->sender_userid)->firstname);
     echo "</span> <i class='fa fa-circle online'></i>";
 
     echo "<span class='message-data-time' >";
@@ -39,7 +39,7 @@ else{
     echo '</span> &nbsp; &nbsp;';
 
     echo '<span class="message-data-name" >';
-    echo Html::encode($model->getProfile($model->reciever_userid)->firstname);
+    echo Html::encode($model->getProfile($model->sender_userid)->firstname);
     echo '</span> <i class="fa fa-circle me"></i>';
 
     echo '</div>';

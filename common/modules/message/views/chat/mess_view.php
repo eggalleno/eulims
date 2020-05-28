@@ -41,7 +41,7 @@ else{
     });
 </script>
 
-<a class="thismessage" id="<?=$model->contact_id?>">
+<a class="thismessage" href="#" id="<?=$model->contact_id?>">
 
 <li class="clearfix">
 <img src="/images/icons/customer.png" alt="avatar" style="width: 30px"/>
