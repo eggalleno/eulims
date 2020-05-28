@@ -13,7 +13,7 @@ use yii\filters\VerbFilter;
 use yii\helpers\ArrayHelper;
 use common\modules\message\models\ChatAttachment;
 use yii\web\UploadedFile;
-use common\modules\message\models\Convo;
+
 /**
  * ChatController implements the CRUD actions for Chat model.
  */
@@ -53,6 +53,7 @@ class ChatController extends Controller
 
 			//save message
 			$chat->reciever_userid=$chat->sender_userid; //
+			$chat->contact_id=$chat->sender_userid;
 			$chat->sender_userid= Yii::$app->user->id;
 			$chat->status_id=1;//sent
 			$chat->message=$chat->message;
@@ -121,30 +122,26 @@ class ChatController extends Controller
 			$userid=Yii::$app->user->id;
 			$recipientid=$model->reciever_userid;
 		
-			$convoid = Convo::find()
-			   ->andWhere(['and',
-				   ['userid'=>$userid],
-				   ['userid_two'=>$recipientid]
-			   ])
-			   ->orWhere(['and',
-				   ['userid'=>$recipientid],
-				   ['userid_two'=>$userid]
-			   ])
-			   ->one();
+			$arr = [$userid,$recipientid];
+			sort($arr);
+			$str = implode(",", $arr); 
+			
+			$contact = Contacts::find()->where(['user_id'=>$str])->one();
+			
 			$id="";   
-			if (!$convoid){
-				$convo= new Convo();
-				$convo->userid=$userid;
-				$convo->userid_two=$recipientid;
-				$convo->save();
-				$id=$convo->convo_id;
+			if (!$contact){
+			
+				$convo= new Contacts();
+				$convo->user_id=$str;
+				$convo->save(false);
+				$id=$convo->contact_id;
 			}else{
-				$id=$convoid->convo_id;
+				$id=$contact->contact_id;
 			}
 			//Send message
 			$model->sender_userid= Yii::$app->user->id;
 			$model->status_id=1;//sent
-			$model->convo_id=$id;
+			$model->contact_id=$id;
 			$model->save(false); 
 			
 			//////
@@ -210,7 +207,8 @@ class ChatController extends Controller
 	public function Getallmessage(){
 		$query = Chat::find()
 							->andWhere(['or',
-								   ['reciever_userid'=>Yii::$app->user->id]
+								   ['reciever_userid'=>Yii::$app->user->id],
+								   ['sender_userid'=>Yii::$app->user->id]
 							   ])
 							->groupBy('contact_id')
                             ->orderBy(['timestamp'=>SORT_DESC]);

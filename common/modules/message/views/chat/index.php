@@ -59,11 +59,10 @@ $this->params['breadcrumbs'][] = $this->title;
             </ul>
 
         </div> <!-- end chat-history -->
-        <input type="text" id="chat-sender_userid" value="">
+     
         <div class="chat-message clearfix">
             <?php $form = ActiveForm::begin(); ?>
-			<?= $form->field($chat, 'sender_userid')->hiddenInput()->label(false) ?>
-
+			<?= $form->field($chat, 'sender_userid')->label(false) ?>
 			<?= $form->field($chat, 'message')->textarea(['rows' => 2]) ?>
 
 
