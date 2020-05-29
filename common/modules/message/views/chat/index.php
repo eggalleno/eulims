@@ -44,10 +44,8 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <div class="chat" >
         <div class="chat-header clearfix">
-
-
             <div class="chat-about">
-                <div class="chat-with">james</div>
+                <div class="chat-with" id="receiver"></div>
                 <div class="chat-num-messages"></div>
             </div>
 
@@ -89,7 +87,7 @@ $this->params['breadcrumbs'][] = $this->title;
     </div> <!-- end chat -->
     
 </div> <!-- end container -->
-  
+
 <script id="message-template" type="text/x-handlebars-template">
     <li class="clearfix">
         <div class="message-data align-right">
