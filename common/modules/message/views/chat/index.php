@@ -18,6 +18,18 @@ use yii\widgets\ActiveForm;
 $this->title = 'Chats';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
+<script>
+    $(document).ready(
+
+        function() {
+            setInterval(function() {
+                $.pjax.reload('#kv-pjax-container-inbox', {timeout : false})
+            }, 3000);
+        });
+    function SearchMess() {
+        alert('james');
+    }
+</script>
 <html lang="en" >
 <head>
     <meta charset="UTF-8">
@@ -29,16 +41,18 @@ $this->params['breadcrumbs'][] = $this->title;
 	    <label style="color:white"> <h4>Chats </h4></label> 
 		<span style=><?=Html::button('<span class="glyphicon glyphicon-edit"></span>', ['value' => '/message/chat/create','onclick'=>'location.href=this.value', 'class' => 'btn btn-primary']);?>
         <div class="search">
-            <input type="text" placeholder="search" />
+            <input type="text" placeholder="search" onkeydown="SearchMess()"/>
             <i class="fa fa-search"></i>
         </div>
-        <ul class="list">
-                    <?= \yii\widgets\ListView::widget([
-                        'dataProvider' => $dataProvider,
-                        'summary' => '',
-                        'itemView' => 'mess_view'
-                    ]);
-                    ?>
+        <ul class="list" id="inbox">
+            <?php \yii\widgets\Pjax::begin(['timeout' => 1, 'id'=>"kv-pjax-container-inbox", 'clientOptions' => ['container' => 'pjax-container']]); ?>
+                <?= \yii\widgets\ListView::widget([
+                    'dataProvider' => $dataProvider,
+                    'summary' => '',
+                    'itemView' => 'mess_view'
+                ]);
+                ?>
+            <?php \yii\widgets\Pjax::end(); ?>
         </ul>
     </div>
 
@@ -51,7 +65,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
         </div> <!-- end chat-header -->
 
-        <div class="chat-history">
+        <div class="chat-history" id="chatHistory">
             <ul id="idconvo">
 
             </ul>

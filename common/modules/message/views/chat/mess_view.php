@@ -45,6 +45,7 @@ else{
 function mes(id,mm) {
     const ido=id;
     document.getElementById("receiver").innerText=mm;
+    document.getElementById("chat-sender_userid").value=id;
     $.ajax({
         url: '/message/chat/getsendermessage',
         //dataType: 'json',
@@ -52,6 +53,7 @@ function mes(id,mm) {
         data: {id:ido},
         success: function (data, textStatus, jqXHR) {
             $('#idconvo').html(data);
+            $('#chatHistory').scrollTop($('#chatHistory')[0].scrollHeight);
         }
     });
     /*const jam = ido;

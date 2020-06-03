@@ -219,6 +219,7 @@ class ChatController extends Controller
 	
 	public function Getallmessage(){
 		$query = Chat::find()
+                            ->select(['contact_id','message','sender_userid','reciever_userid', 'status_id'])
 							->andWhere(['or',
 								   ['reciever_userid'=>Yii::$app->user->id],
 								   ['sender_userid'=>Yii::$app->user->id]
@@ -237,14 +238,16 @@ class ChatController extends Controller
 							   ])
                             ->orderBy('timestamp');
 
+        Chat::updateAll(['status_id' => 2],  ['contact_id' => $id, 'status_id' => 1]);
 		$dataProvider = New ActiveDataProvider(['query' => $query]);
-     
+        header("Refresh:0; url=index.php");
+
         if(Yii::$app->request->isAjax){
 			//return $id;
+
 			return $this->renderAjax('convo_view', ['dataProvider'=>$dataProvider]);
         }
-       
-		
+
 	}
 	
 	public function Sendmessage($senderid,$message,$contactid)
@@ -273,7 +276,6 @@ class ChatController extends Controller
 		$model->contact_group_id=$id;
 		$model->save(); 
 		return ;
-		
 	}
 	
 
