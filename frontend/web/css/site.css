@@ -361,6 +361,12 @@ fieldset>legend {
 .chat .chat-header .chat-num-messages {
     color: #92959E;
 }
+.chat .chat-header .fa-plus-circle {
+    float: right;
+    color: #696969;
+    font-size: 30px;
+    margin-top: 12px;
+}
 .chat .chat-header .fa-star {
     float: right;
     color: #D8DADF;

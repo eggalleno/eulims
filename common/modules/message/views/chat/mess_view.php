@@ -70,7 +70,7 @@ function mes(id,mm) {
                     echo "</div>";
                     echo "<div class='status'>";
                             if ($model->status_id == 1) {
-                                echo "<i class='fa fa-circle offline'></i>";
+                                echo '<img src="/images/icons/red.png" alt="avatar" style="width: 8px; padding-right: 2px; padding-top: 7px"/>';
                             }
                     echo StringHelper::truncateWords(($model->message), 5);
                     echo "</div>";

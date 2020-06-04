@@ -26,8 +26,17 @@ $this->params['breadcrumbs'][] = $this->title;
                 $.pjax.reload('#kv-pjax-container-inbox', {timeout : false})
             }, 3000);
         });
-    function SearchMess() {
-        alert('james');
+    function SearchMess(name) {
+        const id = name;
+        $.ajax({
+            url: '/message/chat/GetSearchMessage',
+            //dataType: 'json',
+            method: 'GET',
+            data: {id:ido},
+            success: function (data, textStatus, jqXHR) {
+                $('#inbox').html(data);
+            }
+        });
     }
 </script>
 <html lang="en" >
@@ -38,10 +47,9 @@ $this->params['breadcrumbs'][] = $this->title;
 </head>
 <div class="container clearfix">
     <div class="people-list" id="people-list">
-	    <label style="color:white"> <h4>Chats </h4></label> 
-		<span style=><?=Html::button('<span class="glyphicon glyphicon-edit"></span>', ['value' => '/message/chat/create','onclick'=>'location.href=this.value', 'class' => 'btn btn-primary']);?>
+	   <!-- <label style="color:white"> <h4>Chats </h4></label> -->
         <div class="search">
-            <input type="text" placeholder="search" onkeydown="SearchMess()"/>
+            <input type="text" placeholder="search" onkeydown="SearchMess('jamestorres')"/>
             <i class="fa fa-search"></i>
         </div>
         <ul class="list" id="inbox">
@@ -62,7 +70,8 @@ $this->params['breadcrumbs'][] = $this->title;
                 <div class="chat-with" id="receiver"></div>
                 <div class="chat-num-messages"></div>
             </div>
-
+            <!--<i class="fa fa-star"></i>-->
+            <a href="/message/chat/create"><i class="fa fa-plus-circle"></i></a>
         </div> <!-- end chat-header -->
 
         <div class="chat-history" id="chatHistory">

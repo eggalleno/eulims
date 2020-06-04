@@ -220,14 +220,32 @@ class ChatController extends Controller
 	public function Getallmessage(){
 		$query = Chat::find()
                             ->select(['contact_id','message','sender_userid','reciever_userid', 'status_id'])
-							->andWhere(['or',
-								   ['reciever_userid'=>Yii::$app->user->id],
-								   ['sender_userid'=>Yii::$app->user->id]
-							   ])
+                            ->andWhere(['or',
+                                ['reciever_userid'=>Yii::$app->user->id],
+                                ['sender_userid'=>Yii::$app->user->id]
+                            ])
 							->groupBy('contact_id')
                             ->orderBy(['timestamp'=>SORT_DESC]);
 		return $query;					
 	}
+    public function actionGetSearchMessage($id){
+        $query = Chat::find()
+            ->select(['contact_id','message','sender_userid','reciever_userid', 'status_id'])
+            ->andWhere(['or',
+                ['like', 'message', $id. '%', false],
+                ['reciever_userid'=>Yii::$app->user->id],
+                ['sender_userid'=>Yii::$app->user->id]
+            ])
+            ->limit(6)
+            ->groupBy('contact_id')
+            ->orderBy(['timestamp'=>SORT_DESC]);
+
+        $dataProvider = New ActiveDataProvider(['query'=>$query]);
+        if(Yii::$app->request->isAjax){
+        return $this->render('index', [
+            'dataProvider' => $dataProvider
+        ]);}
+    }
 	
 	public function actionGetsendermessage($id)
     {
@@ -244,7 +262,6 @@ class ChatController extends Controller
 
         if(Yii::$app->request->isAjax){
 			//return $id;
-
 			return $this->renderAjax('convo_view', ['dataProvider'=>$dataProvider]);
         }
 
