@@ -56,7 +56,8 @@ class Orspreadsheet extends Spreadsheet
         $this->getDocument()->getActiveSheet()->setCellValue('B5', $rstl->name);
         $this->getDocument()->getActiveSheet()->setCellValue('B6', $this->model->payor);
         $this->getDocument()->getActiveSheet()->setCellValue('A9', $this->model->collectiontype ? $this->model->collectiontype->natureofcollection : "");
-        foreach ($paymentitem_Query as $i => $or) {
+ 
+		foreach ($paymentitem_Query as $i => $or) {
            $this->getDocument()->getActiveSheet()->setCellValue('A'.$row, $or['details']);
            $this->getDocument()->getActiveSheet()->setCellValue('D'.$row, number_format($or['amount'],2));
            $row++; 
@@ -70,8 +71,8 @@ class Orspreadsheet extends Spreadsheet
 		   $excess_amount=$excess['amount'];
 		}
 		//////////////////////
-		$gtotal=$this->model->total + $excess_amount;
-		
+		//$gtotal=$this->model->total + $excess_amount;
+		$gtotal=$this->model->total;
 		$amountinwords=$numbertowords->convert($gtotal);
         $whole_number=(int)$gtotal;
         $remainder=$gtotal - $whole_number;
