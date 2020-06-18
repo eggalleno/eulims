@@ -58,9 +58,7 @@ if($op_model == ""){
                  'pluginOptions' => [
                      'format' => 'yyyy-mm-dd',
                      'todayHighlight' => true,
-                     'autoclose'=>true,   
-                     'startDate' => date('Y-m-d'),
-                     'endDate' => date('Y-m-d')
+                     'autoclose'=>true
                  ]
              ]);
              ?>

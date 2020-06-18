@@ -72,6 +72,8 @@ $this->params['breadcrumbs'][] = $this->title;
             </div>
             <!--<i class="fa fa-star"></i>-->
             <a href="/message/chat/create"><i class="fa fa-plus-circle"></i></a>
+
+			<?=Html::button('<span class="fa fa-group"></span> Create new Group', ['value'=>'/finance/op/create', 'class' => 'btn btn-success','title' => Yii::t('app', "Create New Order of Payment"),'id'=>'btnOP','onclick'=>'LoadModal(this.title, this.value);']);?>
         </div> <!-- end chat-header -->
 
         <div class="chat-history" id="chatHistory">
