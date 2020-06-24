@@ -38,30 +38,39 @@ $this->params['breadcrumbs'][] = $this->title;
             }
         });
     }
+    function openForm() {
+        document.getElementById("myForm").style.display = "block";
+    }
+
+    function closeForm() {
+        document.getElementById("myForm").style.display = "none";
+    }
 </script>
 <html lang="en" >
 <head>
     <meta charset="UTF-8">
-    <title>CodePen - Chat Widget</title>
+    <title>OneLab Chat</title>
 
 </head>
 <div class="container clearfix">
     <div class="people-list" id="people-list">
-	   <!-- <label style="color:white"> <h4>Chats </h4></label> -->
+        <!-- <label style="color:white"> <h4>Chats </h4></label> -->
         <div class="search">
             <input type="text" placeholder="search" onkeydown="SearchMess('jamestorres')"/>
             <i class="fa fa-search"></i>
         </div>
-        <ul class="list" id="inbox">
-            <?php \yii\widgets\Pjax::begin(['timeout' => 1, 'id'=>"kv-pjax-container-inbox", 'clientOptions' => ['container' => 'pjax-container']]); ?>
+        <div class="inbox-history">
+            <ul class="list" id="inbox">
+                <?php \yii\widgets\Pjax::begin(['timeout' => 1, 'id'=>"kv-pjax-container-inbox", 'clientOptions' => ['container' => 'pjax-container']]); ?>
                 <?= \yii\widgets\ListView::widget([
                     'dataProvider' => $dataProvider,
                     'summary' => '',
                     'itemView' => 'mess_view'
                 ]);
                 ?>
-            <?php \yii\widgets\Pjax::end(); ?>
-        </ul>
+                <?php \yii\widgets\Pjax::end(); ?>
+            </ul>
+        </div>
     </div>
 
     <div class="chat" >
@@ -72,48 +81,49 @@ $this->params['breadcrumbs'][] = $this->title;
             </div>
             <!--<i class="fa fa-star"></i>-->
             <a href="/message/chat/create"><i class="fa fa-plus-circle"></i></a>
-
-			<?=Html::button('<span class="fa fa-group"></span> Create new Group', ['value'=>'/finance/op/create', 'class' => 'btn btn-success','title' => Yii::t('app', "Create New Order of Payment"),'id'=>'btnOP','onclick'=>'LoadModal(this.title, this.value);']);?>
         </div> <!-- end chat-header -->
 
         <div class="chat-history" id="chatHistory">
             <ul id="idconvo">
 
             </ul>
-
         </div> <!-- end chat-history -->
-     
+
         <div class="chat-message clearfix">
             <?php $form = ActiveForm::begin(); ?>
-			<?= $form->field($chat, 'sender_userid')->hiddenInput()->label(false) ?>
-			<?= $form->field($chat, 'message')->textarea(['rows' => 2]) ?>
+            <?= $form->field($chat, 'sender_userid')->hiddenInput()->label(false) ?>
+            <?= $form->field($chat, 'message')->textarea(['rows' => 2]) ?>
 
 
 
-            <?= $form->field($file, 'filename')->widget(FileInput::classname(), 
-			[ 
-			'options' => ['multiple' => true],
-			'pluginOptions' => [
-						'showPreview' => true,
-						'showCaption' => true,
-						'showUpload' => false,
-						'showRemove'=>true
-					]
-			
-			]);
-			?>
-			<div class="form-group">
-				<?= Html::submitButton($chat->isNewRecord ? 'Send' : 'Update', ['class' => $chat->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
-			</div>
+            <?= $form->field($file, 'filename')->widget(FileInput::classname(),
+                [
+                    'options' => ['multiple' => true],
+                    'pluginOptions' => [
+                        'showPreview' => true,
+                        'showCaption' => true,
+                        'showUpload' => false,
+                        'showRemove'=>true
+                    ]
 
-			<?php ActiveForm::end(); ?>
+                ]);
+            ?>
+            <div class="form-group">
+                <?= Html::submitButton($chat->isNewRecord ? 'Send' : 'Update', ['class' => $chat->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
+            </div>
+
+            <?php ActiveForm::end(); ?>
         </div> <!-- end chat-message -->
 
     </div> <!-- end chat -->
-    
+    <div class="inbox">
+        <div class="inbox-header">
+            <h3>Hello world</h3>
+        </div>
+    </div>
 </div> <!-- end container -->
 
-<script id="message-template" type="text/x-handlebars-template">
+<!--<script id="message-template" type="text/x-handlebars-template">
     <li class="clearfix">
         <div class="message-data align-right">
             <span class="message-data-time" >{{time}}, Today</span> &nbsp; &nbsp;
@@ -135,7 +145,17 @@ $this->params['breadcrumbs'][] = $this->title;
             {{response}}
         </div>
     </li>
-</script>
+</script>-->
+<button class="open-button" onclick="openForm()">Chat</button>
+<div class="chat-popup" id="myForm">
+    <form action="/action_page.php" class="form-container">
+        <h1>Chat</h1>
+        <label for="msg"><b>Message</b></label>
+        <textarea placeholder="Type message.." name="msg" required></textarea>
+        <button type="submit" class="btn">Send</button>
+        <button type="button" class="btn cancel" onclick="closeForm()">Close</button>
+    </form>
+</div>
 <!-- partial -->
 <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js'></script>
 <script src='https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/3.0.0/handlebars.min.js'></script>
