@@ -1294,6 +1294,8 @@ class Printing {
             //loop for everysamples the request has
             foreach ($request->samples as $sample) {
                
+               if($sample->active){ //only the active samples are allowed to be printed
+
                 //************************************
                 //temporary
                 //lab personnel wants to only have 4 digit figure in sample code
@@ -1333,6 +1335,7 @@ class Printing {
                     $RequestTemplate .= "</tr>";
                 }
                 $PrevSampleCode = $CurSampleCode;
+               }
             }
 
             $discount = $totalfee * ($request->discount /100); //request->total is already discounted so it is an overall total
