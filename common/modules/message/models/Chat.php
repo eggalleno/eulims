@@ -133,6 +133,5 @@ class Chat extends \yii\db\ActiveRecord
         $user= User::find()->where(['user_id'=> $userid])->one();
 		return $user;
     }
-
 	
 }

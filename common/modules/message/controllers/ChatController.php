@@ -13,6 +13,8 @@ use yii\filters\VerbFilter;
 use yii\helpers\ArrayHelper;
 use common\modules\message\models\ChatAttachment;
 use yii\web\UploadedFile;
+use common\modules\message\models\ChatGroup;
+use common\modules\message\models\GroupMember;
 
 /**
  * ChatController implements the CRUD actions for Chat model.
@@ -295,5 +297,41 @@ class ChatController extends Controller
 		return ;
 	}
 	
+	 public function actionGroup()
+    {
+	    $model = new ChatGroup();
+		$user = new Yii::$app->controller->module->userModelClass;
+		$possible_recipients = $user::find();
+        $possible_recipients->where(['!=', 'user_id', Yii::$app->user->id]);
+		$dataProvider = New ActiveDataProvider(['query'=>$possible_recipients]);
+		
+		if ($model->load(Yii::$app->request->post())) {
+			
+			//echo "Lost in your Light";
+			$userids=$model->userids;
+			$str_user = explode(',', $userids);
+			$arr_length = count($str_user);
+			$model->createdby_userid=Yii::$app->user->id;
+			$model->save();
+			
+			for($i=0;$i<$arr_length;$i++){
+				$member= new GroupMember();
+				$member->chat_group_id = $model->chat_group_id;
+				$member->user_id=$str_user[$i];
+				$member->save();
+			}
+			Yii::$app->session->setFlash('success', 'Successfully created!');
+            return $this->redirect(['/message/chat/index']);
+			
+		}
+		else{
+			return $this->renderAjax('group', [
+			'model' => $model,
+			'possible_recipients' => $dataProvider,
+			]);
+		}
+		
+        
+    }
 
 }

@@ -16,6 +16,7 @@ use Yii;
  */
 class ChatGroup extends \yii\db\ActiveRecord
 {
+	public $userids;
     /**
      * {@inheritdoc}
      */
@@ -40,7 +41,7 @@ class ChatGroup extends \yii\db\ActiveRecord
         return [
             [['createdby_userid'], 'integer'],
             [['created_datetime'], 'safe'],
-            [['group_name'], 'string', 'max' => 50],
+            [['group_name','userids'], 'string', 'max' => 50],
         ];
     }
 
