@@ -60,16 +60,45 @@ $this->params['breadcrumbs'][] = $this->title;
             <i class="fa fa-search"></i>
         </div>
         <div class="inbox-history">
-            <ul class="list" id="inbox">
-                <?php \yii\widgets\Pjax::begin(['timeout' => 1, 'id'=>"kv-pjax-container-inbox", 'clientOptions' => ['container' => 'pjax-container']]); ?>
-                <?= \yii\widgets\ListView::widget([
-                    'dataProvider' => $dataProvider,
-                    'summary' => '',
-                    'itemView' => 'mess_view'
-                ]);
-                ?>
-                <?php \yii\widgets\Pjax::end(); ?>
+
+
+            <ul class="sidebar-menu tree" data-widget="tree">
+                <li class="treeview">
+                    <a href="/message/chat"><i class="fa fa-inbox" style="display:none;width:0px" "=""></i>
+                        <span>
+                            <span>Inbox</span>
+                        </span>
+                        <span class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span>
+                    </a>
+                    <ul class="treeview-menu" id="inbox">
+                        <!--<ul class="list" >-->
+                            <?php \yii\widgets\Pjax::begin(['timeout' => 1, 'id'=>"kv-pjax-container-inbox", 'clientOptions' => ['container' => 'pjax-container']]); ?>
+                            <?= \yii\widgets\ListView::widget([
+                                'dataProvider' => $dataProvider,
+                                'summary' => '',
+                                'itemView' => 'mess_view'
+                            ]);
+                            ?>
+                            <?php \yii\widgets\Pjax::end(); ?>
+                        <!--</ul>-->
+                    </ul>
+                </li>
+
+                <li class="treeview">
+                    <a href="/message/chat"><i class="fa fa-inbox" style="display:none;width:0px" "=""></i>
+                        <span>
+                            <span>Group Message</span>
+                        </span>
+                        <span class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span>
+                    </a>
+                    <ul class="treeview-menu" id="inbox">
+                        <!--<ul class="list" >-->
+                        
+                        <!--</ul>-->
+                    </ul>
+                </li>
             </ul>
+
         </div>
     </div>
 
@@ -80,8 +109,9 @@ $this->params['breadcrumbs'][] = $this->title;
                 <div class="chat-num-messages"></div>
             </div>
             <!--<i class="fa fa-star"></i>-->
+            <!--<a href="/message/chat/group"><i class="fa fa-group" onclick="LoadModal(this.title, this.value);"></i></a>-->
+            <a onclick="LoadModal('Create Group', '/message/chat/group');" href="#"><i class="fa fa-group"></i></a>
             <a href="/message/chat/create"><i class="fa fa-plus-circle"></i></a>
-			<?=Html::button('<span class="glyphicon glyphicon-plus"></span> New Group', ['value'=>'/message/chat/group', 'class' => 'btn btn-success','title' => Yii::t('app', "Create Group"),'id'=>'btngroup','onclick'=>'LoadModal(this.title, this.value);']) ?>
         </div> <!-- end chat-header -->
 
         <div class="chat-history" id="chatHistory">
@@ -119,7 +149,7 @@ $this->params['breadcrumbs'][] = $this->title;
     </div> <!-- end chat -->
     <div class="inbox">
         <div class="inbox-header">
-            <h3>Hello world</h3>
+            <h3></h3>
         </div>
     </div>
 </div> <!-- end container -->

@@ -295,6 +295,7 @@ fieldset>legend {
 
 .people-list {
     width: 350px;
+    height: 700px;
     float: left;
 }
 .people-list .search {
@@ -313,26 +314,26 @@ fieldset>legend {
     position: relative;
     left: -25px;
 }
-.people-list .inbox-history {
+.people-list .inbox-history .treeview-menu {
     overflow-y: scroll;
-    height: 700px;
+    height: 500px;
 }
-.people-list .inbox-history::-webkit-scrollbar
+.people-list .inbox-history .treeview-menu::-webkit-scrollbar
 {
     width: 12px;
     background-color: #434651;
 }
 
-.people-list .inbox-history::-webkit-scrollbar-thumb
+.people-list .inbox-history .treeview-menu::-webkit-scrollbar-thumb
 {
     border-radius: 5px;
     -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
     background-color: #2b2837;
 }
-.people-list ul {
+/*.people-list .inbox-history ul {
     padding: 20px;
-    height: 700px;
-}
+    height: 600px;
+}*/
 .people-list ul li {
     padding-bottom: 20px;
 }
@@ -387,6 +388,14 @@ fieldset>legend {
 .chat .chat-header .fa-plus-circle {
     float: right;
     color: #696969;
+    margin-right: 18px;
+    font-size: 30px;
+    margin-top: 12px;
+}
+.chat .chat-header .fa-group {
+    float: right;
+    color: #696969;
+    margin-right: 8px;
     font-size: 30px;
     margin-top: 12px;
 }
