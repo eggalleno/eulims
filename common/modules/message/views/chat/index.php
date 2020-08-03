@@ -93,7 +93,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     </a>
                     <ul class="treeview-menu" id="inbox">
                         <!--<ul class="list" >-->
-                        
+
                         <!--</ul>-->
                     </ul>
                 </li>
@@ -177,14 +177,33 @@ $this->params['breadcrumbs'][] = $this->title;
         </div>
     </li>
 </script>-->
-<button class="open-button" onclick="openForm()">Chat</button>
+<button class="open-button" onclick="openForm()"><i class="fa fa-commenting-o"></i></button>
 <div class="chat-popup" id="myForm">
     <form action="/action_page.php" class="form-container">
-        <h1>Chat</h1>
-        <label for="msg"><b>Message</b></label>
-        <textarea placeholder="Type message.." name="msg" required></textarea>
-        <button type="submit" class="btn">Send</button>
-        <button type="button" class="btn cancel" onclick="closeForm()">Close</button>
+        <div class="chat-popup-header">
+            <!--<span>OneLab Chat</span>-->
+            <i class="fa fa-gear"></i>
+            <i class="fa fa-close" onclick="closeForm()"></i>
+
+        </div>
+        <div class="chat-popup-tab">
+            <button type="button" class="btntab"><i class="fa fa-user"></i></button>
+            <button type="button" class="btntab"><i class="fa fa-group"></i></button>
+        </div>
+        <div class="chat-popup-body">
+
+        </div>
+        <div class="chat-popup-footer">
+<!--            <div class="input-group-btn">
+                <div tabindex="500" class="btn btn-primary btn-file"><i class="glyphicon glyphicon-folder-open"></i>&nbsp;  <span class="hidden-xs"></span><input type="file" id="chatattachment-filename" class="" name="ChatAttachment[filename]" multiple="" data-krajee-fileinput="fileinput_94eb551c"></div>
+            </div>-->
+                <!--<input class="fa fa-paperclip" type="file">-->
+                <!--<input type="file" id="chatattachment-filename" class="" name="ChatAttachment[filename]" multiple="" data-krajee-fileinput="fileinput_94eb551c">-->
+            <i class="fa fa-paperclip"></i>
+            <textarea placeholder="Type message.." name="msg" required></textarea>
+            <button type="submit" class="btn"><i class="fa fa-send-o"></i></button>
+        </div>
+        <!--<button type="button" class="btn cancel" onclick="closeForm()">Close</button>-->
     </form>
 </div>
 <!-- partial -->
