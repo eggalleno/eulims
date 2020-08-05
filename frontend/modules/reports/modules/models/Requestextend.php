@@ -48,6 +48,17 @@ class Requestextend extends Request
         return Sample::find()->where(['request_id' => $this->request_id])->count();
     }
 
+    public function getCustomerStats($yearmonth,$type=null){
+        $reqs =  Requestextend::find()->select(['tbl_customer.customer_id', ])->where(['DATE_FORMAT(`request_datetime`, "%Y-%m")' => $yearmonth])->andWhere(['>','status_id',0])->leftJoin('tbl_customer', 'tbl_request.customer_id=tbl_customer.customer_id')->andWhere(['tbl_customer.classification_id'=>$type])->distinct()->count();
+
+         return $reqs;
+    }
+
+    public function getCustomerStatsData($yearmonth,$type=null){
+        $reqs =  Requestextend::find()->select(['tbl_customer.customer_id', 'tbl_customer.customer_name'])->where(['DATE_FORMAT(`request_datetime`, "%Y-%m")' => $yearmonth])->andWhere(['>','status_id',0])->leftJoin('tbl_customer', 'tbl_request.customer_id=tbl_customer.customer_id')->andWhere(['tbl_customer.classification_id'=>$type])->all();
+
+        return $reqs;
+    }
     public function getStats($yearmonth,$lab_id,$type){
         // return Sample::find()->with(['Request' => function($query){
         //     $query->where(['DATE_FORMAT(`request_datetime`, "%Y-%m")' => $yearmonth]);

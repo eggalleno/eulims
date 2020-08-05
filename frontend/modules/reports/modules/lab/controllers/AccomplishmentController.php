@@ -54,10 +54,11 @@ class AccomplishmentController extends \yii\web\Controller
 			'month'=>'DATE_FORMAT(`request_datetime`, "%M")',
 			'totalrequests' => 'count(request_id)',
 			'total'=>'SUM(total)',
-			'request_datetime'
+			'request_datetime',
+            'yearmonth'=>'DATE_FORMAT(request_datetime, "%Y-%m")',
 		])
 		->where('rstl_id =:rstlId AND status_id > :statusId AND lab_id = :labId AND DATE_FORMAT(`request_datetime`, "%Y") = :year AND request_ref_num != ""', [':rstlId'=>$rstlId,':statusId'=>0,':labId'=>$labId,':year'=>$year])
-		->groupBy(['DATE_FORMAT(request_datetime, "%Y-%m")'])
+		->groupBy(['request_datetime'])
 		->orderBy('request_datetime ASC');
 
 
@@ -88,6 +89,74 @@ class AccomplishmentController extends \yii\web\Controller
 
         //return $this->render('index');
 	}
+
+    public function actionFirms(){
+
+
+
+        $model = new Requestextend;
+        $rstlId = Yii::$app->user->identity->profile->rstl_id;
+        
+        if (Yii::$app->request->get())
+        {
+           
+            $year = (int) Yii::$app->request->get('year');
+            
+        } else {
+           
+            $year = date('Y'); //current year
+        }
+
+        $modelRequest = Requestextend::find()
+        ->select([
+            'monthnum'=>'DATE_FORMAT(`request_datetime`, "%m")',
+            'month'=>'DATE_FORMAT(`request_datetime`, "%M")',
+            'totalrequests' => 'count(request_id)',
+            'total'=>'SUM(total)',
+            'request_datetime',
+            'yearmonth'=>'DATE_FORMAT(request_datetime, "%Y-%m")',
+        ])
+        ->where('rstl_id =:rstlId AND status_id > :statusId AND DATE_FORMAT(`request_datetime`, "%Y") = :year AND request_ref_num != ""', [':rstlId'=>$rstlId,':statusId'=>0,':year'=>$year])
+        ->groupBy(['month'])
+        ->orderBy('monthnum ASC');
+
+
+    
+        // var_dump($modelRequest); exit;
+        $dataProvider = new ActiveDataProvider([
+            'query' => $modelRequest,
+            'pagination' => false,
+        ]);
+
+        if (Yii::$app->request->isAjax) {
+            return $this->renderAjax('firm', [
+                'dataProvider' => $dataProvider,
+                'year' => $year,
+                'model'=>$modelRequest,
+                'laboratories' => $this->listLaboratory(),
+            ]);
+        } else {
+            return $this->render('firm', [
+                'dataProvider' => $dataProvider,
+                'model'=>$modelRequest,
+                'year' => $year,
+                'laboratories' => $this->listLaboratory(),
+            ]);
+        }
+    }
+
+    public function actionShows($monthyear,$type=null){
+        $reqs =  Requestextend::find()->where(['DATE_FORMAT(`request_datetime`, "%Y-%m")' => $monthyear])->andWhere(['>','status_id',0])->leftJoin('tbl_customer', 'tbl_request.customer_id=tbl_customer.customer_id')->andWhere(['tbl_customer.classification_id'=>$type]);
+         $dataProvider = new ActiveDataProvider([
+            'query' => $reqs,
+            'pagination' => false,
+        ]);
+            return $this->render('customerlist', [
+                'dataProvider'=>$dataProvider,
+                'monthyear'=>$monthyear
+            ]);
+        
+    }
 	
 	public function actionMontly($id)
     {
