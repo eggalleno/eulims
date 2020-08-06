@@ -55,10 +55,9 @@ class AccomplishmentController extends \yii\web\Controller
 			'totalrequests' => 'count(request_id)',
 			'total'=>'SUM(total)',
 			'request_datetime',
-            'yearmonth'=>'DATE_FORMAT(request_datetime, "%Y-%m")',
 		])
 		->where('rstl_id =:rstlId AND status_id > :statusId AND lab_id = :labId AND DATE_FORMAT(`request_datetime`, "%Y") = :year AND request_ref_num != ""', [':rstlId'=>$rstlId,':statusId'=>0,':labId'=>$labId,':year'=>$year])
-		->groupBy(['request_datetime'])
+		->groupBy(['DATE_FORMAT(request_datetime, "%Y-%m")'])
 		->orderBy('request_datetime ASC');
 
 
