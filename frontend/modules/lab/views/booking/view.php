@@ -1,7 +1,8 @@
 <?php
 
 use yii\helpers\Html;
-use yii\widgets\DetailView;
+use kartik\detail\DetailView;
+use kartik\grid\GridView;
 
 /* @var $this yii\web\View */
 /* @var $model common\models\lab\Booking */
@@ -12,17 +13,11 @@ $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="booking-view">
 
-    <h1><?= Html::encode($this->title) ?></h1>
 
     <p>
-        <?= Html::a('Update', ['update', 'id' => $model->booking_id], ['class' => 'btn btn-primary']) ?>
-        <?= Html::a('Delete', ['delete', 'id' => $model->booking_id], [
-            'class' => 'btn btn-danger',
-            'data' => [
-                'confirm' => 'Are you sure you want to delete this item?',
-                'method' => 'post',
-            ],
-        ]) ?>
+        <?= Html::a('Save as Request', ['saverequest', 'id' => $model->booking_id], ['class' => 'btn btn-success
+		']) ?>
+       
     </p>
 
     <?= DetailView::widget([
@@ -38,5 +33,63 @@ $this->params['breadcrumbs'][] = $this->title;
             'customer_id',
         ],
     ]) ?>
+	
+	  <?= DetailView::widget([
+        'model'=>$model,
+        'responsive'=>true,
+        'hover'=>true,
+        'mode'=>DetailView::MODE_VIEW,
+        'panel'=>[
+            'heading'=>'<i class="glyphicon glyphicon-book"></i> Booking Details: ',
+            'type'=>DetailView::TYPE_PRIMARY,
+        ],
+        'buttons1' => '',
+        'attributes' => [
+            [
+                    'group'=>true,
+                    'label'=>'Customer Details ',
+                    'rowOptions'=>['class'=>'info']
+            ],
+            [
+                'columns' => [
+                    [
+                        'label'=>'Customer Name',
+                        'format'=>'raw',
+                        'value'=>$model->customer ? $model->customer->customer_name : "",
+                        'valueColOptions'=>['style'=>'width:30%'], 
+                        'displayOnly'=>true
+                    ],
+                    [
+                        'label'=>'Contact Number',
+                        'format'=>'raw',
+                        'value'=>$model->customer ? $model->customer->tel : "",
+                        'valueColOptions'=>['style'=>'width:30%'], 
+                        'displayOnly'=>true
+                    ],
+                ],
+                    
+            ],
+			  [
+                'columns' => [
+                    [
+                        'label'=>'Email',
+                        'format'=>'raw',
+                        'value'=>$model->customer ? $model->customer->email : "",
+                        'valueColOptions'=>['style'=>'width:30%'], 
+                        'displayOnly'=>true
+                    ],
+                    [
+                        'label'=>'Address',
+                        'format'=>'raw',
+                        'value'=>$model->customer ? $model->customer->address : "",
+                        'valueColOptions'=>['style'=>'width:30%'], 
+                        'displayOnly'=>true
+                    ],
+                ],
+                    
+            ],
+        ],
+    ]) ?>
+	
 
 </div>

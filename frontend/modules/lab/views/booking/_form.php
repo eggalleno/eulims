@@ -8,6 +8,11 @@ use kartik\select2\Select2;
 use kartik\widgets\DatePicker;
 use common\components\Functions;
 use common\models\system\Rstl;
+use kartik\widgets\DepDrop;
+use yii\helpers\Url;
+use common\models\lab\Modeofrelease;
+use common\models\lab\Classification;
+use common\models\lab\Businessnature;
 /* @var $this yii\web\View */
 /* @var $model common\models\lab\Booking */
 /* @var $form yii\widgets\ActiveForm */
@@ -17,8 +22,59 @@ use common\models\system\Rstl;
 <div class="booking-form">
 
     <?php $form = ActiveForm::begin(); ?>
+	<div class="row">
+		<div class="col-md-6">
+			<?= $form->field($customer, 'customer_name')->textInput(['maxlength' => true]) ?>
+		</div>
+		
+		<div class="col-md-6">
+			<?= $form->field($customer, 'tel')->textInput(['maxlength' => true]) ?>
+		</div>
+		
+	</div>
+	
+	<div class="row">
+		<div class="col-md-6">
+			<?php 
+            echo $form->field($customer, 'business_nature_id')->widget(Select2::classname(), [
+                'data' => ArrayHelper::map(Businessnature::find()->all(), 'business_nature_id', 'nature'),
+                'language' => 'en',
+                'options' => ['placeholder' => 'Select  ...'],
+                'pluginOptions' => [
+                  'allowClear' => true
+                ],
+            ]);
+            ?>
+		</div>
+		
+		<div class="col-md-6">
+			<?php 
+            echo $form->field($customer, 'classification_id')->widget(Select2::classname(), [
+                'data' => ArrayHelper::map(Classification::find()->all(), 'classification_id', 'classification'),
+                'language' => 'en',
+                'options' => ['placeholder' => 'Select  ...'],
+                'pluginOptions' => [
+                  'allowClear' => true
+                ],
+            ]);
+            ?>
+		</div>
+		
+	</div>
+	 
+	 <div class="row">
+		<div class="col-md-6">
+			<?= $form->field($customer, 'email')->textInput(['maxlength' => true]) ?>
+		</div>
+		
+		<div class="col-md-6">
+			<?= $form->field($customer, 'address')->textInput(['maxlength' => true]) ?>
+		</div>
+		
+	</div>
+	
     <div class="row">
-         <div class="col-sm-12">
+         <div class="col-sm-6">
         <?php
         echo $form->field($model, 'rstl_id')->widget(Select2::classname(), [
             'data' => ArrayHelper::map(Rstl::find()->asArray()->all(), 'rstl_id', 'name'),
@@ -31,15 +87,7 @@ use common\models\system\Rstl;
         ])->label('Laboratory');
         ?>
         </div>
-    </div>
-    <div class="row">
-        <div class="col-sm-6">
-            <?php
-             $func=new Functions();
-            echo $func->GetCustomerList($form,$model,false,"Customer");
-            ?>  
-        </div>
-        <div class="col-sm-6">
+		<div class="col-sm-6">
              <?php
              echo $form->field($model, 'scheduled_date')->widget(DatePicker::classname(), [
              'options' => ['placeholder' => 'Select Date ...',
@@ -53,14 +101,35 @@ use common\models\system\Rstl;
              ]);
              ?>
         </div>
+    </div>
+    <div class="row">
+	
+		
+   
     </div>    
   
     <div class="row">
-        <div class="col-sm-3" style="margin-top: 10px;">
+		 <div class="col-sm-6">
+		 <?= $form->field($model, 'modeofrelease_ids')->widget(Select2::classname(), [
+			'data' => ArrayHelper::map(Modeofrelease::find()->all(),'modeofrelease_id','mode'),
+			//'initValueText'=>$model->modeofrelease_ids,
+			'language' => 'en',
+			 'options' => [
+				'placeholder' => 'Select Mode of Release...',
+				'multiple' => true,
+			],
+			'pluginEvents' => [
+				"change" => "function() { 
+					$('#modeofrelease_ids').val($(this).val());
+				}
+				",
+			]
+		])->label('Mode of Release'); ?> 
+		</div>
+		
+        <div class="col-sm-6">
             <label>Sample Quantity</label>
-        </div>
-        <div class="col-sm-3">
-            <div class="input-group" style="margin-bottom: 15px;">
+			 <div class="input-group">
                 <span class="input-group-btn">
                     <button type="button" class="btn btn-default btn-number" disabled="disabled" data-type="minus" data-field="qty_sample">
                         <span class="glyphicon glyphicon-minus"></span>
@@ -76,11 +145,25 @@ use common\models\system\Rstl;
         </div>
         <div class="err-message" style="margin-top: 10px;font-size: 12px;color: #FF0000;"></div>
     </div>
+	<div class="row">
+		<div class="col-lg-6"> 
+		 <?=$form->field($model,'sampletype_id')->widget(Select2::classname(),[
+				'data' => $sampletype,
+				'theme' => Select2::THEME_KRAJEE,
+				'options' => ['id'=>'the-sample-type'],
+				'pluginOptions' => ['allowClear' => true,'placeholder' => 'Select Sample Type'],
+			]); ?>
+		</div>
+		<div class="col-lg-6"> 
+		 <?= $form->field($model, 'samplename')->textInput(['maxlength' => true,'placeholder' => 'Enter sample name ...']) ?>
+		</div>
+	</div>
       <div class="row">
             <div class="col-lg-12"> 
                 <?= $form->field($model, 'description')->textarea(['maxlength' => true]); ?>
             </div>
         </div>
+	
     <div class="form-group pull-right">
             <?= Html::submitButton($model->isNewRecord ? 'Create' : 'Update', ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary',
                 'id'=>'createBooking']) ?>
@@ -166,4 +249,22 @@ $(".input-number").keydown(function (e) {
             e.preventDefault();
         }
     });
+	
+$('#sample-sample_type_id').on('change',function() {
+        $.ajax({
+            url: '/lab/booking/gettestnamemethod',
+            method: "GET",
+            dataType: 'html',
+            data: { 
+            sampletype_id: $('#the-sample-type').val(),
+            testname_id: $(this).val()},
+            beforeSend: function(xhr) {
+               $('.image-loader').addClass("img-loader");
+               }
+            })
+            .done(function( response ) {
+                $("#methodreference").html(response); 
+                $('.image-loader').removeClass("img-loader");  
+            });
+    });	
 </script>

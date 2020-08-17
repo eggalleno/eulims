@@ -4,7 +4,8 @@ use yii\helpers\Html;
 use yii\helpers\Url;
 use kartik\grid\GridView;
 use common\components\Functions;
-use common\models\lab\Customer;
+//use common\models\lab\Customer;
+use common\models\lab\CustomerBooking;
 
 $func= new Functions();
 $this->title = 'Booking';
@@ -50,7 +51,7 @@ use yii\helpers\ArrayHelper;
                     }
                 },
                 'filterType' => GridView::FILTER_SELECT2,
-                'filter' => ArrayHelper::map(Customer::find()->asArray()->all(), 'customer_id', 'customer_name'),
+                'filter' => ArrayHelper::map(CustomerBooking::find()->asArray()->all(), 'customer_booking_id', 'customer_name'),
                 'filterWidgetOptions' => [
                     'pluginOptions' => ['allowClear' => true],
                 ],

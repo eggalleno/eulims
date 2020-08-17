@@ -82,7 +82,7 @@ function(calEvent, jsEvent, view) {
     // change the border color just for fun
     // $(this).css('border-color', 'red');
 
-    window.open( "/inventory/equipmentservice/update?id=" + calEvent.id, "_blank", "" );
+    window.open( "/lab/booking/view?id=" + calEvent.id, "_blank", "" );
 }
 EOF;
 
@@ -96,13 +96,9 @@ EOF;
    <?= \yii2fullcalendar\yii2fullcalendar::widget(array(
           'events'=> Url::to(["/lab/booking/jsoncalendar?id=$rstl_id"]),
           'clientOptions' => [
-                       // 'selectable' => true,
                         'selectHelper' => true,
-                      //  'droppable' => true,
                         'editable' => true,
                         'height'=>500,
-                        // 'select' => new JsExpression($JSCode),
-                        // 'drop' => new JsExpression($JSDropEvent),
                         'eventClick' => new JsExpression($JSEventClick),
                         // 'dayClick'=>new \yii\web\JsExpression($JSDayClick),
                         'defaultDate' => date('Y-m-d')

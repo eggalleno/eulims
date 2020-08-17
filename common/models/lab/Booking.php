@@ -3,8 +3,8 @@
 namespace common\models\lab;
 
 use Yii;
-use common\models\lab\Customer;
-
+//use common\models\lab\Customer;
+use common\models\lab\CustomerBooking;
 /**
  * This is the model class for table "tbl_booking".
  *
@@ -16,6 +16,7 @@ use common\models\lab\Customer;
  * @property string $date_created
  * @property int $qty_sample
  * @property int $customer_id
+ * @property int $sampletype_id
  */
 class Booking extends \yii\db\ActiveRecord
 {
@@ -42,8 +43,8 @@ class Booking extends \yii\db\ActiveRecord
     {
         return [
             [['scheduled_date', 'booking_reference', 'qty_sample', 'customer_id'], 'required'],
-            [['scheduled_date', 'date_created','booking_status'], 'safe'],
-            [['rstl_id', 'qty_sample', 'customer_id'], 'integer'],
+            [['scheduled_date', 'date_created','booking_status','samplename','modeofrelease_ids'], 'safe'],
+            [['rstl_id', 'qty_sample', 'customer_id','sampletype_id'], 'integer'],
             [['booking_reference'], 'string', 'max' => 50],
             [['description'], 'string', 'max' => 100],
         ];
@@ -63,10 +64,12 @@ class Booking extends \yii\db\ActiveRecord
             'date_created' => 'Date Created',
             'qty_sample' => 'Qty Sample',
             'customer_id' => 'Customer ID',
+			'sampletype_id' => 'Sample Type',
+			'samplename' => 'Sample Name',
         ];
     }
     public function getCustomer()
     {
-        return $this->hasOne(Customer::className(), ['customer_id' => 'customer_id']);
+        return $this->hasOne(CustomerBooking::className(), ['customer_booking_id' => 'customer_id']);
     }
 }
