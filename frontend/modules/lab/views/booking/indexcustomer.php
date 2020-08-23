@@ -8,7 +8,7 @@ use yii\web\JsExpression;
 /* @var $searchModel common\models\lab\BookingSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = 'Booking';
+$this->title = 'Create Booking';
 $this->params['breadcrumbs'][] = ['label' => 'Manage Booking', 'url' => ['/lab/booking/manage']];
 $this->params['breadcrumbs'][] = $this->title;
 
@@ -65,49 +65,46 @@ $JSEventClick = <<<EOF
 function(calEvent, jsEvent, view) {
 
 
-    // $.ajax({
-    //     url: Url::to(['/inventory/products/dayClickCalendarEvent']),
-    //     dataType: 'json',
-    //     data: { 
-    //           title: calEvent.title,
-             
-    //     },
-        
-    // });
-
-    // alert('Event: id is  ' + calEvent.id);
-    // alert('Coordinates: ' + jsEvent.pageX + ',' + jsEvent.pageY);
-    // alert('View: ' + view.name);
-
-    // change the border color just for fun
-    // $(this).css('border-color', 'red');
-
     window.open( "/lab/booking/view?id=" + calEvent.id, "_blank", "" );
 }
 EOF;
 
 ?>
 <div class="booking-index">
+    <div>
+        <?= Html::button('<span class="glyphicon glyphicon-plus"></span>  Book Now!', ['value'=>'/lab/booking/create', 'class' => 'btn btn-lg btn-success ','title' => Yii::t('app', "Booking"),'id'=>'btnBooking', 'style'=>'style="left: 50%;margin-right: -50%;"','onclick'=>'addBooking(this.value,this.title)'])?>
+        - or -
+        <?= Html::button('<span class="glyphicon glyphicon-eye-open"></span>  Track your request!', ['value'=>'/lab/booking/viewbyreference', 'class' => 'btn btn-success btn-lg','title' => Yii::t('app', "View Booking"),'id'=>'btnBooking','onclick'=>'viewBooking(this.value,this.title)'])?>
+    </div>
 
-    <?= Html::button('<span class="glyphicon glyphicon-plus"></span> Create Booking', ['value'=>'/lab/booking/create', 'class' => 'btn btn-success','title' => Yii::t('app', "Booking"),'id'=>'btnBooking','onclick'=>'addBooking(this.value,this.title)'])?>
     
-  <?php $rstl_id= 11; //default 11, just get all from the db, let the db set the defualt rstlid to 11?>  
+    <br><br>
 
-   <?= \yii2fullcalendar\yii2fullcalendar::widget(array(
-          'events'=> Url::to(["/lab/booking/jsoncalendar?id=$rstl_id"]),
-          'clientOptions' => [
-                        'selectHelper' => true,
-                        'editable' => true,
-                        'height'=>500,
-                        'eventClick' => new JsExpression($JSEventClick),
-                        // 'dayClick'=>new \yii\web\JsExpression($JSDayClick),
-                        'defaultDate' => date('Y-m-d')
-                  ],
-      ));
-    ?>
+    <div>
+        <i style="font-size: 30pt"><b style="color:#00a65a">3 steps on how to submit samples online</b></i>
+        <br>
+        <br>
+        <i style="font-size: 20pt"><b style="color:#3c8dbc">Step 1</b> - Book a request</i>
+        <br>
+        <br>
+        <i style="font-size: 20pt"><b style="color:#3c8dbc">Step 2</b> - Fill up the form</i>
+        <br>
+        <br>
+        <i style="font-size: 20pt"><b style="color:#3c8dbc">Step 3</b> - Track your request using the reference number</i>
+
+    </div>
+    <br><br>
+    <div>
+        <i style="font-size: 20pt"><b style="color:#f39c12">Note: </b> - You may receive a text message from the CRO, if your booking is accepted for the schedule requested. </i>
+
+    </div>
 </div>
 <script type="text/javascript">
     function addBooking(url,title){
+        LoadModal(title,url,'true','700px');
+    }
+
+    function viewBooking(url,title){
         LoadModal(title,url,'true','700px');
     }
     $('#btnBooking').click(function(){
@@ -117,3 +114,5 @@ EOF;
             .load($(this).attr('value'));
     });
 </script>
+
+

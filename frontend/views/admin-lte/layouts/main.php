@@ -71,10 +71,11 @@ elseif (Yii::$app->controller->action->id === 'login') {
             } else {
               print_r($logpage->getErrors());
             }
-      } else {
-          //return 'Session time out!';
-          return Yii::$app->controller->redirect(['/site/login']);
-      }
+      } 
+      // else {
+      //     //return 'Session time out!';
+      //     return Yii::$app->controller->redirect(['/site/login']);
+      // }
 
     ?>
     <?php $this->beginPage() ?>

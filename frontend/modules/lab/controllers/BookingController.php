@@ -20,6 +20,7 @@ use frontend\modules\lab\components\eRequest;
 use common\models\system\Profile;
 use common\models\lab\Sample;
 use common\models\lab\CustomerBooking;
+use common\models\lab\Trackform;
 /**
  * BookingController implements the CRUD actions for Booking model.
  */
@@ -46,6 +47,7 @@ class BookingController extends Controller
      */
     public function actionIndex()
     {
+      if(!Yii::$app->user->isGuest){
         $searchModel = new BookingSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
         
@@ -53,6 +55,10 @@ class BookingController extends Controller
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
         ]);
+      }
+        else{
+          return $this->render('indexcustomer');
+        }
     }
 
     /**
@@ -71,6 +77,30 @@ class BookingController extends Controller
         ]);
     }
 
+
+     public function actionViewbyreference()
+    {
+      $trackform = new Trackform();
+
+      if ($trackform->load(Yii::$app->request->post())) {
+
+          $booking = Booking::find()->where(['booking_reference'=>$trackform->referencenumber])->one();
+          if($booking){
+            return $this->redirect(['viewcustomer', 
+                'id' => $booking->booking_id,
+            ]);
+          }
+          else{
+            Yii::$app->session->setFlash('error','Reference Number Not Found!');
+             return $this->redirect('index');
+          }
+      }
+
+        return $this->renderAjax('viewbyreference', [
+          'model'=> $trackform
+        ]);
+    }
+
     /**
      * Creates a new Booking model.
      * If creation is successful, the browser will be redirected to the 'view' page.
@@ -80,14 +110,14 @@ class BookingController extends Controller
     {
 		
         $model = new Booking();
-		$customer = new CustomerBooking();
-		$testname = [];
-        $model->rstl_id= Yii::$app->user->identity->profile->rstl_id;
+    		$customer = new CustomerBooking();
+    		$testname = [];
+        $model->rstl_id=11; //default 11, just get all from the db, let the db set the defualt rstlid to 11
         if ($model->load(Yii::$app->request->post()) && $customer->load(Yii::$app->request->post())) {
             $customer->save(false);
-			$model->booking_reference=$this->Createreferencenum();
+			     $model->booking_reference=$this->Createreferencenum();
             $model->scheduled_date;
-            $model->description;echo "<br>";
+            $model->description;
             $model->rstl_id;
             $model->date_created=date("Y-m-d");
             if(isset($_POST['qty_sample'])){
@@ -98,23 +128,33 @@ class BookingController extends Controller
             $model->qty_sample=$quantity;
             $model->customer_id=$customer->customer_booking_id;
             $model->sampletype_id;
-			$model->description;
-			$model->modeofrelease_ids='1';
+      			$model->description;
+      			$model->modeofrelease_ids='1';
 			
 			
             $model->save();
 			
-            Yii::$app->session->setFlash('success','Successfully Saved');
-            return $this->redirect(['index']);
+            Yii::$app->session->setFlash('success','Successfully Saved, Reference Number : '.$model->booking_reference);
+
+             return $this->redirect(['viewcustomer', 
+              'id' => $model->booking_id,
+          ]);
+
         }
         
         return $this->renderAjax(
-		'create', [
+		        'create', [
             'model' => $model,
-			'sampletype'=>$this->listSampletype(),
-			'testname'=>$testname,
-			'customer'=>$customer
+      			'sampletype'=>$this->listSampletype(),
+      			'testname'=>$testname,
+      			'customer'=>$customer
         ]);
+    }
+
+    public function actionViewcustomer($id){
+      return $this->render('viewcustomer', [
+              'model' =>$this->findModel($id),
+          ]);
     }
     
     public function actionJsoncalendar($start=NULL,$end=NULL,$_=NULL,$id){
@@ -201,7 +241,7 @@ class BookingController extends Controller
             ->from('eulims_lab.tbl_booking')
             ->one();
           $lastnum=$lastid["lastnumber"]+1;
-          $rstl_id=Yii::$app->user->identity->profile->rstl_id;
+          $rstl_id=11;
            
           $string = Yii::$app->security->generateRandomString(9);
         
