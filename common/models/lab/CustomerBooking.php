@@ -44,6 +44,7 @@ class CustomerBooking extends \yii\db\ActiveRecord
             [['customer_name'], 'string', 'max' => 100],
             [['tel', 'email'], 'string', 'max' => 50],
             [['address'], 'string', 'max' => 200],
+			[['classification_id', 'business_nature_id', 'customer_name', 'email','address','tel'], 'required'],
         ];
     }
 

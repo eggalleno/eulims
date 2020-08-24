@@ -67,26 +67,6 @@ use common\models\lab\Businessnature;
 			<?= $form->field($customer, 'email')->textInput(['maxlength' => true]) ?>
 		</div>
 		
-		<div class="col-md-6">
-			<?= $form->field($customer, 'address')->textInput(['maxlength' => true]) ?>
-		</div>
-		
-	</div>
-	
-    <div class="row">
-         <div class="col-sm-6">
-        <?php
-        echo $form->field($model, 'rstl_id')->widget(Select2::classname(), [
-            'data' => ArrayHelper::map(Rstl::find()->asArray()->all(), 'rstl_id', 'name'),
-            'language' => 'en-gb',
-            'options' => ['placeholder' => 'Select Testing Laboratory'],
-            'pluginOptions' => [
-                'allowClear' => true,
-                //'disabled' => !Yii::$app->user->can('super-administrator'),
-            ],
-        ])->label('Laboratory');
-        ?>
-        </div>
 		<div class="col-sm-6">
              <?php
              echo $form->field($model, 'scheduled_date')->widget(DatePicker::classname(), [
@@ -101,6 +81,14 @@ use common\models\lab\Businessnature;
              ]);
              ?>
         </div>
+		
+		
+	</div>
+	
+    <div class="row">
+       <div class="col-md-12">
+			<?= $form->field($customer, 'address')->textInput(['maxlength' => true]) ?>
+		</div>
     </div>
     <div class="row">
 	

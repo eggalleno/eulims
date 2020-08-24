@@ -15,24 +15,23 @@ $this->params['breadcrumbs'][] = $this->title;
 
 
     <p>
-        <?= Html::a('Save as Request', ['saverequest', 'id' => $model->booking_id], ['class' => 'btn btn-success
-		']) ?>
-       
+        <?php
+		if ($model->booking_status <> 1){
+			echo Html::a('Save as Request', ['saverequest', 'id' => $model->booking_id], ['class' => 'btn btn-success']);
+			echo "&nbsp;&nbsp;";
+			echo Html::a('Cancel Booking', ['cancelbooking', 'id' => $model->booking_id], ['class' => 'btn btn-danger']) ;
+			echo "&nbsp;&nbsp;";
+			echo Html::a('Save as new Customer', ['savecustomer', 'id' => $model->booking_id], ['class' => 'btn btn-success']) ;
+		}
+		
+		?>
+        <?php
+	//if ($model->customer ? $model->customer->status : 1 != 1) {
+		//	echo Html::a('Save as new Customer', ['savecustomer', 'id' => $model->booking_id], ['class' => 'btn btn-success']) ;
+	//	}
+		
+		?>
     </p>
-
-    <?= DetailView::widget([
-        'model' => $model,
-        'attributes' => [
-            'booking_id',
-            'scheduled_date',
-            'booking_reference',
-            'description',
-            'rstl_id',
-            'date_created',
-            'qty_sample',
-            'customer_id',
-        ],
-    ]) ?>
 	
 	  <?= DetailView::widget([
         'model'=>$model,
@@ -55,33 +54,95 @@ $this->params['breadcrumbs'][] = $this->title;
                     [
                         'label'=>'Customer Name',
                         'format'=>'raw',
-                        'value'=>$model->customer ? $model->customer->customer_name : "",
+                        'value'=>$customer ? $customer->customer_name : "",
                         'valueColOptions'=>['style'=>'width:30%'], 
                         'displayOnly'=>true
                     ],
                     [
                         'label'=>'Contact Number',
                         'format'=>'raw',
-                        'value'=>$model->customer ? $model->customer->tel : "",
+                        'value'=>$customer ? $customer->tel : "",
                         'valueColOptions'=>['style'=>'width:30%'], 
                         'displayOnly'=>true
                     ],
                 ],
                     
             ],
-			  [
+			[
                 'columns' => [
                     [
                         'label'=>'Email',
                         'format'=>'raw',
-                        'value'=>$model->customer ? $model->customer->email : "",
+                        'value'=>$customer ? $customer->email : "",
                         'valueColOptions'=>['style'=>'width:30%'], 
                         'displayOnly'=>true
                     ],
                     [
                         'label'=>'Address',
                         'format'=>'raw',
-                        'value'=>$model->customer ? $model->customer->address : "",
+                        'value'=>$customer ? $customer->address : "",
+                        'valueColOptions'=>['style'=>'width:30%'], 
+                        'displayOnly'=>true
+                    ],
+                ],
+                    
+            ],
+			[
+                    'group'=>true,
+                    'label'=>'Sample booking details ',
+                    'rowOptions'=>['class'=>'info']
+            ],
+			[
+                'columns' => [
+                    [
+                        'label'=>'Scheduled Date',
+                        'format'=>'raw',
+                        'value'=>$model->scheduled_date,
+                        'valueColOptions'=>['style'=>'width:30%'], 
+                        'displayOnly'=>true
+                    ],
+                    [
+                        'label'=>'Booking Reference',
+                        'format'=>'raw',
+                        'value'=>$model->booking_reference,
+                        'valueColOptions'=>['style'=>'width:30%'], 
+                        'displayOnly'=>true
+                    ],
+                ],
+                    
+            ],
+			[
+                'columns' => [
+                    [
+                        'label'=>'Date Created',
+                        'format'=>'raw',
+                        'value'=>$model->date_created,
+                        'valueColOptions'=>['style'=>'width:30%'], 
+                        'displayOnly'=>true
+                    ],
+                    [
+                        'label'=>'Quantity Sample',
+                        'format'=>'raw',
+                        'value'=>$model->qty_sample,
+                        'valueColOptions'=>['style'=>'width:30%'], 
+                        'displayOnly'=>true
+                    ],
+                ],
+                    
+            ],
+			[
+                'columns' => [
+                    [
+                        'label'=>'Sample name',
+                        'format'=>'raw',
+                        'value'=>$model->samplename,
+                        'valueColOptions'=>['style'=>'width:30%'], 
+                        'displayOnly'=>true
+                    ],
+                    [
+                        'label'=>'Decription',
+                        'format'=>'raw',
+                        'value'=>$model->description,
                         'valueColOptions'=>['style'=>'width:30%'], 
                         'displayOnly'=>true
                     ],

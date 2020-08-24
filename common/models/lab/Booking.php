@@ -42,8 +42,8 @@ class Booking extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['scheduled_date', 'booking_reference', 'qty_sample', 'customer_id'], 'required'],
-            [['scheduled_date', 'date_created','booking_status','samplename','modeofrelease_ids'], 'safe'],
+            [['scheduled_date', 'booking_reference', 'qty_sample', 'customer_id','samplename','description','qty_sample','sampletype_id'], 'required'],
+            [['scheduled_date', 'date_created','booking_status','samplename','modeofrelease_ids','reason'], 'safe'],
             [['rstl_id', 'qty_sample', 'customer_id','sampletype_id'], 'integer'],
             [['booking_reference'], 'string', 'max' => 50],
             [['description'], 'string', 'max' => 100],

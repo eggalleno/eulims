@@ -21,6 +21,7 @@ use common\models\system\Profile;
 use common\models\lab\Sample;
 use common\models\lab\CustomerBooking;
 use common\models\lab\Trackform;
+use common\models\lab\Bookingrequest;
 /**
  * BookingController implements the CRUD actions for Booking model.
  */
@@ -70,7 +71,15 @@ class BookingController extends Controller
     public function actionView($id)
     {
 		$model=$this->findModel($id);
-		$customer =CustomerBooking::find()->where(['customer_booking_id'=>$model->customer_id])->one();
+		
+		$customer_id= $model->customer_id;
+		if($model->booking_status==1){
+			$customer =Customer::findOne($customer_id);
+		}
+		else{
+			$customer =CustomerBooking::findOne($customer_id);
+		}
+		//$customer =CustomerBooking::find()->where(['customer_booking_id'=>$model->customer_id])->one();
         return $this->render('view', [
             'model' => $model,
 			'customer' => $customer
@@ -100,6 +109,7 @@ class BookingController extends Controller
           'model'=> $trackform
         ]);
     }
+	
 
     /**
      * Creates a new Booking model.
@@ -112,13 +122,14 @@ class BookingController extends Controller
         $model = new Booking();
     		$customer = new CustomerBooking();
     		$testname = [];
-        $model->rstl_id=11; //default 11, just get all from the db, let the db set the defualt rstlid to 11
+       // $model->rstl_id=11; //default 11, just get all from the db, let the db set the defualt rstlid to 11
         if ($model->load(Yii::$app->request->post()) && $customer->load(Yii::$app->request->post())) {
             $customer->save(false);
 			     $model->booking_reference=$this->Createreferencenum();
-            $model->scheduled_date;
-            $model->description;
-            $model->rstl_id;
+           // $model->scheduled_date;
+           // $model->description;
+            //$model->rstl_id;
+			$model->booking_status=0;
             $model->date_created=date("Y-m-d");
             if(isset($_POST['qty_sample'])){
                 $quantity = (int) $_POST['qty_sample'];
@@ -143,7 +154,7 @@ class BookingController extends Controller
         }
         
         return $this->renderAjax(
-		        'create', [
+		    'create', [
             'model' => $model,
       			'sampletype'=>$this->listSampletype(),
       			'testname'=>$testname,
@@ -164,11 +175,18 @@ class BookingController extends Controller
     $events = array();
     
     //as of now get all the schedules
-    $schedules = Booking::find()->where(['rstl_id'=>$id,'booking_status'=>0])->all(); 
- 
+    $schedules = Booking::find()->where(['booking_status'=>0])->all(); 
+	
     foreach ($schedules AS $schedule){
         $customer_id= $schedule->customer_id;
-        $customer =CustomerBooking::find()->where(['customer_booking_id'=>$customer_id])->one();
+		if($schedule->booking_status==1){
+			$customer =Customer::findOne($customer_id);
+		}
+		else{
+			$customer =CustomerBooking::findOne($customer_id);
+		}
+		
+        
         $Event= new Schedule();
         $Event->id = $schedule->booking_id;
         $Event->title =$customer->customer_name.": ".$schedule->description."\n Sample Qty:".$schedule->qty_sample;
@@ -229,6 +247,15 @@ class BookingController extends Controller
     protected function findModel($id)
     {
         if (($model = Booking::findOne($id)) !== null) {
+            return $model;
+        }
+
+        throw new NotFoundHttpException('The requested page does not exist.');
+    }
+	
+	 protected function findModelcustomer($id)
+    {
+        if (($model = CustomerBooking::findOne($id)) !== null) {
             return $model;
         }
 
@@ -359,6 +386,7 @@ class BookingController extends Controller
 		$request->booking_id=$model->booking_id;
 		$request->purpose_id=1;
 		$request->report_due=date("Y-m-d");
+
 		$request->save(false);
 		$quantity=$model->qty_sample;
 	    if($quantity > 1)
@@ -384,10 +412,38 @@ class BookingController extends Controller
 		}
 		
 		
+		$bookingrequest = new Bookingrequest();
+		$bookingrequest->request_id= $request->request_id;
+		$bookingrequest->booking_id= $id;
+		$bookingrequest->save();
+		$model->booking_status=1;
+		$model->save(false);
 		return $this->redirect(['/lab/request/view', 'id' => $request->request_id]);
 		//Yii::$app->session->setFlash('success', 'Successfully Created!');
       
 		
 		//return $this->redirect(['index']);
     }
+	
+	 public function actionSavecustomer($id)
+    {
+        $model = $this->findModel($id);
+		$customerid= $model->customer_id;
+		$customermodel=$this->findModelcustomer($customerid);
+		$customermodel->status=1;
+		$customermodel->save();
+		
+		$customer = new Customer();
+		$customer->rstl_id= 11; //default
+		$customer->customer_name= $customermodel->customer_name;
+		$customer->classification_id= $customermodel->classification_id;
+		$customer->address= $customermodel->address;
+		$customer->tel= $customermodel->tel;
+		$customer->email= $customermodel->email;
+		$customer->business_nature_id= $customermodel->business_nature_id;
+		$customer->save(false);
+		$model->customer_id=$customer->customer_id;
+		$model->save();
+		return $this->redirect(['/lab/booking/view', 'id' => $id]);
+	}	
 }
