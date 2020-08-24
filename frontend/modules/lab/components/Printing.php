@@ -1385,23 +1385,23 @@ class Printing {
             $RequestTemplate .= "<td class='text-left border-left-line border-top-line border-right-line padding-right-5 padding-left-5' colspan='10'>&nbsp;</td>";
             $RequestTemplate .= "</tr>";
             foreach ($request->samples as $sample) {
+                if($sample->active == 1){
+                    //************************************
+                    //temporary
+                    //lab personnel wants to only have 4 digit figure in sample code
+                    $CurSampleCode2 = $sample->sample_code;
+                    $word = explode("-", $CurSampleCode2);
 
-
-                //************************************
-                //temporary
-                //lab personnel wants to only have 4 digit figure in sample code
-                $CurSampleCode2 = $sample->sample_code;
-                $word = explode("-", $CurSampleCode2);
-
-                $CurSampleCode2 = $word[0] ."-".substr($word[1],1);
-                //*********************************
-              
-                if ($CurSampleCode2 != $PrevSampleCode2) {
-                    $RequestTemplate .= "<tr>";
-                    $RequestTemplate .= "<td style='color:#0f17c4;' class='text-left border-left-line border-right-line padding-left-5' colspan='10'> ".$CurSampleCode2." : <i>".$sample->customer_description."</i>, ".$sample->description."</td>";
-                    $RequestTemplate .= "</tr>";
+                    $CurSampleCode2 = $word[0] ."-".substr($word[1],1);
+                    //*********************************
+                  
+                    if ($CurSampleCode2 != $PrevSampleCode2) {
+                        $RequestTemplate .= "<tr>";
+                        $RequestTemplate .= "<td style='color:#0f17c4;' class='text-left border-left-line border-right-line padding-left-5' colspan='10'> ".$CurSampleCode2." : <i>".$sample->customer_description."</i>, ".$sample->description."</td>";
+                        $RequestTemplate .= "</tr>";
+                    }
+                    $PrevSampleCode2 = $CurSampleCode2;
                 }
-                $PrevSampleCode2 = $CurSampleCode2;
             }
             $RequestTemplate .= "<tr>";
             $RequestTemplate .= "<td class='text-left border-left-line border-bottom-line border-right-line padding-right-5 padding-left-5' colspan='10'>&nbsp;</td>";
