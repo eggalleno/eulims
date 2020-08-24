@@ -71,33 +71,39 @@ EOF;
 
 ?>
 <div class="booking-index">
+
+    <div class="alert alert-success" style="background: #d4f7e8 !important;margin-top: 1px !important;">
+        <a href="#" class="close" data-dismiss="alert" >×</a>
+        <i style="font-size: 20pt"><b style="color:#00a65a">3 Easy steps to submit samples online</b></i>
+
+        <br>
+        <br>
+        <i style="font-size: 15pt;color:#00a65a;"><b>1. </b> Book a request</i>
+        <br>
+        <br>
+        <i style="font-size: 15pt;color:#00a65a;"><b>2. </b> Fill up the form</i>
+        <br>
+        <br>
+        <i style="font-size: 15pt;color:#00a65a;"><b>3. </b> Track your request using the reference number</i>
+
+
+
+        <p class="note" style="color:#d73925;font-size: 12pt;"><b>Always secure a copy of your reference number </b><br/> You may also reach us through (062) 991-1024</p>
+   
+    </div>
+    <div class="alert alert-warning" style="background: #F4D6B6 !important;margin-top: 1px !important;">
+        <a href="#" class="close" data-dismiss="alert" >×</a>
+         <i style="font-size: 20pt;color:#E17400"><b>Note:Our Customer Relation Officer may contact you to verify your booking details.</b></i>
+
+         <p class="note" style="color:#d73925;font-size: 12pt;"><b>Make sure that the provided contact number is updated</b><br/> Thank you!</p>
+    </div>
     <div>
         <?= Html::button('<span class="glyphicon glyphicon-plus"></span>  Book Now!', ['value'=>'/lab/booking/create', 'class' => 'btn btn-lg btn-success ','title' => Yii::t('app', "Booking"),'id'=>'btnBooking', 'style'=>'style="left: 50%;margin-right: -50%;"','onclick'=>'addBooking(this.value,this.title)'])?>
         - or -
         <?= Html::button('<span class="glyphicon glyphicon-eye-open"></span>  Track your request!', ['value'=>'/lab/booking/viewbyreference', 'class' => 'btn btn-success btn-lg','title' => Yii::t('app', "View Booking"),'id'=>'btnBooking','onclick'=>'viewBooking(this.value,this.title)'])?>
     </div>
-
+    <br>
     
-    <br><br>
-
-    <div>
-        <i style="font-size: 30pt"><b style="color:#00a65a">3 steps on how to submit samples online</b></i>
-        <br>
-        <br>
-        <i style="font-size: 20pt"><b style="color:#3c8dbc">Step 1</b> - Book a request</i>
-        <br>
-        <br>
-        <i style="font-size: 20pt"><b style="color:#3c8dbc">Step 2</b> - Fill up the form</i>
-        <br>
-        <br>
-        <i style="font-size: 20pt"><b style="color:#3c8dbc">Step 3</b> - Track your request using the reference number</i>
-
-    </div>
-    <br><br>
-    <div>
-        <i style="font-size: 20pt"><b style="color:#f39c12">Note: </b> - You may receive a text message from the CRO, if your booking is accepted for the schedule requested. </i>
-
-    </div>
 </div>
 <script type="text/javascript">
     function addBooking(url,title){
