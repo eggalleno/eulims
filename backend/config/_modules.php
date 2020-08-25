@@ -3,8 +3,7 @@
 
 return [
     'admin' => [
-        'class' => 'common\modules\admin\Module',
-        //'class' => 'common\mdm\admin\Module',
+        'class' => 'mdm\admin\Module',
     ],
     'system' => [
         'class' => 'backend\modules\system\Module',
