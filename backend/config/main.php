@@ -99,8 +99,6 @@ return [
         'class' => 'mdm\admin\components\AccessControl',
         'allowActions' => [
             'site/logout',
-            // 'admin/*',
-            // '/admin/user/signup'
         ]
     ],
     'params' => $params,
