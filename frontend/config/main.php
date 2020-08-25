@@ -182,19 +182,15 @@ return [
 		'absoluteUrl' => false,
 		'databaseComponent' => 'db' // The used database component by the image manager, this defaults to the Yii::$app->db component
         ],
-    ],
-    /*'as access' => [
-        //'class' => 'mdm\admin\components\AccessControl',
-        'class' => 'common\modules\admin\components\AccessControl',
-        'allowActions' => [
-            '/ajax/*',
-            '/ajax/get-lab/*',
-            'site/*',
-            '/admin/user/signup',
-            '/lab/analysis/listtest',
+        'authManager' => [
+            'class' => 'yii\rbac\DbManager', // or use 'yii\rbac\DbManager'
         ]
     ],
-     * 
-     */
+    'as access' => [
+        'class' => 'mdm\admin\components\AccessControl',
+        // 'allowActions' => [
+        //     'site/*',
+        // ]
+    ],
     'params' => $params,
 ];
