@@ -74,17 +74,17 @@ EOF;
 
     <div class="alert alert-success" style="background: #d4f7e8 !important;margin-top: 1px !important;">
         <a href="#" class="close" data-dismiss="alert" >×</a>
-        <i style="font-size: 20pt"><b style="color:#00a65a">3 Easy steps to submit samples online</b></i>
+        <i style="font-size: 20pt"><b style="color:#00a65a">3 Easy steps to book online</b></i>
 
         <br>
         <br>
-        <i style="font-size: 15pt;color:#00a65a;"><b>1. </b> Book a request</i>
+        <i style="font-size: 15pt;color:#00a65a;"><b>1. </b> Click "Book Now!"</i>
         <br>
         <br>
-        <i style="font-size: 15pt;color:#00a65a;"><b>2. </b> Fill up the form</i>
+        <i style="font-size: 15pt;color:#00a65a;"><b>2. </b> Fill up the form and Submit.</i>
         <br>
         <br>
-        <i style="font-size: 15pt;color:#00a65a;"><b>3. </b> Track your request using the reference number</i>
+        <i style="font-size: 15pt;color:#00a65a;"><b>3. </b> Track your request using the reference number.</i>
 
 
 
