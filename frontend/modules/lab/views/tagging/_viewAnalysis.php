@@ -60,7 +60,7 @@ $roles = \Yii::$app->authManager->getRolesByUser(\Yii::$app->user->id);
 $show = false;
 foreach ($roles as $role) {
 
-    if($role->name == "Analyst")
+    if($role->name == "pro-ANALYST")
         $show=true;
 }
 ?>
