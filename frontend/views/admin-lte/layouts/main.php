@@ -91,11 +91,11 @@ elseif (Yii::$app->controller->action->id === 'login') {
         <?php echo PHP_EOL; ?>
         <script type="text/javascript">
             function ToggleLeftMenu(){
-                $.post("/ajax/togglemenu", {}, function(result){
-                    if(result){
-                        //
-                    }
-                });
+                // $.post("/ajax/togglemenu", {}, function(result){
+                //     if(result){
+                //         //
+                //     }
+                // });
             }
             function PreviewReport(PDFUrl){
                 /*
