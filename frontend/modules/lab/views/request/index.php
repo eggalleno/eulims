@@ -34,7 +34,7 @@ $Button="{view}";
 $roles = \Yii::$app->authManager->getRolesByUser(\Yii::$app->user->id);
 foreach ($roles as $role) {
     //if the user has the role of these two then actioncgridview will not display the specific action buttons 
-    if(($role->name == "lab-manager")or($role->name == "super-administrator"))
+    if(($role->name == "pro-MANAGER")or($role->name == "super-administrator"))
         $Button="{view}{update}{delete}";
 
 }

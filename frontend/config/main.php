@@ -191,6 +191,11 @@ return [
         'class' => 'mdm\admin\components\AccessControl',
         'allowActions' => [
             'site/logout',
+            'lab/booking/index',
+            'lab/booking/create',
+            'lab/booking/viewcustomer',
+            'lab/booking/viewbyreference',
+            'lab/csf/index'
         ]
     ],
 
