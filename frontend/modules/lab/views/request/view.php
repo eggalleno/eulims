@@ -128,7 +128,7 @@ if($Request_Ref){//With Reference
     $roles = \Yii::$app->authManager->getRolesByUser(\Yii::$app->user->id);
     foreach ($roles as $role) {
 
-        if($role->name == "lab-manager")
+        if(($role->name == "pro-CRO") ||($role->name == "pro-MANAGER"))
              $ClickButton='addSample(this.value,this.title)';
     }
     $btnID="";
