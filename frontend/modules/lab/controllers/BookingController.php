@@ -128,7 +128,7 @@ class BookingController extends Controller
 			     $model->booking_reference=$this->Createreferencenum();
            // $model->scheduled_date;
            // $model->description;
-            //$model->rstl_id;
+            $model->modeofrelease_ids=1;//pickup
 			$model->booking_status=0; //status pending
             $model->date_created=date("Y-m-d");
             if(isset($_POST['qty_sample'])){
@@ -384,7 +384,7 @@ class BookingController extends Controller
 		$request->customer_id=$model->customer_id;
 		$request->conforme="";
 		$request->booking_id=$model->booking_id;
-		$request->purpose_id=1;
+		$request->purpose_id=$model->purpose;
 		$request->report_due=date("Y-m-d");
 
 		$request->save(false);

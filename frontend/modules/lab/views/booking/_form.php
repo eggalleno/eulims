@@ -13,6 +13,8 @@ use yii\helpers\Url;
 use common\models\lab\Modeofrelease;
 use common\models\lab\Classification;
 use common\models\lab\Businessnature;
+use common\models\lab\Purpose;
+use yii\captcha\Captcha;
 /* @var $this yii\web\View */
 /* @var $model common\models\lab\Booking */
 /* @var $form yii\widgets\ActiveForm */
@@ -98,21 +100,14 @@ use common\models\lab\Businessnature;
   
     <div class="row">
 		 <div class="col-sm-6">
-		 <?= $form->field($model, 'modeofrelease_ids')->widget(Select2::classname(), [
-			'data' => ArrayHelper::map(Modeofrelease::find()->all(),'modeofrelease_id','mode'),
-			//'initValueText'=>$model->modeofrelease_ids,
-			'language' => 'en',
-			 'options' => [
-				'placeholder' => 'Select Mode of Release...',
-				'multiple' => true,
-			],
-			'pluginEvents' => [
-				"change" => "function() { 
-					$('#modeofrelease_ids').val($(this).val());
-				}
-				",
-			]
-		])->label('Mode of Release'); ?> 
+		 <?= $form->field($model, 'purpose')->widget(Select2::classname(), [
+			'data' => ArrayHelper::map(Purpose::find()->all(),'purpose_id','name'),
+				'language' => 'en',
+				'options' => ['placeholder' => 'Select Purpose'],
+				'pluginOptions' => [
+					'allowClear' => true
+				],
+			])->label('Purpose'); ?>
 		</div>
 		
         <div class="col-sm-6">
@@ -151,7 +146,20 @@ use common\models\lab\Businessnature;
                 <?= $form->field($model, 'description')->textarea(['maxlength' => true]); ?>
             </div>
         </div>
-	
+	<?= $form->field($model, 'captcha')->widget(Captcha::className(), [
+                        'captchaAction' => ['/site/captcha'],
+						'imageOptions' => [
+							'id' => 'my-captcha-image'
+						]
+                    ]) ?>
+	<?php echo Html::button('Refresh captcha', ['id' => 'refresh-captcha']);?>
+	<?php $this->registerJs("
+		$('#refresh-captcha').on('click', function(e){
+			e.preventDefault();
+
+			$('#my-captcha-image').yiiCaptcha('refresh');
+		})
+	"); ?>
     <div class="form-group pull-right">
             <?= Html::submitButton($model->isNewRecord ? 'Create' : 'Update', ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary',
                 'id'=>'createBooking']) ?>
