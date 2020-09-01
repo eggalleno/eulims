@@ -48,6 +48,8 @@ class BookingController extends Controller
      */
     public function actionIndex()
     {
+      $session = Yii::$app->session;
+      $session->set('hideMenu',true);
       if(!Yii::$app->user->isGuest){
         $searchModel = new BookingSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
