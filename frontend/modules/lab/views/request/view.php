@@ -68,6 +68,7 @@ $js=<<<SCRIPT
         var AnalysisRows=$analysisdataprovider->count;
         var msg='';
         if(SampleRows>0 && AnalysisRows>0){
+            this.disabled = true;
             $.post('/lab/request/saverequestransaction', {
                 request_id: $model->request_id,
                 lab_id: $model->lab_id,
