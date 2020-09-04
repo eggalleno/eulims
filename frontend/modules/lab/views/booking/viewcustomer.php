@@ -10,6 +10,15 @@ use kartik\grid\GridView;
 $this->title = $model->booking_reference;
 $this->params['breadcrumbs'][] = ['label' => 'Bookings', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
+
+$stat="";
+if($model->booking_status == 0){
+	$stat="Pending";
+}elseif($model->booking_status == 1){
+	$stat="Approved";
+}else{
+	$stat="Cancelled";
+}
 ?>
 <div class="booking-view">
 
@@ -75,5 +84,5 @@ $this->params['breadcrumbs'][] = $this->title;
     ]) ?>
 	
 <h2>Status</h2>
-    <h4>-Booking Placed-</h4>
+    <h4><?php echo "Booking is ".$stat; ?></h4>
 </div>

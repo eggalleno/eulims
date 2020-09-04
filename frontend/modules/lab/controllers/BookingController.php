@@ -48,6 +48,8 @@ class BookingController extends Controller
      */
     public function actionIndex()
     {
+      $session = Yii::$app->session;
+      $session->set('hideMenu',true);
       if(!Yii::$app->user->isGuest){
         $searchModel = new BookingSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
@@ -73,7 +75,7 @@ class BookingController extends Controller
 		$model=$this->findModel($id);
 		
 		$customer_id= $model->customer_id;
-		if($model->booking_status==1){
+		if($model->customerstat == 1){
 			$customer =Customer::findOne($customer_id);
 		}
 		else{
@@ -128,8 +130,8 @@ class BookingController extends Controller
 			     $model->booking_reference=$this->Createreferencenum();
            // $model->scheduled_date;
            // $model->description;
-            //$model->rstl_id;
-			$model->booking_status=0;
+            $model->modeofrelease_ids=1;//pickup
+			$model->booking_status=0; //status pending
             $model->date_created=date("Y-m-d");
             if(isset($_POST['qty_sample'])){
                 $quantity = (int) $_POST['qty_sample'];
@@ -179,7 +181,7 @@ class BookingController extends Controller
 	
     foreach ($schedules AS $schedule){
         $customer_id= $schedule->customer_id;
-		if($schedule->booking_status==1){
+		if($schedule->customerstat==1){
 			$customer =Customer::findOne($customer_id);
 		}
 		else{
@@ -384,7 +386,7 @@ class BookingController extends Controller
 		$request->customer_id=$model->customer_id;
 		$request->conforme="";
 		$request->booking_id=$model->booking_id;
-		$request->purpose_id=1;
+		$request->purpose_id=$model->purpose;
 		$request->report_due=date("Y-m-d");
 
 		$request->save(false);
@@ -416,7 +418,7 @@ class BookingController extends Controller
 		$bookingrequest->request_id= $request->request_id;
 		$bookingrequest->booking_id= $id;
 		$bookingrequest->save();
-		$model->booking_status=1;
+		$model->booking_status=1; //Status Approved
 		$model->save(false);
 		return $this->redirect(['/lab/request/view', 'id' => $request->request_id]);
 		//Yii::$app->session->setFlash('success', 'Successfully Created!');
@@ -443,7 +445,44 @@ class BookingController extends Controller
 		$customer->business_nature_id= $customermodel->business_nature_id;
 		$customer->save(false);
 		$model->customer_id=$customer->customer_id;
+		$model->customerstat=1; //Customer updated
 		$model->save();
+		Yii::$app->session->setFlash('success','Customer Updated!');
 		return $this->redirect(['/lab/booking/view', 'id' => $id]);
 	}	
+	 public function actionCancelbooking($id)
+    {
+		$model = $this->findModel($id);
+		if ($model->load(Yii::$app->request->post())) {
+			$model->booking_status=2;//cancelled
+			$model->save();
+		}
+		else{
+			return $this->renderAjax('cancel', [
+            'model' => $model,
+			]);
+		}
+		Yii::$app->session->setFlash('success','Cancelled!');
+		return $this->redirect(['/lab/booking/view', 'id' => $id]);
+		
+	}
+	 public function actionExistingcustomer($id)
+    {
+		$model = $this->findModel($id);
+		$customer=ArrayHelper::map(Customer::find()->all(),'customer_id','customer_name');
+		if ($model->load(Yii::$app->request->post())) {
+			//echo $model->customer_id;
+			//exit;
+			$model->customerstat=1; //Customer updated
+			$model->save();
+		}
+		else{
+			return $this->renderAjax('existingcustomer', [
+            'model' => $model,
+			'customers' => $customer
+			]);
+		}
+		Yii::$app->session->setFlash('success','Customer Updated!');
+		return $this->redirect(['/lab/booking/view', 'id' => $id]);
+	}
 }

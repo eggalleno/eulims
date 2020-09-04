@@ -3,25 +3,61 @@
 use yii\helpers\Html;
 use kartik\detail\DetailView;
 use kartik\grid\GridView;
-
+use common\components\Functions;
 /* @var $this yii\web\View */
 /* @var $model common\models\lab\Booking */
-
+$fc = new Functions();
 $this->title = $model->booking_id;
 $this->params['breadcrumbs'][] = ['label' => 'Bookings', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
+$stat="";
+if($model->booking_status == 0){
+	$stat="Pending";
+	$CancelClass='cancelled-hide';
+    $BackClass='';
+}elseif($model->booking_status == 1){
+	$stat="Approved";
+	$CancelClass='cancelled-hide';
+    $BackClass='';
+}else{
+	$stat="Cancelled";
+	$CancelClass='request-cancelled';
+    $BackClass='background-cancel';
+}
 ?>
-<div class="booking-view">
-
+<div class="booking-view" style="position:relative;">
+	<div id="cancelled-div" class="outer-div <?= $CancelClass ?>">
+         <div class="inner-div">
+        <img src="/images/cancelled.png" alt="" style="width: 300px;margin-left: 80px"/>
+        <div class="panel panel-primary">
+            <div class="panel-heading"></div>
+            <table class="table table-condensed table-hover table-striped table-responsive">
+            
+                <tr>
+                    <th style="width: 120px;background-color: lightgray">Reason of Cancellation</th>
+                    <td style="width: 230px"><?= $model->reason ?></td>
+                </tr>
+            </table>
+        </div>
+        </div>
+	  </div>	
 
     <p>
         <?php
 		if ($model->booking_status <> 1){
 			echo Html::a('Save as Request', ['saverequest', 'id' => $model->booking_id], ['class' => 'btn btn-success']);
 			echo "&nbsp;&nbsp;";
-			echo Html::a('Cancel Booking', ['cancelbooking', 'id' => $model->booking_id], ['class' => 'btn btn-danger']) ;
-			echo "&nbsp;&nbsp;";
-			echo Html::a('Save as new Customer', ['savecustomer', 'id' => $model->booking_id], ['class' => 'btn btn-success']) ;
+			if($model->customerstat <> 1){
+				echo Html::a('Save as new Customer', ['savecustomer', 'id' => $model->booking_id], ['class' => 'btn btn-success']) ;
+				echo "&nbsp;&nbsp;";
+				$existing="LoadModal('Update Existing Customer','/lab/booking/existingcustomer?id=".$model->booking_id."',true,500)";
+				echo $CancelButton='<button id="btnCancel" onclick="'.$existing.'" type="button" style="float: right;padding-right:5px;margin-left: 5px" class="btn btn-primary"><i class="fa fa-pencil"></i> Update Customer</button>';
+				echo "&nbsp;&nbsp;";
+			}
+			$Func="LoadModal('Cancel Booking','/lab/booking/cancelbooking?id=".$model->booking_id."',true,500)";
+            echo $CancelButton='<button id="btnCancel" onclick="'.$Func.'" type="button" style="float: right;padding-right:5px;margin-left: 5px" class="btn btn-danger"><i class="fa fa-remove"></i> Cancel Booking</button>';
+			
+				
 		}
 		
 		?>
@@ -32,14 +68,15 @@ $this->params['breadcrumbs'][] = $this->title;
 		
 		?>
     </p>
-	
+   <div class="<?= $BackClass ?>"></div>
+   <div class="container">
 	  <?= DetailView::widget([
         'model'=>$model,
         'responsive'=>true,
         'hover'=>true,
         'mode'=>DetailView::MODE_VIEW,
         'panel'=>[
-            'heading'=>'<i class="glyphicon glyphicon-book"></i> Booking Details: ',
+            'heading'=>'<i class="glyphicon glyphicon-book"></i> Booking Details: '.$stat,
             'type'=>DetailView::TYPE_PRIMARY,
         ],
         'buttons1' => '',
@@ -151,6 +188,6 @@ $this->params['breadcrumbs'][] = $this->title;
             ],
         ],
     ]) ?>
+	</div>
 	
-
 </div>

@@ -94,7 +94,7 @@ $GLOBALS['rstl_id']= 11;
                             </ul>
                         </li>
                         <li class="footer">
-                            <a href="<?= Url::to($GLOBALS['frontend_base_uri'].'message/message/inbox') ?>">View all Messages</a>
+                            <!-- <a href="<?= Url::to($GLOBALS['frontend_base_uri'].'message/message/inbox') ?>">View all Messages</a> -->
                         </li>
                     </ul>
                 </li>

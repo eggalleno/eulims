@@ -1268,7 +1268,7 @@ class Printing {
             
             $RequestTemplate .= "<tr>";
             $RequestTemplate .= "<td style='border-bottom: 1px solid black;border-left: 1px solid black;border-top: 1px solid black;'>Address:</td>";
-            $RequestTemplate .= "<td colspan='6' style='color:#0f17c4;border-bottom: 1px solid black;border-bottom: 1px solid black;border-top: 1px solid black;'>". $this->sentenceCase($completeaddress)  ."</td>";
+            $RequestTemplate .= "<td colspan='6' style='color:#0f17c4;border-bottom: 1px solid black;border-bottom: 1px solid black;border-top: 1px solid black;'>".$completeaddress."</td>";
             $RequestTemplate .= "<td style='border-bottom: 1px solid black;border-top: 1px solid black;border-left: 1px solid black;'>Fax No.:</td>";
             $RequestTemplate .= "<td colspan='2' style='color:#0f17c4;border-bottom: 1px solid black;border-right: 1px solid black;border-top: 1px solid black;'>".$request->customer->fax."</td>";
             $RequestTemplate .= "</tr>";

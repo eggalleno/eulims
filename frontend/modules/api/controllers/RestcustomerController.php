@@ -82,9 +82,9 @@ class RestcustomerController extends \yii\rest\Controller
 
                     return $this->asJson([
                         'token' => (string)$token,
-                        'user'=> (['email'=>$customer->email,
-                                    'fullname' => $customer->customer_name,
-                                    'type' => "customer",]),
+                        'email'=>$customer->email,
+                        'fullname' => $customer->customer_name,
+                        'type' => "customer",
                     ]);  
             } else {
                 //check if the user account is not activated
