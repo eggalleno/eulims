@@ -45,8 +45,10 @@ class ChatController extends Controller
         $searchModel = new ChatSearch();
         //$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
         $query = $this->Getallmessage();
-		
         $dataProvider = New ActiveDataProvider(['query'=>$query]);
+
+        $queryGroup = $this->GetallGC();
+        $dataProviderGrp = New ActiveDataProvider(['query'=>$queryGroup]);
 		
 		$file= new ChatAttachment();
 		$chat=new Chat();
@@ -90,6 +92,7 @@ class ChatController extends Controller
 			return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
+            'dataProviderGrp'=>$dataProviderGrp,
 			'file'=>$file,
 			'chat'=>$chat
 			]);
@@ -230,6 +233,10 @@ class ChatController extends Controller
                             ->orderBy(['timestamp'=>SORT_DESC]);
 		return $query;					
 	}
+    Public function GetallGC(){
+        $queryGroup = ChatGroup::find()->select(['chat_group_id', 'group_name']);
+        return $queryGroup;
+    }
     public function actionGetSearchMessage($id){
         $query = Chat::find()
             ->select(['contact_id','message','sender_userid','reciever_userid', 'status_id'])
@@ -268,6 +275,25 @@ class ChatController extends Controller
         }
 
 	}
+    public function actionGetGCmessage($gcid, $id)
+    {
+        $query = Chat::find()
+            //->where(['reciever_userid' => Yii::$app->user->id, 'sender_userid' => $id])
+            ->andWhere(['or',
+                ['group_id'=>$gcid]
+            ])
+            ->orderBy('timestamp');
+
+        Chat::updateAll(['status_id' => 2],  ['contact_id' => $id, 'status_id' => 1, 'group_id'=> $gcid]);
+        $dataProvider = New ActiveDataProvider(['query' => $query]);
+        header("Refresh:0; url=index.php");
+
+        if(Yii::$app->request->isAjax){
+            //return $id;
+            return $this->renderAjax('convo_view', ['dataProvider'=>$dataProvider]);
+        }
+
+    }
 	
 	public function Sendmessage($senderid,$message,$contactid)
     {

@@ -94,6 +94,13 @@ $this->params['breadcrumbs'][] = $this->title;
                     <ul class="treeview-menu" id="inbox">
                         <!--<ul class="list" >-->
 
+                        <?= \yii\widgets\ListView::widget([
+                            'dataProvider' => $dataProviderGrp,
+                            'summary' => '',
+                            'itemView' => 'gc_view'
+                        ]);
+                        ?>
+
                         <!--</ul>-->
                     </ul>
                 </li>
