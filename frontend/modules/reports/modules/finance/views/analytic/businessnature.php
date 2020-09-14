@@ -31,7 +31,7 @@ use yii\web\JsExpression;
             ],
             'series' => [
                 [
-                    'name' => 'Total consumption',
+                    'name' => 'Total',
                     'data' => $data,
                     'size' => '100%',
                     'showInLegend' => true,
