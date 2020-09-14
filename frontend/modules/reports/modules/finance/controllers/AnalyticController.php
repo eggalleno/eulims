@@ -59,7 +59,8 @@ class AnalyticController extends \yii\web\Controller
 			$month ++;
 		}
 
-		return $this->render('index',['actualfees'=>$actualfees,'discounts'=>$discounts,'finalize'=>$finalize,'labId' => $labId,'year' => $year,'reportform'=>$reportform]);
+		$lab = Lab::findOne($labId);
+		return $this->render('index',['actualfees'=>$actualfees,'discounts'=>$discounts,'finalize'=>$finalize,'labId' => $labId,'year' => $year,'reportform'=>$reportform,'labtitle'=>$lab->labname]);
     }
 
 
@@ -112,34 +113,50 @@ class AnalyticController extends \yii\web\Controller
     	try {
 
     		$reqs =  Request::find()
-    		->select(['total'=>'count(analysis_id)','conforme'=>'testname'])
+    		->select(['conforme'=>'sampletype_id'])
     		->where(['DATE_FORMAT(`request_datetime`, "%Y-%m")' => $yearmonth,'lab_id'=>$lab_id])
     		->andWhere(['>','status_id',0])
-			->joinWith(['analyses'])
-    		->groupBy(['testname'])
-    		->orderBy('testname ASC')
+			->joinWith(['samples'])
+    		->groupBy(['sampletype_id'])
+    		->orderBy('sampletype_id ASC')
+    		->distinct()
     		->all();
-
+    		
     		$series = [];
     		foreach ($reqs as $req) {
-    			 // $st= Sampletype::findOne($req->conforme);
-    			// $series[]=['name'=>$st->type,'value'=>(int)$req->total];
+    			$st= Sampletype::findOne($req->conforme);
 
-    			$new = new Reportholder;
-    			$new->name = $req->conforme;
-    			$new->y = (int)$req->total;
 
-    			$series[]=$new;
+    			$inner_reqs =  Request::find()
+	    		->select(['total'=>'count(analysis_id)','conforme'=>'testname'])
+	    		->where(['DATE_FORMAT(`request_datetime`, "%Y-%m")' => $yearmonth,'lab_id'=>$lab_id,'tbl_sample.sampletype_id'=>$req->conforme,])
+	    		->andWhere(['>','status_id',0])
+				->joinWith(['samples'=>function($query){
+					return $query->andWhere(['active'=>'1']);
+				}])
+				->joinWith(['analyses'=>function($query){
+					return $query->andWhere(['<>','references','-'])->andWhere(['cancelled'=>'0']);
+				}])
+	    		->groupBy(['testname'])
+	    		->orderBy('testname ASC')
+	    		->all();
+	    		$data=[];
+	    		foreach ($inner_reqs as $inner_req) {
+	    			$data[]=['name'=>$inner_req->conforme,'value'=>(int)$inner_req->total];
+	    		}
+    			$series[]=['name'=>$st->type,'data'=>$data];
     		}
 
 
     	} catch (Exception $e) {
 			return $e;
     	}
-    	// echo var_dump($series); exit;
-    	// return json_encode($reqs);
-    	return $this->renderAjax('testperformed',['reqs'=>$series,'reportholder'=>new Reportholder]);
+    	$series= json_encode($series); 
+    	 // return $series;
+    	return $this->renderAjax('testperformed',['data'=>$series]);
     
     }
+
+   
 
 }

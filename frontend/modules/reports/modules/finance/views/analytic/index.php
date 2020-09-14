@@ -71,7 +71,7 @@ $this->registerJsFile("/js/finance/highcharts-more.js", [
                                                                         'type' => 'column',
                                                                     ],
                                                                 'title' => [
-                                                                    'text' => 'Income Generated',
+                                                                    'text' => 'Income Generated - '.$labtitle ,
                                                                 ],
                                                                 'xAxis' => [
                                                                     'title' => [

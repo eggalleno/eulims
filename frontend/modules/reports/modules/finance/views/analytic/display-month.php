@@ -12,7 +12,7 @@ use yii\helpers\Url;
 
 <div class="row">
     <div class="col-md-3">
-        <div class="box box-solid">
+        <div class="box box-solid col-md-12">
             <div class="box-header with-border" style="background-color:#3c8dbc !important;color:white">
                 <h3 class="box-title">Factors</h3>
             </div>
@@ -64,9 +64,19 @@ use yii\helpers\Url;
 	            </div>
 	        </div>
     	</div>
+        <div class="col-md-12">
+        <div class="box box-solid">
+            <div class="box-header with-border" style="background-color:#ffa500 !important;color:white">
+                
+                <div id="customercount" class="delay" data-url="/reports/finance/analytic/getcustomers?yearmonth=<?= $yearmonth?>&lab_id=<?= $lab_id?>"><div style='text-align:center;'><img src='/images/img-loader64.gif' alt=''></div></div>
+            </div>
+            <!-- /.box-header -->
+
+        </div>
+    </div>
 	</div>
 
-	<div class="col-md-6">
+	<div class="col-md-9">
         <div class="box box-solid">
             <div class="box-header with-border" style="background-color:#00a65a !important;color:white">
                 <div id="tests" class="delay" data-url="/reports/finance/analytic/gettestsperformed?yearmonth=<?= $yearmonth?>&lab_id=<?= $lab_id?>"><div style='text-align:center;'><img src='/images/img-loader64.gif' alt=''></div></div>
@@ -78,16 +88,7 @@ use yii\helpers\Url;
     	</div>
 	</div>
 
-	<div class="col-md-3">
-        <div class="box box-solid">
-            <div class="box-header with-border" style="background-color:#ffa500 !important;color:white">
-                
-                <div id="customercount" class="delay" data-url="/reports/finance/analytic/getcustomers?yearmonth=<?= $yearmonth?>&lab_id=<?= $lab_id?>"><div style='text-align:center;'><img src='/images/img-loader64.gif' alt=''></div></div>
-            </div>
-            <!-- /.box-header -->
-
-    	</div>
-	</div>
+	
 
 
 </div>
