@@ -31,3 +31,13 @@
 .highcharts-data-table tr:hover {
     /*background: #f1f7ff;*/
 }
+
+
+.info-box-icon:hover {
+  background-color: yellow;
+  color: #000000;
+  transition: color .50s ease-in-out;
+  cursor: pointer;
+}
+
+
