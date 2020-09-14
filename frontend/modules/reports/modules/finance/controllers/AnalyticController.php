@@ -38,7 +38,6 @@ class AnalyticController extends \yii\web\Controller
 
     	//get all the sum of income generated per month
     	$summary = Reportsummary::find()->where(['year'=> $year,'lab_id'=>$labId,'rstl_id'=>$rstlId])->all();
-
     	$actualfees = [];
     	$discounts = [];
     	$finalize = [];
@@ -52,10 +51,11 @@ class AnalyticController extends \yii\web\Controller
 				$monthlyname[]  = $summary[$month]->year."-".$summary[$month]->month;
 				$finalize[] = "green";
 			}
-			else
+			else{
 				$actualfees[] =0;
 				$discounts[] = 0;
 				$finalize[] = "red";
+			}
 			$month ++;
 		}
 
