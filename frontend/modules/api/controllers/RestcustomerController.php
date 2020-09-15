@@ -218,7 +218,6 @@ class RestcustomerController extends \yii\rest\Controller
     //************************************************
 
     public function actionSetbooking(){ //create booking for customers
-        //set booking default to pending
         $my_var = \Yii::$app->request->post();
 
 
@@ -228,17 +227,19 @@ class RestcustomerController extends \yii\rest\Controller
                 'message' => 'POST empty',
             ]); 
        }
-
-        //Booking
+        //attributes Purpose, Sample Quantity, Sample type, Sample Name and Description, schedule date and datecreated
         $bookling = new Booking;
-        $bookling->scheduled_date = $my_var['date'];
-        $bookling->booking_reference = '34ertgdsg';
-        $bookling->rstl_id = $my_var['lab'];
-        $bookling->date_created = $my_var['date'];
-        $bookling->qty_sample = $my_var['qty'];
+        $bookling->scheduled_date = $my_var['Schedule Date'];
+        //$bookling->booking_reference = '34ertgdsg'; //reference how to generate? is it before save? or 
+        $bookling->rstl_id = $my_var['Lab'];
+        $bookling->date_created = $my_var['Datecreated'];
+        $bookling->qty_sample = $my_var['Sample Quantity'];
+        $bookling->scheduled_date = $my_var['Scheduled_date'];
+        $bookling->description=$my_var['Description'];
+        $bookling->samplename=$my_var['Sample Name'];
+        $bookling->sampletype_id=$my_var['Sample type'];
         $bookling->customer_id = $this->getuserid();
         $bookling->booking_status = 0;
-         // return $this->asJson($bookling); exit;
 
         if($bookling->save()){
             return $this->asJson([
