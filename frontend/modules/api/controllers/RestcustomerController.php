@@ -15,6 +15,7 @@ use common\models\lab\Booking;
 use common\components\Functions;
 use common\models\system\Rstl;
 use common\models\lab\Sample;
+use common\models\lab\Sampletype;
 
 class RestcustomerController extends \yii\rest\Controller
 {
@@ -255,7 +256,7 @@ class RestcustomerController extends \yii\rest\Controller
         }
     }
     public function actionListsampletypes(){
-        $model = Sampletype::find()->select(['sampletype_id','type','status_id'])->where(['status_id'=>1])->orderBy('type')->all();
+        $model = Sampletype::find()->select(['sampletype_id','type','status_id'])->where(['status_id'=>1])->orderBy('type ASC')->all();
 
         if($model){
             return $this->asJson(
