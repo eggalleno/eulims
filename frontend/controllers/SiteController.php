@@ -14,6 +14,7 @@ use frontend\models\SignupForm;
 use frontend\models\ContactForm;
 use common\components\SwiftMessage;
 use common\models\system\User;
+use common\models\lab\Sample;
 use dosamigos\google\places\Search;
 use common\models\auth\AuthAssignment;
 use common\models\system\Profile;
@@ -119,6 +120,9 @@ class SiteController extends Controller
      * @return mixed
      */
     public function actionIndex(){
+
+       
+        //return json_encode($result);
         
         global $tmpLabId;
         /*$Payment_details=[];
@@ -330,6 +334,8 @@ class SiteController extends Controller
             ],
            
         ]);
+
+       
         
        //  print_r($dataGraphCalibrationTmpList);
         // exit;
@@ -348,9 +354,11 @@ class SiteController extends Controller
         $datainitial['pie'] = $arrayGraphPieMain;//$dataGraphPie2017; 
         $datainitial['arrmain'] =$datatotal;// $arrayGraphMain; 
         
-       // return  print_r($dataGraphCalibration);exit;
-        
-        return $this->render('index', array('data'=>$datainitial,'curYearValue'=>$curYearValue));
+
+
+        $dataProvider = $this->actionTopsample();
+
+        return $this->render('index', array('data'=>$datainitial,'curYearValue'=>$curYearValue,'dataProvider' => $dataProvider));
      
      //   return $this->render('index');
     }
@@ -1140,7 +1148,47 @@ class SiteController extends Controller
         }
     }
     
+    public function actionTopsample(){
+       
+        if(!empty(\Yii::$app->request->get())){
+            $post = \Yii::$app->request->get();
+            $year = $post['year'];
+            $lab = $post['lab'] + 1;
+        }else{
+            $year = date('Y');
+            $lab = 1;
+        }
+
+        $modelRequest = Sample::find()
+        ->select([
+            'samplename',
+            'package_rate' => 'count(samplename)',
+        ])
+        //->joinWith(['request' => function($query){ return $query;}])
+        ->innerJoin('tbl_request', 'tbl_sample.request_id = tbl_request.request_id')
+        ->where('year(tbl_request.request_datetime) = '.$year.'')->andWhere(['tbl_request.lab_id' => $lab])
+        ->groupBy('samplename')
+        ->orderBy('package_rate DESC')
+        ->limit(10);
+        
+
+        $dataProvider = new ActiveDataProvider([
+            'query' => $modelRequest,
+            'pagination' => false,
+        ]);
+
+        if(!empty(\Yii::$app->request->get())){
+            return $this->renderAjax('_sample10', [
+            'dataProvider' => $dataProvider
+            ]);
+        }else{
+            return $dataProvider;
+        }
+
+        
     
+    }
+  
 }
 
 class DashboardDetails extends Model
