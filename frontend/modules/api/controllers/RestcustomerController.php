@@ -254,6 +254,20 @@ class RestcustomerController extends \yii\rest\Controller
             ]); 
         }
     }
+    public function actionListsampletypes(){
+        $model = Sampletype::find()->select(['sampletype_id','type','status_id'])->where(['status_id'=>1])->orderBy('type')->all();
+
+        if($model){
+            return $this->asJson(
+                $model
+            ); 
+        }else{
+            return $this->asJson([
+                'success' => false,
+                'message' => 'No data Found',
+            ]); 
+        }
+    }
 
     public function actionGetbookings(){
         $my_var = Booking::find()->where(['customer_id'=>$this->getuserid()])->orderby('scheduled_date DESC')->all();
