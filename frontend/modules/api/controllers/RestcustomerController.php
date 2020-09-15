@@ -233,11 +233,11 @@ class RestcustomerController extends \yii\rest\Controller
         //$bookling->booking_reference = '34ertgdsg'; //reference how to generate? is it before save? or 
         $bookling->rstl_id = $my_var['Lab'];
         $bookling->date_created = $my_var['Datecreated'];
-        $bookling->qty_sample = $my_var['Sample Quantity'];
-        $bookling->scheduled_date = $my_var['Scheduled_date'];
+        $bookling->qty_sample = $my_var['SampleQuantity'];
+        $bookling->scheduled_date = $my_var['Scheduleddate'];
         $bookling->description=$my_var['Description'];
-        $bookling->samplename=$my_var['Sample Name'];
-        $bookling->sampletype_id=$my_var['Sample type'];
+        $bookling->samplename=$my_var['SampleName'];
+        $bookling->sampletype_id=$my_var['Sampletype'];
         $bookling->customer_id = $this->getuserid();
         $bookling->booking_status = 0;
 
