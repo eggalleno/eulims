@@ -127,11 +127,8 @@ class BookingController extends Controller
        // $model->rstl_id=11; //default 11, just get all from the db, let the db set the defualt rstlid to 11
         if ($model->load(Yii::$app->request->post()) && $customer->load(Yii::$app->request->post())) {
             $customer->save(false);
-			     $model->booking_reference=$this->Createreferencenum();
-           // $model->scheduled_date;
-           // $model->description;
             $model->modeofrelease_ids=1;//pickup
-			$model->booking_status=0; //status pending
+			      $model->booking_status=0; //status pending
             $model->date_created=date("Y-m-d");
             if(isset($_POST['qty_sample'])){
                 $quantity = (int) $_POST['qty_sample'];
@@ -145,13 +142,17 @@ class BookingController extends Controller
       			$model->modeofrelease_ids='1';
 			
 			
-            $model->save();
-			
-            Yii::$app->session->setFlash('success','Successfully Saved, Reference Number : '.$model->booking_reference);
+            if($model->save()){
+              Yii::$app->session->setFlash('success','Successfully Saved, Reference Number : '.$model->booking_reference);
 
-             return $this->redirect(['viewcustomer', 
-              'id' => $model->booking_id,
-          ]);
+                 return $this->redirect(['viewcustomer', 
+                  'id' => $model->booking_id,
+              ]);
+            }else{
+              return $this->redirect(['index']);
+            }
+			
+            
 
         }
         
@@ -187,8 +188,6 @@ class BookingController extends Controller
 		else{
 			$customer =CustomerBooking::findOne($customer_id);
 		}
-		
-        
         $Event= new Schedule();
         $Event->id = $schedule->booking_id;
         $Event->title =$customer->customer_name.": ".$schedule->description."\n Sample Qty:".$schedule->qty_sample;
@@ -263,20 +262,6 @@ class BookingController extends Controller
 
         throw new NotFoundHttpException('The requested page does not exist.');
     }
-    
-    public function Createreferencenum(){
-          $lastid=(new Query)
-            ->select('MAX(booking_id) AS lastnumber')
-            ->from('eulims_lab.tbl_booking')
-            ->one();
-          $lastnum=$lastid["lastnumber"]+1;
-          $rstl_id=11;
-           
-          $string = Yii::$app->security->generateRandomString(9);
-        
-          $next_refnumber=$rstl_id.$string.$lastnum;//rstl_id+random strings+(lastid+1)
-          return $next_refnumber;
-     }
      
      public function actionManage()
      {
