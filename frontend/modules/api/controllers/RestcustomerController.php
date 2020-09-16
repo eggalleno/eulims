@@ -379,7 +379,7 @@ class RestcustomerController extends \yii\rest\Controller
         $my_var = \Yii::$app->request->post();
 
         $code = $my_var['code'];
-        $password = $my_var['password']
+        $password = $my_var['password'];
 
         $account = Customeraccount::find()->where(['verifycode'=>$code])->one();
         if($account){
