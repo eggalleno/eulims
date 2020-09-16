@@ -401,7 +401,7 @@ class RestcustomerController extends \yii\rest\Controller
             return $this->asJson([
                 'success' => false,
                 'message' => 'Invalid code'
-            ])
+            ]);
         }
     }
 
