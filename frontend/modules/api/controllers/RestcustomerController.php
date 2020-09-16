@@ -16,6 +16,7 @@ use common\components\Functions;
 use common\models\system\Rstl;
 use common\models\lab\Sample;
 use common\models\lab\Sampletype;
+use common\models\lab\Purpose;
 
 class RestcustomerController extends \yii\rest\Controller
 {
@@ -230,7 +231,7 @@ class RestcustomerController extends \yii\rest\Controller
        }
         //attributes Purpose, Sample Quantity, Sample type, Sample Name and Description, schedule date and datecreated
         $bookling = new Booking;
-        $bookling->scheduled_date = $my_var['Schedule Date'];
+        //$bookling->scheduled_date = $my_var['Schedule Date'];
         //$bookling->booking_reference = '34ertgdsg'; //reference how to generate? is it before save? or 
         $bookling->rstl_id = $my_var['Lab'];
         $bookling->date_created = $my_var['Datecreated'];
@@ -241,6 +242,7 @@ class RestcustomerController extends \yii\rest\Controller
         $bookling->sampletype_id=$my_var['Sampletype'];
         $bookling->customer_id = $this->getuserid();
         $bookling->booking_status = 0;
+        $bookling->purpose = $my_var['Purpose'];
 
         if($bookling->save()){
             return $this->asJson([
@@ -257,6 +259,21 @@ class RestcustomerController extends \yii\rest\Controller
     }
     public function actionListsampletypes(){
         $model = Sampletype::find()->select(['sampletype_id','type','status_id'])->where(['status_id'=>1])->orderBy('type ASC')->all();
+
+        if($model){
+            return $this->asJson(
+                $model
+            ); 
+        }else{
+            return $this->asJson([
+                'success' => false,
+                'message' => 'No data Found',
+            ]); 
+        }
+    }
+
+        public function actionListpurpose(){
+        $model = Purpose::find()->select(['purpose_id','name','active'])->where(['active'=>1])->orderBy('name ASC')->all();
 
         if($model){
             return $this->asJson(
