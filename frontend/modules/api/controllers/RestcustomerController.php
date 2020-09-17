@@ -17,6 +17,7 @@ use common\models\system\Rstl;
 use common\models\lab\Sample;
 use common\models\lab\Sampletype;
 use common\models\lab\Purpose;
+use common\models\lab\Modeofrelease
 
 class RestcustomerController extends \yii\rest\Controller
 {
@@ -287,7 +288,7 @@ class RestcustomerController extends \yii\rest\Controller
             ]); 
         }
     }
-    public function actionListMode(){
+    public function actionListmode(){
         $model = Purpose::find()->select(['modeofrelease_id','mode','status'])->where(['status'=>1])->orderBy('mode ASC')->all();
 
         if($model){
