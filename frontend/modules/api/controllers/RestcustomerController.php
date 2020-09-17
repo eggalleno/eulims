@@ -17,6 +17,7 @@ use common\models\system\Rstl;
 use common\models\lab\Sample;
 use common\models\lab\Sampletype;
 use common\models\lab\Purpose;
+use common\models\lab\Modeofrelease;
 
 class RestcustomerController extends \yii\rest\Controller
 {
@@ -243,8 +244,9 @@ class RestcustomerController extends \yii\rest\Controller
         $bookling->customer_id = $this->getuserid();
         $bookling->booking_status = 0;
         $bookling->purpose = $my_var['Purpose'];
+        $bookling->modeofrelease_ids = $my_var['Modeofrelease'];
 
-        if($bookling->save()){
+        if($bookling->save(false)){
             return $this->asJson([
                 'success' => true,
                 'message' => 'Booked Successfully',
@@ -272,8 +274,22 @@ class RestcustomerController extends \yii\rest\Controller
         }
     }
 
-        public function actionListpurpose(){
+    public function actionListpurpose(){
         $model = Purpose::find()->select(['purpose_id','name','active'])->where(['active'=>1])->orderBy('name ASC')->all();
+
+        if($model){
+            return $this->asJson(
+                $model
+            ); 
+        }else{
+            return $this->asJson([
+                'success' => false,
+                'message' => 'No data Found',
+            ]); 
+        }
+    }
+    public function actionListmode(){
+        $model = Modeofrelease::find()->select(['modeofrelease_id','mode','status'])->where(['status'=>1])->orderBy('mode ASC')->all();
 
         if($model){
             return $this->asJson(
@@ -357,6 +373,37 @@ class RestcustomerController extends \yii\rest\Controller
                 'success' => false,
                 'message' => 'Email is not a valid customer',
             ]); 
+        }
+    }
+
+    public function actionRegister(){
+        $my_var = \Yii::$app->request->post();
+
+        $code = $my_var['code'];
+        $password = $my_var['password'];
+
+        $account = Customeraccount::find()->where(['verifycode'=>$code])->one();
+        if($account){
+            $account->status=1;
+            $account->setPassword($password);
+            $account->generateAuthKey();
+            $account->verifycode=Null;
+            if($account->save()){
+                return $this->asJson([
+                    'success' => true,
+                    'message' => 'Account activated'
+                ]);
+            }else{
+                return $this->asJson([
+                    'success' => false,
+                    'message' => 'Invalid activation'
+                ]);
+            }
+        }else{
+            return $this->asJson([
+                'success' => false,
+                'message' => 'Invalid code'
+            ]);
         }
     }
 
