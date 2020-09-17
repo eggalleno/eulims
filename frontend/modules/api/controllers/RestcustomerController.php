@@ -289,7 +289,7 @@ class RestcustomerController extends \yii\rest\Controller
         }
     }
     public function actionListmode(){
-        $model = Purpose::find()->select(['modeofrelease_id','mode','status'])->where(['status'=>1])->orderBy('mode ASC')->all();
+        $model = Modeofrelease::find()->select(['modeofrelease_id','mode','status'])->where(['status'=>1])->orderBy('mode ASC')->all();
 
         if($model){
             return $this->asJson(
@@ -387,6 +387,7 @@ class RestcustomerController extends \yii\rest\Controller
             $account->status=1;
             $account->setPassword($password);
             $account->generateAuthKey();
+            $account->verifycode=Null;
             if($account->save()){
                 return $this->asJson([
                     'success' => true,
