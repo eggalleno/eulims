@@ -244,7 +244,7 @@ class RestcustomerController extends \yii\rest\Controller
         $bookling->customer_id = $this->getuserid();
         $bookling->booking_status = 0;
         $bookling->purpose = $my_var['Purpose'];
-        $booking->modeofrelease_ids = $my_var['Modeofrelease'];
+        $bookling->modeofrelease_ids = $my_var['Modeofrelease'];
 
         if($bookling->save(false)){
             return $this->asJson([
