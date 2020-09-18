@@ -26,7 +26,7 @@ class RestcustomerController extends \yii\rest\Controller
         $behaviors = parent::behaviors();
         $behaviors['authenticator'] = [
             'class' => \sizeg\jwt\JwtHttpBearerAuth::class,
-            'except' => ['login','server','confirmaccount','mailcode'], //all the other
+            'except' => ['login','server','codevalid','mailcode','register'], //all the other
             'user'=> \Yii::$app->customeraccount
         ];
 
