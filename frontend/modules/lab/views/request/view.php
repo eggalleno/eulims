@@ -571,11 +571,11 @@ $this->registerJs($PrintEvent);
                                  $discounted = ($subtotal * ($rate/100));
                                  $total = $subtotal - $discounted;
                                 
-                                 if ($total <= 0){
-                                     return  '<div id="subtotal">₱'.number_format($subtotal, 2).'</div><div id="discount">₱0.00</div><div id="total"><b>₱'.number_format($total, 2).'</b></div>';
-                                 }else{
+                                 // if ($total <= 0){
+                                 //     return  '<div id="subtotal">₱'.number_format($subtotal, 2).'</div><div id="discount">₱0.00</div><div id="total"><b>₱'.number_format($total, 2).'</b></div>';
+                                 // }else{
                                      return  '<div id="subtotal">₱'.number_format($subtotal, 2).'</div><div id="discount">₱'.number_format($discounted, 2).'</div><div id="total"><b>₱'.number_format($total, 2).'</b></div>';
-                                 }
+                                 // }
                         }else{
                             return '';
                         }     

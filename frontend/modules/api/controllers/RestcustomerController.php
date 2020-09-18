@@ -17,6 +17,7 @@ use common\models\system\Rstl;
 use common\models\lab\Sample;
 use common\models\lab\Sampletype;
 use common\models\lab\Purpose;
+use common\models\lab\Modeofrelease;
 
 class RestcustomerController extends \yii\rest\Controller
 {
@@ -25,7 +26,7 @@ class RestcustomerController extends \yii\rest\Controller
         $behaviors = parent::behaviors();
         $behaviors['authenticator'] = [
             'class' => \sizeg\jwt\JwtHttpBearerAuth::class,
-            'except' => ['login','server','confirmaccount','mailcode'], //all the other
+            'except' => ['login','server','codevalid','mailcode','register'], //all the other
             'user'=> \Yii::$app->customeraccount
         ];
 
@@ -243,7 +244,7 @@ class RestcustomerController extends \yii\rest\Controller
         $bookling->customer_id = $this->getuserid();
         $bookling->booking_status = 0;
         $bookling->purpose = $my_var['Purpose'];
-        $booking->modeofrelease_ids = $my_var['Modeofrelease'];
+        $bookling->modeofrelease_ids = $my_var['Modeofrelease'];
 
         if($bookling->save(false)){
             return $this->asJson([
@@ -287,8 +288,8 @@ class RestcustomerController extends \yii\rest\Controller
             ]); 
         }
     }
-    public function actionListMode(){
-        $model = Purpose::find()->select(['modeofrelease_id','mode','status'])->where(['status'=>1])->orderBy('mode ASC')->all();
+    public function actionListmode(){
+        $model = Modeofrelease::find()->select(['modeofrelease_id','mode','status'])->where(['status'=>1])->orderBy('mode ASC')->all();
 
         if($model){
             return $this->asJson(
@@ -376,6 +377,8 @@ class RestcustomerController extends \yii\rest\Controller
     }
 
     public function actionRegister(){
+        //set null for coulmn verifycode after register, 
+        //to eliminate the process of inputing of email add.
         $my_var = \Yii::$app->request->post();
 
         $code = $my_var['code'];
@@ -386,10 +389,11 @@ class RestcustomerController extends \yii\rest\Controller
             $account->status=1;
             $account->setPassword($password);
             $account->generateAuthKey();
+            $account->verifycode=Null;
             if($account->save()){
                 return $this->asJson([
                     'success' => true,
-                    'message' => 'Account activated'
+                    'message' => 'It is great to have you with us. Our warmest welcome from OneLab Team.'
                 ]);
             }else{
                 return $this->asJson([
@@ -405,47 +409,24 @@ class RestcustomerController extends \yii\rest\Controller
         }
     }
 
-    public function actionConfirmaccount(){
-
+    public function actionCodevalid(){
         //validate the code sent by the customer
         $my_var = \Yii::$app->request->post();
 
-        $email = $my_var['email'];
         $code = $my_var['code'];
-        $password = $my_var['password'];
-
-        $customer = Customer::find()->where(['email'=>$email])->one();
-
-        if($customer){
-            $account = Customeraccount::find()->where(['customer_id'=>$customer->customer_id])->one();
-            if($account->verifycode==$code){
-                $account->status=1;
-                $account->setPassword($password);
-                $account->generateAuthKey();
-                if($account->save()){
-                    return $this->asJson([
-                        'success' => true,
-                        'message' => 'Customer account activated and updated!',
-                    ]); 
-                }else{
-                    return $this->asJson([
-                        'success' => false,
-                        'message' => 'Failed to update customer record!',
-                    ]);
-                }
-            }else{
-                return $this->asJson([
-                        'success' => false,
-                        'message' => 'Verification Code invalid!',
-                    ]);
-            }
-        }else{
+        $account = Customeraccount::find()->where(['verifycode'=>$code])->one();
+        if($account){
             return $this->asJson([
-                        'success' => false,
-                        'message' => 'Email is not a valid customer!',
-                    ]);
+                'success'=> true,
+                'message'=> 'Valid code'
+            ]);
         }
-
+        else{
+            return $this->asJson([
+                'success'=> false,
+                'message'=> 'Sorry your code is invalid, Please try again.'
+            ]);
+        }
     }
 
     public function actionLogout(){

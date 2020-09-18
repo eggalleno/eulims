@@ -6,6 +6,7 @@ use yii\helpers\Html;
 use yii\helpers\Url;
 use kartik\grid\GridView;
 use common\models\lab\Lab;
+use common\models\lab\Reportsummary;
 use kartik\grid\Module;
 use kartik\daterange\DateRangePicker;
 use yii\widgets\ActiveForm;
@@ -79,6 +80,7 @@ $pdfFooter="{PAGENO}";
         	<?php
 			    $gridColumns= [
 			    	['class' => 'kartik\grid\ActionColumn',
+			    		'header'=>'Details',
 						'contentOptions' => ['style' => 'width: 8.7%'],
 						'template' => '{view}',
 						'buttons'=>[
@@ -165,14 +167,30 @@ $pdfFooter="{PAGENO}";
 			    			$subtotal = $model->total;
 			    			$discount = $model->getStats($monthyear,$lab_id,3);
 			    			return ($subtotal + $discount);
-
-
-
 			    		},
 			    		'pageSummary'=>true,
         				'pageSummaryFunc'=>GridView::F_SUM,
         				'pageSummaryOptions'=>['class'=>'text-right text-primary'],
 			    	],
+			    	
+			    	['class' => 'kartik\grid\ActionColumn',
+			    		'header'=>'Verification',
+						'contentOptions' => ['style' => 'width: 8.7%'],
+						'template' => '{verify}',
+						'buttons'=>[
+							'verify'=>function ($url, $model) use($year, $lab_id) {
+
+								//check if this month year is already finalize
+								$summary = Reportsummary::find()->where(['lab_id'=>$lab_id,'year'=>$year,'month'=>$model->monthnum])->one();
+
+								if ($summary)
+									return Html::button('<span class="glyphicon glyphicon glyphicon-ok"></span>',['class' => 'btn btn-success','title' => Yii::t('app', "Already Submitted")]);
+								else
+									return Html::button('<span class="glyphicon glyphicon-ok"></span>', ['value'=>Url::to(['validate?data=hghghghty']),'class' => 'btn btn-danger modal_method','title' => Yii::t('app', "Monthly Report")]);
+							},
+						   
+						],
+					],
 
 			    	// 'samplescount'
 			    ];
@@ -274,4 +292,57 @@ $pdfFooter="{PAGENO}";
 			$.pjax.reload({container:"#accomplishment-report-pjax",url: '/reports/lab/accomplishment?lab_id='+$('#lab_id').val()+'&year='+$('#the-year').val(),replace:false,timeout: false});
 		}
 	});
+
+	jQuery(document).ready(function ($) {
+
+
+		$('.modal_method').each(function(){
+
+			$this=$(this.closest('tr')); 
+			 var month = $this.find('td:nth-child(2)').html();
+			 var requests = $this.find('td:nth-child(3)').html();
+			 var samples = $this.find('td:nth-child(4)').html();
+			 var analyses = $this.find('td:nth-child(5)').html();
+			 var fees = $this.find('td:nth-child(6)').html();
+			 var gratis = $this.find('td:nth-child(7)').html();
+			 var discounts = $this.find('td:nth-child(8)').html();
+			 var gross = $this.find('td:nth-child(9)').html();
+			 var data = {"year":<?=$year?>,"month":month,"requests":requests,"samples":samples,"analyses":analyses,"fees":fees,"gratis":gratis,"discounts":discounts,"gross":gross,"labid":<?=$lab_id?>};
+			 $(this).attr('value','/reports/lab/accomplishment/validate?data='+JSON.stringify(data));
+
+		});
+
+
+
+
+
+	});
+
+
+
 </script>
+
+
+<?php
+    // This section will allow to popup a notification
+    $session = Yii::$app->session;
+    if ($session->isActive) {
+        $session->open();
+        if (isset($session['deletepopup'])) {
+            $func->CrudAlert("Deleted Successfully","WARNING");
+            unset($session['deletepopup']);
+            $session->close();
+        }
+        if (isset($session['updatepopup'])) {
+            $func->CrudAlert("Updated Successfully");
+            unset($session['updatepopup']);
+            $session->close();
+        }
+        if (isset($session['savepopup'])) {
+            $func->CrudAlert("Saved Successfully","SUCCESS",true);
+            unset($session['savepopup']);
+            $session->close();
+        }
+    }
+    ?>
+</div>
