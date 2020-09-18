@@ -6,6 +6,8 @@ use Yii;
 use yii\db\Query;
 //use common\models\lab\Customer;
 use common\models\lab\CustomerBooking;
+use common\models\lab\Modeofrelease;
+use common\models\lab\Purpose;
 /**
  * This is the model class for table "tbl_booking".
  *
@@ -96,6 +98,14 @@ class Booking extends \yii\db\ActiveRecord
 
             return parent::beforeSave($insert);
         }
+    }
+    public function getModeofrelease()
+    {
+        return $this->hasOne(Modeofrelease::className(), ['modeofrelease_id' => 'modeofrelease_id']);
+    }
+
+    public function getPurpose(){
+        return $this->hasOne(Purpose::className(), ['purpose' => 'purpose_id']);
     }
 
 

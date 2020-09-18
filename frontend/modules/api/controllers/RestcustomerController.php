@@ -377,6 +377,8 @@ class RestcustomerController extends \yii\rest\Controller
     }
 
     public function actionRegister(){
+        //set null for coulmn verifycode after register, 
+        //to eliminate the process of inputing of email add.
         $my_var = \Yii::$app->request->post();
 
         $code = $my_var['code'];
@@ -391,7 +393,7 @@ class RestcustomerController extends \yii\rest\Controller
             if($account->save()){
                 return $this->asJson([
                     'success' => true,
-                    'message' => 'Account activated'
+                    'message' => 'It is great to have you with us. Our warmest welcome from OneLab Team.'
                 ]);
             }else{
                 return $this->asJson([
@@ -422,7 +424,7 @@ class RestcustomerController extends \yii\rest\Controller
         else{
             return $this->asJson([
                 'success'=> false,
-                'message'=> 'Invalid code'
+                'message'=> 'Sorry your code is invalid, Please try again.'
             ]);
         }
     }
