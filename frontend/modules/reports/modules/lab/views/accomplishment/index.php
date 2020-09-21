@@ -6,7 +6,6 @@ use yii\helpers\Html;
 use yii\helpers\Url;
 use kartik\grid\GridView;
 use common\models\lab\Lab;
-use common\models\lab\Reportsummary;
 use kartik\grid\Module;
 use kartik\daterange\DateRangePicker;
 use yii\widgets\ActiveForm;
@@ -80,7 +79,6 @@ $pdfFooter="{PAGENO}";
         	<?php
 			    $gridColumns= [
 			    	['class' => 'kartik\grid\ActionColumn',
-			    		'header'=>'Details',
 						'contentOptions' => ['style' => 'width: 8.7%'],
 						'template' => '{view}',
 						'buttons'=>[
@@ -92,41 +90,46 @@ $pdfFooter="{PAGENO}";
 					],
 			    	'month',
 			    	[
-			    		'header'=> 'No. of Requests',
-			    		'contentOptions' => ['class' => 'text-right'],
-			    		'attribute' => 'totalrequests',
+						'header'=> 'No. of Request',
+						'headerOptions' => ['class' => 'text-center'],
+			    		'contentOptions' => ['class' => 'text-center'],
+						'value'=> function( $model ){
+			    			return $model->totalrequests;
+			    		},
 			    		'pageSummary'=>true,
         				'pageSummaryFunc'=>GridView::F_SUM,
-        				'pageSummaryOptions'=>['class'=>'text-right text-primary'],
-			    	],
-			    	[
-			    		'header'=> 'No. of Samples',
-			    		'contentOptions' => ['class' => 'text-right'],
+        				'pageSummaryOptions'=>['class'=>'text-center text-primary'],
+					],
+					[
+						'header'=> 'No. of Samples',
+						'headerOptions' => ['class' => 'text-center'],
+			    		'contentOptions' => ['class' => 'text-center'],
 			    		'value'=> function( $model ) use($year,$lab_id){
 			    			$monthyear = $year."-".$model->monthnum;
-			    			return $model->getStats($monthyear,$lab_id,1);
+			    			return $model->countTables($monthyear,$lab_id,'samples');
 
 			    		},
 			    		'pageSummary'=>true,
         				'pageSummaryFunc'=>GridView::F_SUM,
         				'pageSummaryOptions'=>['class'=>'text-right text-primary'],
-			    	],
-
-			    	[
-			    		'header'=> 'No. of Analyses',
-			    		'contentOptions' => ['class' => 'text-right'],
+					],
+					[
+						'header'=> 'No. of Analyses',
+						'headerOptions' => ['class' => 'text-center'],
+			    		'contentOptions' => ['class' => 'text-center'],
 			    		'value'=> function( $model ) use($year,$lab_id){
 			    			$monthyear = $year."-".$model->monthnum;
-			    			return $model->getStats($monthyear,$lab_id,2);
+			    			return $model->countTables($monthyear,$lab_id,'analysis');
 
 			    		},
 			    		'pageSummary'=>true,
         				'pageSummaryFunc'=>GridView::F_SUM,
-        				'pageSummaryOptions'=>['class'=>'text-right text-primary'],
-			    	],
-			    	[
+        				'pageSummaryOptions'=>['class'=>'text-center text-primary'],
+					],
+					[
+						'headerOptions' => ['class' => 'text-center'],
 			    		'header'=> 'Income Generated (Actual Fees Collected)',
-			    		'contentOptions' => ['class' => 'text-right'],
+			    		'contentOptions' => ['class' => 'text-center'],
 			            'format'=>['decimal', 2],
 			    		'value'=> function( $model ){
 			    			return $model->total;
@@ -134,65 +137,47 @@ $pdfFooter="{PAGENO}";
 			    		},
 			    		'pageSummary'=>true,
         				'pageSummaryFunc'=>GridView::F_SUM,
-        				'pageSummaryOptions'=>['class'=>'text-right text-primary'],
-			    	],
-			    	[ //logically it wll return 0, but we will get back to this if there's anything needed
-			    		'header'=> 'Gratis',
-			    		'contentOptions' => ['class' => 'text-right'],
+        				'pageSummaryOptions'=>['class'=>'text-center text-primary'],
+					],
+					[ //logically it wll return 0, but we will get back to this if there's anything needed
+						'header'=> 'Gratis',
+						'headerOptions' => ['class' => 'text-center'],
+			    		'contentOptions' => ['class' => 'text-center'],
 			    		'value' =>function($data){
 			    			return '0.00';
 			    		},
 			    		'pageSummary'=>true,
         				'pageSummaryFunc'=>GridView::F_SUM,
-        				'pageSummaryOptions'=>['class'=>'text-right text-primary'],
-			    	],
-			    	[
-			    		'header'=> 'Discount',
-			    		'contentOptions' => ['class' => 'text-right'],
-			    		//'format'=>['decimal', 2],
+        				'pageSummaryOptions'=>['class'=>'text-center text-primary'],
+					],
+					[
+						'header'=> 'Discount',
+						'headerOptions' => ['class' => 'text-center'],
+			    		'contentOptions' => ['class' => 'text-center'],
+			    		'format'=>['decimal', 2],
 			    		'value'=> function( $model ) use($year,$lab_id){
 			    			$monthyear = $year."-".$model->monthnum;
-			    			return $model->getStats($monthyear,$lab_id,3);
+						 	return  $model->countTables($monthyear,$lab_id,'discount');
 			    		},
 			    		'pageSummary'=>true,
         				'pageSummaryFunc'=>GridView::F_SUM,
-        				'pageSummaryOptions'=>['class'=>'text-right text-primary'],
-			    	],
-			    	[
-			    		'header'=> 'Gross',
-			    		'contentOptions' => ['class' => 'text-right'],
-			    		//'format'=>['decimal', 2],
+        				'pageSummaryOptions'=>['class'=>'text-center text-primary'],
+					],
+					[
+						'header'=> 'Gross',
+						'headerOptions' => ['class' => 'text-center'],
+			    		'contentOptions' => ['class' => 'text-center'],
+			    		'format'=>['decimal', 2],
 			    		'value'=> function( $model ) use($year,$lab_id){
-			    			$monthyear = $year."-".$model->monthnum;
-			    			$subtotal = $model->total;
-			    			$discount = $model->getStats($monthyear,$lab_id,3);
-			    			return ($subtotal + $discount);
+							$monthyear = $year."-".$model->monthnum;
+							$discount = $model->countTables($monthyear,$lab_id,'discount');
+			    			return ($model->total + $discount);
 			    		},
 			    		'pageSummary'=>true,
         				'pageSummaryFunc'=>GridView::F_SUM,
-        				'pageSummaryOptions'=>['class'=>'text-right text-primary'],
+        				'pageSummaryOptions'=>['class'=>'text-center text-primary'],
 			    	],
 			    	
-			    	['class' => 'kartik\grid\ActionColumn',
-			    		'header'=>'Verification',
-						'contentOptions' => ['style' => 'width: 8.7%'],
-						'template' => '{verify}',
-						'buttons'=>[
-							'verify'=>function ($url, $model) use($year, $lab_id) {
-
-								//check if this month year is already finalize
-								$summary = Reportsummary::find()->where(['lab_id'=>$lab_id,'year'=>$year,'month'=>$model->monthnum])->one();
-
-								if ($summary)
-									return Html::button('<span class="glyphicon glyphicon glyphicon-ok"></span>',['class' => 'btn btn-success','title' => Yii::t('app', "Already Submitted")]);
-								else
-									return Html::button('<span class="glyphicon glyphicon-ok"></span>', ['value'=>Url::to(['validate?data=hghghghty']),'class' => 'btn btn-danger modal_method','title' => Yii::t('app', "Monthly Report")]);
-							},
-						   
-						],
-					],
-
-			    	// 'samplescount'
 			    ];
 
 			    echo GridView::widget([
@@ -292,57 +277,4 @@ $pdfFooter="{PAGENO}";
 			$.pjax.reload({container:"#accomplishment-report-pjax",url: '/reports/lab/accomplishment?lab_id='+$('#lab_id').val()+'&year='+$('#the-year').val(),replace:false,timeout: false});
 		}
 	});
-
-	jQuery(document).ready(function ($) {
-
-
-		$('.modal_method').each(function(){
-
-			$this=$(this.closest('tr')); 
-			 var month = $this.find('td:nth-child(2)').html();
-			 var requests = $this.find('td:nth-child(3)').html();
-			 var samples = $this.find('td:nth-child(4)').html();
-			 var analyses = $this.find('td:nth-child(5)').html();
-			 var fees = $this.find('td:nth-child(6)').html();
-			 var gratis = $this.find('td:nth-child(7)').html();
-			 var discounts = $this.find('td:nth-child(8)').html();
-			 var gross = $this.find('td:nth-child(9)').html();
-			 var data = {"year":<?=$year?>,"month":month,"requests":requests,"samples":samples,"analyses":analyses,"fees":fees,"gratis":gratis,"discounts":discounts,"gross":gross,"labid":<?=$lab_id?>};
-			 $(this).attr('value','/reports/lab/accomplishment/validate?data='+JSON.stringify(data));
-
-		});
-
-
-
-
-
-	});
-
-
-
 </script>
-
-
-<?php
-    // This section will allow to popup a notification
-    $session = Yii::$app->session;
-    if ($session->isActive) {
-        $session->open();
-        if (isset($session['deletepopup'])) {
-            $func->CrudAlert("Deleted Successfully","WARNING");
-            unset($session['deletepopup']);
-            $session->close();
-        }
-        if (isset($session['updatepopup'])) {
-            $func->CrudAlert("Updated Successfully");
-            unset($session['updatepopup']);
-            $session->close();
-        }
-        if (isset($session['savepopup'])) {
-            $func->CrudAlert("Saved Successfully","SUCCESS",true);
-            unset($session['savepopup']);
-            $session->close();
-        }
-    }
-    ?>
-</div>
