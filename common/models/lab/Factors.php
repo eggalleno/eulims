@@ -37,7 +37,7 @@ class Factors extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['title'], 'required'],
+            [['title','type'], 'required'],
             [['type'], 'integer'],
             [['rate'], 'number'],
             [['title'], 'string', 'max' => 50],

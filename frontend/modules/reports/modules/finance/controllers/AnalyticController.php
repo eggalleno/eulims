@@ -20,8 +20,9 @@ class AnalyticController extends \yii\web\Controller
     public function actionDisplaymonth($data)
     {
     	$exploded = explode("_", $data);
-    	$rstlId = Yii::$app->user->identity->profile->rstl_id;
-        return $this->renderAjax('display-month',['yearmonth'=>$exploded[0],'lab_id'=>$exploded[1],'rstlId'=>$rstlId]);
+    	$rstlId = Yii::$app->user->identity->profile->rstl_id; //get the rstlid
+        $factors = Reportfactors::find()->with('factor')->where(['yearmonth'=>$exploded[0]])->all();//get the factors for this year
+        return $this->renderAjax('display-month',['yearmonth'=>$exploded[0],'lab_id'=>$exploded[1],'rstlId'=>$rstlId,'factors'=>$factors]);
     }
 
     public function actionIndex()
@@ -37,8 +38,6 @@ class AnalyticController extends \yii\web\Controller
 			$labId = 1;
 			$year = date('Y'); //current year
 		}
-
-    	//get the rstlid of the user
 
     	//get all the sum of income generated per month
     	$summary = Reportsummary::find()->where(['year'=> $year,'lab_id'=>$labId,'rstl_id'=>$rstlId])->all();
@@ -63,7 +62,8 @@ class AnalyticController extends \yii\web\Controller
 			$month ++;
 		}
 
-		$lab = Lab::findOne($labId);
+		$lab = Lab::findOne($labId);//get the lab profile
+
 		return $this->render('index',['actualfees'=>$actualfees,'discounts'=>$discounts,'finalize'=>$finalize,'labId' => $labId,'year' => $year,'reportform'=>$reportform,'labtitle'=>$lab->labname]);
     }
 
@@ -161,22 +161,54 @@ class AnalyticController extends \yii\web\Controller
     
     }
 
-   public function actionAddfactors($yearmonth){
-    $reportfactor = new Reportfactors;
-    $reportfactor->yearmonth = $yearmonth;
-    $factors = Factors::find()->all();
+    public function actionAddfactors($yearmonth){
+        $reportfactor = new Reportfactors;
+        $reportfactor->yearmonth = $yearmonth;
+        $factors = Factors::find()->all();
 
-    if ($reportfactor->load(Yii::$app->request->post())) {
-        if($reportfactor->save(false))
-            Yii::$app->session->setFlash('success', 'Factor Successfully Added');
-        else
-            Yii::$app->session->setFlash('danger', 'Linking Factor Failed');
+        if ($reportfactor->load(Yii::$app->request->post())) {
+            if($reportfactor->save(false))
+                Yii::$app->session->setFlash('success', 'Factor Successfully Added');
+            else
+                Yii::$app->session->setFlash('danger', 'Linking Factor Failed');
 
-        return $this->redirect(['/reports/finance/analytic/']);
+            return $this->redirect(['/reports/finance/analytic/']);
+        }
+
+        return $this->renderAjax('linkfactor',['model'=>$reportfactor,'factors'=>$factors]);
     }
 
+    public function actionCreatefactor($yearmonth){
+        $reportfactor = new Reportfactors;
+        $reportfactor->yearmonth = $yearmonth;
+        $factor =  new Factors;
 
-    return $this->renderAjax('linkfactor',['model'=>$reportfactor,'factors'=>$factors]);
-   }
+        if (($factor->load(Yii::$app->request->post()))&&($reportfactor->load(Yii::$app->request->post()))) {
+            if($factor->save()){
+                $reportfactor->factor_id = $factor->factor_id;
+                if($reportfactor->save(false)){
+                    Yii::$app->session->setFlash('success', 'Factor Successfully Added');
+                    return $this->redirect(['/reports/finance/analytic/']);
+                }
+                else{
+                    Yii::$app->session->setFlash('danger', 'Linking Factor Failed');
+                }
+            }
+            else{
+                Yii::$app->session->setFlash('danger', 'Linking Factor Failed');
+            }
+        }
+
+        return $this->renderAjax('linkfactor2',['model'=>$reportfactor,'factor'=>$factor]);
+    }
+
+    public function actionRemovefactor($factor_id){
+        $reportfactor = Reportfactors::findOne($factor_id)->delete();
+        if ($reportfactor) 
+            Yii::$app->session->setFlash('success', 'Factor Successfully Deleted!');
+        else
+            Yii::$app->session->setFlash('error', 'Factor Failed to Delete!');
+        return $this->redirect(['/reports/finance/analytic/']);
+    }
 
 }

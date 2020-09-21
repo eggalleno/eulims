@@ -19,8 +19,6 @@ $this->registerJsFile("/js/finance/highcharts.js", [
 
 $this->registerJsFile("/js/finance/highcharts-more.js", [
 ], 'js-highcharts-more');
-
-
 ?>
 
 
@@ -49,13 +47,6 @@ $this->registerJsFile("/js/finance/highcharts-more.js", [
 
 			<?php ActiveForm::end(); ?>
 		</div>
-
-		<div class="info-box">
-            <span class="info-box-icon box-action-content bg-green bg-hover" id="btn_createfactor"><i class="fa fa-plus"></i></span>
-            <div class="info-box-content"><span class="info-box-text">Create New</span>
-                <span class="info-box-number">Factor</span>
-            </div>
-        </div>
    	</div>
     <div class="col-xs-12 col-md-10">
     	<div class="box-header with-border bg-graphs">
@@ -202,7 +193,7 @@ $this->registerJsFile("/js/finance/highcharts-more.js", [
 		                    </a>
 	                    </div>
 	                    <div class="col-md-1 col-sm-4 col-xs-12">
-	                    	<a class="btn-openFigures" name="<?= $year.'-09_'.$labId?>">
+	                    	<a class="btn-openFigures" name="<?= $year.'-09_'.$labId?>" id="2020-09">
 	                    		<div class="info-box bg-<?= $finalize[8]?>">
 		                    		<span class="info-box-icon bg-entities bg-hover">Sep</span>
 							        <div class="info-box-content"><span class="info-box-text"></span>

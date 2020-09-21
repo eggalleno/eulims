@@ -2,6 +2,8 @@
 use miloschuman\highcharts\Highcharts;
 use yii\web\JsExpression;
 use yii\helpers\Url;
+use yii\helpers\Html;
+
 /* @var $this yii\web\View */
 
 ?>
@@ -11,7 +13,7 @@ use yii\helpers\Url;
 
 
 <div class="row">
-    <div class="col-md-3">
+    <div class="col-md-4">
         <div class="col-md-12">
                             
             <div class="col-md-12 col-sm-12 col-xs-12">
@@ -33,12 +35,29 @@ use yii\helpers\Url;
             </div>
 
         	<div class="col-md-12 col-sm-12 col-xs-12" id="factors">
-                <!-- <div class="info-box bg-red">
-                    <span class="info-box-icon box-action"><i class="fa fa-minus"></i></span>
-                    <div class="info-box-content"><span class="info-box-text">Pandemic</span>
-                        <span class="info-box-number"><a href="#" style="color:white">Limited Services</a></span>
-                    </div>
-                </div> -->
+                <?php
+                foreach ($factors as $factor) {
+                    echo '<div class="info-box">';
+                    if($factor->factor->type)
+                        echo '<span class="info-box-icon box-action-content bg-green"><i class="fa fa-thumbs-up"></i></span>';
+                    else
+                        echo '<span class="info-box-icon box-action-content bg-red"><i class="fa fa-thumbs-down"></i></span>';
+
+                    echo Html::a('x',['/reports/finance/analytic/removefactor?factor_id='.$factor->accompfactor_id,],
+                        [
+                            'data-confirm' => "Are you sure you want to delete this factor for '".$factor->name."'?",
+                            'class'=>'btn btn-small pull-right',
+                            // 'style'=>'display:block'
+                        ]
+                            );
+                    echo '<div class="info-box-content">';
+                    echo '<span class="info-box-text">'.($factor->factor?$factor->factor->title:"Error Null").'</span>';
+                    echo '<span class="info-box-number">'.$factor->name.'</span>';
+                    echo '<span class="info-box-text">'.$factor->remarks.'</span>';
+                    echo '</div>';
+                    echo '</div>';
+                }
+                ?>
             </div>
         </div>
         <div class="col-md-12">
@@ -48,12 +67,11 @@ use yii\helpers\Url;
                     <div id="customercount" class="delay" data-url="/reports/finance/analytic/getcustomers?yearmonth=<?= $yearmonth?>&lab_id=<?= $lab_id?>"><div style='text-align:center;'><img src='/images/img-loader64.gif' alt=''></div></div>
                 </div>
                 <!-- /.box-header -->
-
             </div>
         </div>
     </div>
 
-	<div class="col-md-9">
+	<div class="col-md-8">
         <div class="box box-solid">
             <div class="box-header with-border bg-bigpanel">
                 <div id="tests" class="delay" data-url="/reports/finance/analytic/gettestsperformed?yearmonth=<?= $yearmonth?>&lab_id=<?= $lab_id?>"><div style='text-align:center;'><img src='/images/img-loader64.gif' alt=''></div></div>
