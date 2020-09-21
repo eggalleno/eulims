@@ -310,6 +310,26 @@ class RestcustomerController extends \yii\rest\Controller
         );
     }
 
+    public function actionGetbookingdetails(){
+        $purposeqry = Purpose::find()->select(['purpose_id','name','active'])->where(['active'=>1])->orderBy('name ASC')->all();
+        $modeofreleaseqry = Modeofrelease::find()->select(['modeofrelease_id','mode','status'])->where(['status'=>1])->orderBy('mode ASC')->all();
+
+         $my_var = Booking::find()
+         ->select(['booking_id','scheduled_date','booking_reference', 'description', 'rstl_id', 'date_created', 'qty_sample', 'customer_id', 'booking_status', 'samplename', 'reason','modeofrelease_ids'=> 'tbl_modeofrelease.mode', 'purpose'=>'tbl_purpose.name', 'sampletype_id' =>'tbl_sampletype.type'])
+         ->where(['customer_id'=>$this->getuserid()])
+         ->joinWith(['modeofrelease'])
+         ->joinWith(['purpose'])
+         ->joinWith(['sampletype'])
+         ->orderby('scheduled_date DESC')
+         ->all();
+
+         // var_dump($my_var); exit;
+
+        return $this->asJson(
+            $my_var
+        );
+    }
+
     public function actionMailcode($email){
         //sends a code to a customer for account verification purpose
 
