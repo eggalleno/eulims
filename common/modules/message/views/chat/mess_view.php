@@ -14,12 +14,15 @@ use yii\widgets\DetailView;
 /* @var $searchModel common\modules\message\models\ChatSearch */
 $id="";
 $name="";
+$receiver="";
 if($model->sender_userid == Yii::$app->user->id){
 	$id=$model->reciever_userid;
+	$receiver=$model->sender_userid;
 	$name=($model->getProfile($model->reciever_userid)->fullname);
 }
 else{
 	$id=$model->sender_userid;
+	$receiver=$model->reciever_userid;
     $name=($model->getProfile($model->sender_userid)->fullname);
 }
 ?>
@@ -42,10 +45,11 @@ else{
 
         });
     });*/
-function mes(id,mm) {
+function mes(id,mm,receiver,sender) {
     const ido=id;
     document.getElementById("receiver").innerText=mm;
-    document.getElementById("chat-sender_userid").value=id;
+    document.getElementById("chat-sender_userid").value=sender;
+	document.getElementById("chat-reciever_userid").value=receiver;
     $.ajax({
         url: '/message/chat/getsendermessage',
         //dataType: 'json',
@@ -60,7 +64,7 @@ function mes(id,mm) {
         document.getElementById("receiver").innerText=jam;*/
 }
 </script>
-<a class="thismessage" onclick="mes('<?= $model->contact_id?>', '<?php echo $name;?>')" href="#">
+<a class="thismessage" onclick="mes('<?= $model->contact_id?>', '<?php echo $name;?>', '<?php echo $receiver;?>','<?php echo $id;?>')" href="#">
 <li class="clearfix">
 <img src="/images/icons/customer.png" alt="avatar" style="width: 30px"/>
     <div class="about">

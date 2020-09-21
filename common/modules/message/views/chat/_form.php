@@ -49,6 +49,7 @@ use yii\widgets\ActiveForm;
             <?= $form->field($model, 'message')->textarea(['rows' => 2]) ?>
             <div class="form-group">
                 <?= Html::submitButton($model->isNewRecord ? 'Send' : 'Update', ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
+				
             </div>
         </div> <!-- end chat-message -->
 

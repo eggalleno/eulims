@@ -15,7 +15,7 @@ use common\modules\message\models\ChatAttachment;
 use yii\web\UploadedFile;
 use common\modules\message\models\ChatGroup;
 use common\modules\message\models\GroupMember;
-
+use common\models\system\LoginForm;
 /**
  * ChatController implements the CRUD actions for Chat model.
  */
@@ -42,62 +42,80 @@ class ChatController extends Controller
      */
     public function actionIndex()
     {
-        $searchModel = new ChatSearch();
-        //$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
-        $query = $this->Getallmessage();
-        $dataProvider = New ActiveDataProvider(['query'=>$query]);
+		$session = Yii::$app->session;
+		if(isset($_SESSION['usertoken'])){
+			//echo "sadasf";
+			$token=$_SESSION['usertoken'];
+			 $searchModel = new ChatSearch();
+			//$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+			$query = $this->Getallmessage();
+			$dataProvider = New ActiveDataProvider(['query'=>$query]);
 
-        $queryGroup = $this->GetallGC();
-        $dataProviderGrp = New ActiveDataProvider(['query'=>$queryGroup]);
-		
-		$file= new ChatAttachment();
-		$chat=new Chat();
-		if ($chat->load(Yii::$app->request->post()) and $file->load(Yii::$app->request->post())) {
-			$sds = UploadedFile::getInstance($file, 'filename');
-
-			//save message
-			$contact = Contacts::find()->where(['contact_id'=>$chat->sender_userid])->one();
-			$contact_id=$contact->user_id;
-			$str_total = explode(',', $contact_id);
-            $arr_length = count($str_total); 
-			$receiverid="";
-            for($i=0;$i<$arr_length;$i++){
-                 if(Yii::$app->user->id != $str_total[$i]){
-					$receiverid= $str_total[$i];
-				 }
-            }
-			$chat->reciever_userid=$receiverid;
-			/////////////////////////////////////////////////////////
-			$chat->contact_id=$chat->sender_userid;
-			$chat->sender_userid= Yii::$app->user->id;
-			$chat->status_id=1;//sent
-			$chat->message=$chat->message;
-			$chat->save();
-			//end of save message-----
+			$queryGroup = $this->GetallGC();
+			$dataProviderGrp = New ActiveDataProvider(['query'=>$queryGroup]);
 			
-			//for file attachment
-			if (!empty($sds) && $sds !== 0) {                
-                $sds->saveAs('uploads/message/' . $chat->chat_id.'.'.$sds->extension);
-                $file->filename ='uploads/message/'.$chat->chat_id.'.'.$sds->extension;
+			$file= new ChatAttachment();
+			$chat=new Chat();
+			/*if ($chat->load(Yii::$app->request->post()) and $file->load(Yii::$app->request->post())) {
+				$sds = UploadedFile::getInstance($file, 'filename');
+
+				//save message
+				$contact = Contacts::find()->where(['contact_id'=>$chat->sender_userid])->one();
+				$contact_id=$contact->user_id;
+				$str_total = explode(',', $contact_id);
+				$arr_length = count($str_total); 
+				$receiverid="";
+				for($i=0;$i<$arr_length;$i++){
+					 if(Yii::$app->user->id != $str_total[$i]){
+						$receiverid= $str_total[$i];
+					 }
+				}
+				$chat->reciever_userid=$receiverid;
+				/////////////////////////////////////////////////////////
+				$chat->contact_id=$chat->sender_userid;
+				$chat->sender_userid= Yii::$app->user->id;
+				$chat->status_id=1;//sent
+				$chat->message=$chat->message;
+				$chat->save();
+				//end of save message-----
 				
-				$this->Saveattachment($file->filename,$chat->contact_id);
-            }
-			
-			//end
-			
-			Yii::$app->session->setFlash('success', 'Message Sent!'); 
-			return $this->redirect(['/message/chat/index']);
-			
+				//for file attachment
+				if (!empty($sds) && $sds !== 0) {                
+					$sds->saveAs('uploads/message/' . $chat->chat_id.'.'.$sds->extension);
+					$file->filename ='uploads/message/'.$chat->chat_id.'.'.$sds->extension;
+					
+					$this->Saveattachment($file->filename,$chat->contact_id);
+				}
+				
+				//end
+				
+				Yii::$app->session->setFlash('success', 'Message Sent!'); 
+				return $this->redirect(['/message/chat/index']);
+				
+			}else{ */
+				
+				
+				return $this->render('index', [
+				'searchModel' => $searchModel,
+				'dataProvider' => $dataProvider,
+				'dataProviderGrp'=>$dataProviderGrp,
+				'file'=>$file,
+				'chat'=>$chat,
+				'token'=>$token
+				]);
+			//}
 		}else{
-			return $this->render('index', [
-            'searchModel' => $searchModel,
-            'dataProvider' => $dataProvider,
-            'dataProviderGrp'=>$dataProviderGrp,
-			'file'=>$file,
-			'chat'=>$chat
-			]);
-		}
-        
+			$model = new LoginForm();
+			if ($model->load(Yii::$app->request->post())){
+				//echo $model->email;
+				//echo $model->password;
+				
+			}else{
+				return $this->render('login', [
+				'model' => $model
+				]);
+			}	
+		} 
     }
 
 /*    Public function actionView($sendId){
@@ -131,6 +149,14 @@ class ChatController extends Controller
      */
     public function actionCreate()
     {
+		/*$session = Yii::$app->session;
+		$session->set('language', 'en-US');
+		
+		$language = $session->get('language');
+		$language = $session['language'];
+		$language = isset($_SESSION['language']) ? $_SESSION['language'] : null;
+		
+		echo $language;*/
         $model = new Chat();
        
         $possible_recipients = Chat::getPossibleRecipients();
@@ -171,7 +197,8 @@ class ChatController extends Controller
                 'model' => $model,
 				'possible_recipients' => $recipients,
             ]);
-        }
+        } 
+		
     }
 
     /**
@@ -359,5 +386,19 @@ class ChatController extends Controller
 		
         
     }
+	
+	public function actionSettoken($token)
+    {
+		$session = Yii::$app->session;
+		
+		$session->set('usertoken', $token);
+		return;
+	}	
+    public function beforeAction($action) 
+	{ 
+		$this->enableCsrfValidation = false; 
+		return parent::beforeAction($action); 
+	}	
+	
 
 }

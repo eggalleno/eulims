@@ -11,6 +11,8 @@ use common\models\lab\Lab;
 use common\models\lab\Businessnature;
 use common\models\lab\Reportholder;
 use common\models\lab\Sampletype;
+use common\models\lab\Factors;
+use common\models\lab\Reportfactors;
 
 class AnalyticController extends \yii\web\Controller
 {
@@ -24,6 +26,8 @@ class AnalyticController extends \yii\web\Controller
 
     public function actionIndex()
     {
+        $session = Yii::$app->session;
+        $session->set('hideMenu',true);
     	$reportform = new Reportform();
     	$rstlId = Yii::$app->user->identity->profile->rstl_id;
     	if ($reportform->load(Yii::$app->request->post())) {
@@ -157,6 +161,22 @@ class AnalyticController extends \yii\web\Controller
     
     }
 
-   
+   public function actionAddfactors($yearmonth){
+    $reportfactor = new Reportfactors;
+    $reportfactor->yearmonth = $yearmonth;
+    $factors = Factors::find()->all();
+
+    if ($reportfactor->load(Yii::$app->request->post())) {
+        if($reportfactor->save(false))
+            Yii::$app->session->setFlash('success', 'Factor Successfully Added');
+        else
+            Yii::$app->session->setFlash('danger', 'Linking Factor Failed');
+
+        return $this->redirect(['/reports/finance/analytic/']);
+    }
+
+
+    return $this->renderAjax('linkfactor',['model'=>$reportfactor,'factors'=>$factors]);
+   }
 
 }

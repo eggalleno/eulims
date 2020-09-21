@@ -1,7 +1,7 @@
 .highcharts-figure, .highcharts-data-table table {
     min-width: 320px; 
     max-width: 800px;
-    margin: 1em auto;
+    margin: 1em auto; 
 }
 
 .highcharts-data-table table {
@@ -26,18 +26,45 @@
     padding: 0.5em;
 }
 .highcharts-data-table thead tr, .highcharts-data-table tr:nth-child(even) {
-    /*background: #f8f8f8;*/
+    background: #f8f8f8;
 }
 .highcharts-data-table tr:hover {
     /*background: #f1f7ff;*/
 }
 
 
-.info-box-icon:hover {
-  background-color: yellow;
-  color: #000000;
-  transition: color .50s ease-in-out;
-  cursor: pointer;
+.modal-content,.modal-header,.modal-header h4 span{
+  background-color: #667292 !important;
+  color: #fff
+}
+
+.modal-white form div label{
+  color: #fff;
 }
 
 
+.bg-graphs{
+  background-color:#fefbd8  !important; 
+}
+
+.bg-panel{
+  background-color:#ff7b25 !important;
+  color:#fff;
+}
+
+.bg-bigpanel{
+  background-color:#96ceb4 !important;
+  color:#fff;
+}
+
+.bg-hover:hover{
+  background-color: #ffcc5c  !important;
+  color: #000;
+  transition: color-color .50s ease-in-out;
+  cursor: pointer;
+}
+
+.bg-entities{
+  background-color: #618685  !important;
+  color: #fff
+}

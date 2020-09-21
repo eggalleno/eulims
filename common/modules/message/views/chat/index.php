@@ -17,6 +17,7 @@ use yii\widgets\ActiveForm;
 
 $this->title = 'Chats';
 $this->params['breadcrumbs'][] = $this->title;
+//echo $token;
 ?>
 <script>
     $(document).ready(
@@ -38,6 +39,7 @@ $this->params['breadcrumbs'][] = $this->title;
             }
         });
     }
+	
     function openForm() {
         document.getElementById("myForm").style.display = "block";
     }
@@ -129,7 +131,8 @@ $this->params['breadcrumbs'][] = $this->title;
 
         <div class="chat-message clearfix">
             <?php $form = ActiveForm::begin(); ?>
-            <?= $form->field($chat, 'sender_userid')->hiddenInput()->label(false) ?>
+            <?= $form->field($chat, 'sender_userid')->label(false) ?>
+			<?= $form->field($chat, 'reciever_userid')->label(false) ?>
             <?= $form->field($chat, 'message')->textarea(['rows' => 2]) ?>
 
 
@@ -147,8 +150,8 @@ $this->params['breadcrumbs'][] = $this->title;
                 ]);
             ?>
             <div class="form-group">
-                <?= Html::submitButton($chat->isNewRecord ? 'Send' : 'Update', ['class' => $chat->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
-            </div>
+				<button id="sendmessage"> Send </button>
+			</div>
 
             <?php ActiveForm::end(); ?>
         </div> <!-- end chat-message -->
@@ -208,7 +211,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 <!--<input type="file" id="chatattachment-filename" class="" name="ChatAttachment[filename]" multiple="" data-krajee-fileinput="fileinput_94eb551c">-->
             <i class="fa fa-paperclip"></i>
             <textarea placeholder="Type message.." name="msg" required></textarea>
-            <button type="submit" class="btn"><i class="fa fa-send-o"></i></button>
+            <button type="submit" class="btn" id="sendmes"><i class="fa fa-send-o"></i></button>
         </div>
         <!--<button type="button" class="btn cancel" onclick="closeForm()">Close</button>-->
     </form>
@@ -216,7 +219,36 @@ $this->params['breadcrumbs'][] = $this->title;
 <!-- partial -->
 <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js'></script>
 <script src='https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/3.0.0/handlebars.min.js'></script>
-<script src='https://cdnjs.cloudflare.com/ajax/libs/list.js/1.1.1/list.min.js'></script><script  src="./script.js"></script>
-
 </body>
 </html>
+
+<script type="text/javascript">
+$("#sendmessage").click(function(){
+   var token=<?php echo json_encode($token) ?>;
+   var sender_userid= $('#chat-reciever_userid').val();
+   var reciever_userid= $('#chat-sender_userid').val();
+   var message =  $('#chat-message').val();
+  // alert(message);
+  // alert("sdsdqwertyu");
+	$.ajax({
+		url: "http://www.eulims.local/api/message/setmessage", //API LINK FROM THE CENTRAL
+		type: 'POST',
+		dataType: "JSON",
+		beforeSend: function (xhr) {
+			xhr.setRequestHeader('Authorization', 'Bearer '+ token);
+		}, 
+		data: {
+			sender_userid: sender_userid,
+			reciever_userid: reciever_userid,
+			
+			message: message
+		},
+		success: function(response) {
+			alert(response.message);
+		},
+		error: function(xhr, status, error) {
+			alert(error);
+		}
+	}); 
+});
+</script>

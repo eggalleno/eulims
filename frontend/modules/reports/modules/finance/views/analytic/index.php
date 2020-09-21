@@ -9,6 +9,7 @@ use yii\helpers\ArrayHelper;
 use common\models\lab\Lab;
 
 
+
 $this->registerCssFile("/css/modcss/financeanalytic.css", [
 ], 'css-fanalytic');
 
@@ -25,8 +26,8 @@ $this->registerJsFile("/js/finance/highcharts-more.js", [
 
 
 <div class="row">
-	<div class="panel panel-default col-xs-12 col-md-2">
-	 	<div class="panel-body">
+	<div class="col-xs-12 col-md-2">
+		<div class="box-header with-border bg-bigpanel">
 		    <?php $form = ActiveForm::begin(); ?>
 
 	        <?= $form->field($reportform, 'lab_id')->widget(Select2::classname(), [
@@ -47,18 +48,18 @@ $this->registerJsFile("/js/finance/highcharts-more.js", [
 		    </div>
 
 			<?php ActiveForm::end(); ?>
+		</div>
 
-       </div>
-
-       <div class="alert alert-warning" style="background: #F4D6B6 !important;margin-top: 1px !important;">
-        <a href="#" class="close" data-dismiss="alert" >×</a>
-
-         <p class="note" style="color:#d73925;font-size: 12pt;"><b>Months displayed in RED color are not yet finalize</b><br/> Thank you.</p>
-    </div>
-   </div>
+		<div class="info-box">
+            <span class="info-box-icon box-action-content bg-green bg-hover" id="btn_createfactor"><i class="fa fa-plus"></i></span>
+            <div class="info-box-content"><span class="info-box-text">Create New</span>
+                <span class="info-box-number">Factor</span>
+            </div>
+        </div>
+   	</div>
     <div class="col-xs-12 col-md-10">
-       <div class="box box-solid">
-       		<div id="divColumnChart" style="display: block">
+    	<div class="box-header with-border bg-graphs">
+    		<div id="divColumnChart" style="display: block">
                                                         <?php
                                                         echo Highcharts::widget([
                                                             'id' => 'labColumnChart',
@@ -107,23 +108,23 @@ $this->registerJsFile("/js/finance/highcharts-more.js", [
                                                         ]);
                                                         ?>
        		</div>
-		</div>
+    	</div>
 	</div>
-	 <div class="col-md-12">
-        <div class="box box-solid">
+	<div class="col-md-12">
+        <div class="box">
             
             <!-- /.box-header -->
             <div class="box-body">
 
 
-                <div id="carousel-lab" class="carousel slide" data-ride="carousel" data-interval="false">
+                <div>
                     
 
                     <div class="carousel-inner">
                     	<div class="col-md-1 col-sm-4 col-xs-12">
                     		<a class="btn-openFigures" name="<?= $year.'-01_'.$labId?>">
                     			<div class="info-box bg-<?= $finalize[0]?>">
-                    				<span class="info-box-icon" >
+                    				<span class="info-box-icon bg-entities bg-hover" >
                     				Jan 
 	                    			</span>
 							        <!-- <span class="info-box-number"><a href="#" style="color:white;font-size:25px;" >12345</a></span> -->
@@ -134,7 +135,7 @@ $this->registerJsFile("/js/finance/highcharts-more.js", [
 	                    <div class="col-md-1 col-sm-4 col-xs-12">
                     		<a class="btn-openFigures" name="<?= $year.'-02_'.$labId?>">
                     			<div class="info-box bg-<?= $finalize[1]?>">
-	                    			<span class="info-box-icon">Feb</span>
+	                    			<span class="info-box-icon bg-entities bg-hover">Feb</span>
 						        	<div class="info-box-content"><span class="info-box-text"></span>
 							    	</div>
 	                    		</div>
@@ -144,7 +145,7 @@ $this->registerJsFile("/js/finance/highcharts-more.js", [
                     	<div class="col-md-1 col-sm-4 col-xs-12">
                     		<a class="btn-openFigures" name="<?= $year.'-03_'.$labId?>">
                     			<div class="info-box bg-<?= $finalize[2]?>">
-	                    			<span class="info-box-icon">Mar</span>
+	                    			<span class="info-box-icon bg-entities bg-hover">Mar</span>
 						        	<div class="info-box-content"><span class="info-box-text"></span>
 							    	</div>
 	                    		</div>
@@ -154,7 +155,7 @@ $this->registerJsFile("/js/finance/highcharts-more.js", [
 	                    <div class="col-md-1 col-sm-4 col-xs-12">
 	                    	<a class="btn-openFigures" name="<?= $year.'-04_'.$labId?>">
 	                    		<div class="info-box bg-<?= $finalize[3]?>">
-		                    		<span class="info-box-icon">Apr</span>
+		                    		<span class="info-box-icon bg-entities bg-hover">Apr</span>
 							        <div class="info-box-content"><span class="info-box-text"></span>
 								    </div>
 		                    	</div>
@@ -164,7 +165,7 @@ $this->registerJsFile("/js/finance/highcharts-more.js", [
 	                    <div class="col-md-1 col-sm-4 col-xs-12">
 	                    	<a class="btn-openFigures" name="<?= $year.'-05_'.$labId?>">
 	                    		<div class="info-box bg-<?= $finalize[4]?>">
-		                    		<span class="info-box-icon">May</span>
+		                    		<span class="info-box-icon bg-entities bg-hover">May</span>
 							        <div class="info-box-content"><span class="info-box-text"></span>
 								    </div>
 		                    	</div>
@@ -174,7 +175,7 @@ $this->registerJsFile("/js/finance/highcharts-more.js", [
 	                    <div class="col-md-1 col-sm-4 col-xs-12">
 	                    	<a class="btn-openFigures" name="<?= $year.'-06_'.$labId?>">
 	                    		<div class="info-box bg-<?= $finalize[5]?>">
-		                    		<span class="info-box-icon">Jun</span>
+		                    		<span class="info-box-icon bg-entities bg-hover">Jun</span>
 							        <div class="info-box-content"><span class="info-box-text"></span>
 								    </div>
 		                    	</div>
@@ -184,7 +185,7 @@ $this->registerJsFile("/js/finance/highcharts-more.js", [
                     	<div class="col-md-1 col-sm-4 col-xs-12">
                     		<a class="btn-openFigures" name="<?= $year.'-07_'.$labId?>">
 	                    		<div class="info-box bg-<?= $finalize[6]?>">
-		                    		<span class="info-box-icon">Jul</span>
+		                    		<span class="info-box-icon bg-entities bg-hover">Jul</span>
 							        <div class="info-box-content"><span class="info-box-text"></span>
 								    </div>
 		                    	</div>
@@ -194,7 +195,7 @@ $this->registerJsFile("/js/finance/highcharts-more.js", [
 	                    <div class="col-md-1 col-sm-4 col-xs-12">
 	                    	<a class="btn-openFigures" name="<?= $year.'-08_'.$labId?>">
 	                    		<div class="info-box bg-<?= $finalize[7]?>">
-		                    		<span class="info-box-icon">Aug</span>
+		                    		<span class="info-box-icon bg-entities bg-hover">Aug</span>
 							        <div class="info-box-content"><span class="info-box-text"></span>
 								    </div>
 		                    	</div>
@@ -203,7 +204,7 @@ $this->registerJsFile("/js/finance/highcharts-more.js", [
 	                    <div class="col-md-1 col-sm-4 col-xs-12">
 	                    	<a class="btn-openFigures" name="<?= $year.'-09_'.$labId?>">
 	                    		<div class="info-box bg-<?= $finalize[8]?>">
-		                    		<span class="info-box-icon">Sep</span>
+		                    		<span class="info-box-icon bg-entities bg-hover">Sep</span>
 							        <div class="info-box-content"><span class="info-box-text"></span>
 								    </div>
 		                    	</div>
@@ -213,7 +214,7 @@ $this->registerJsFile("/js/finance/highcharts-more.js", [
 	                    <div class="col-md-1 col-sm-4 col-xs-12">
 	                    	<a class="btn-openFigures" name="<?= $year.'-10_'.$labId?>">
 	                    		<div class="info-box bg-<?= $finalize[9]?>">
-		                    		<span class="info-box-icon">Oct</span>
+		                    		<span class="info-box-icon bg-entities bg-hover">Oct</span>
 							        <div class="info-box-content"><span class="info-box-text"></span>
 								    </div>
 		                    	</div>
@@ -223,7 +224,7 @@ $this->registerJsFile("/js/finance/highcharts-more.js", [
                     	<div class="col-md-1 col-sm-4 col-xs-12">
                     		<a class="btn-openFigures" name="<?= $year.'-11_'.$labId?>">
 	                    		<div class="info-box bg-<?= $finalize[10]?>">
-		                    		<span class="info-box-icon">Nov</span>
+		                    		<span class="info-box-icon bg-entities bg-hover">Nov</span>
 							        <div class="info-box-content"><span class="info-box-text"></span>
 								    </div>
 		                    	</div>
@@ -233,7 +234,7 @@ $this->registerJsFile("/js/finance/highcharts-more.js", [
 	                    <div class="col-md-1 col-sm-4 col-xs-12">
 	                    	<a class="btn-openFigures" name="<?= $year.'-12_'.$labId?>">
 	                    		<div class="info-box bg-<?= $finalize[11]?>">
-		                    		<span class="info-box-icon">Dec</span>
+		                    		<span class="info-box-icon bg-entities bg-hover">Dec</span>
 							        <div class="info-box-content"><span class="info-box-text"></span>
 								    </div>
 		                    	</div>

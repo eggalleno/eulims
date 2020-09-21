@@ -12,73 +12,50 @@ use yii\helpers\Url;
 
 <div class="row">
     <div class="col-md-3">
-        <div class="box box-solid col-md-12">
-            <div class="box-header with-border" style="background-color:#3c8dbc !important;color:white">
-                <h3 class="box-title">Factors</h3>
-            </div>
-            <!-- /.box-header -->
-            <div class="box-body">
-
-
-                <div id="carousel-lab" class="carousel slide" data-ride="carousel" data-interval="false">
-                    
-                    <div class="col-md-12 col-sm-12 col-xs-12">
-                        <div class="info-box bg-blue">
-                            <span class="info-box-icon"><i class="fa fa-calendar"></i></span>
-                            <div class="info-box-content"><span class="info-box-text">Month</span>
-                                <span class="info-box-number"><a href="#" style="color:white"><?= date('F Y',strtotime($yearmonth)) ?></a></span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="carousel-inner">
-                    	<div class="col-md-12 col-sm-12 col-xs-12">
-                    		<div class="info-box bg-blue">
-	                    		<span class="info-box-icon"><i class="fa fa-money"></i></span>
-						        <div class="info-box-content"><span class="info-box-text">Samples  Handled</span>
-							        <span class="info-box-number"><a href="#" style="color:white;font-size:25px;" ><div id="samplecount" class="delay" data-url="/reports/finance/analytic/getsamples?yearmonth=<?= $yearmonth?>&lab_id=<?= $lab_id?>"><div style='text-align:center;'><img src='/images/img-loader64.gif' alt=''></div></div></a></span>
-							    </div>
-	                    	</div>
-	                    </div>
-
-                    	<div class="col-md-12 col-sm-12 col-xs-12">
-                    		<div class="info-box bg-green">
-	                    		<span class="info-box-icon"><i class="fa fa-plus"></i></span>
-						        <div class="info-box-content"><span class="info-box-text">Partnership  </span><p style="background-color:#ffe2d8   !important;color:red">Forecasting Ongoing Development</p>
-							        <span class="info-box-number"><a href="#" style="color:white;font-size:25px;" >DOH</a></span>
-							    </div>
-	                    	</div>
-	                    </div>
-	                   
-	                    <div class="col-md-12 col-sm-12 col-xs-12">
-                    		<div class="info-box bg-red">
-	                    		<span class="info-box-icon"><i class="fa fa-minus"></i></span>
-						        <div class="info-box-content"><span class="info-box-text">Pandemic</span><p style="background-color:#ffe2d8   !important;color:red">Forecasting Ongoing Development</p>
-							        <span class="info-box-number"><a href="#" style="color:white">Limited Services</a></span>
-							    </div>
-	                    	</div>
-	                    </div>
-	                    
-	                    
-	                </div>
-	            </div>
-	        </div>
-    	</div>
         <div class="col-md-12">
-        <div class="box box-solid">
-            <div class="box-header with-border" style="background-color:#ffa500 !important;color:white">
-                
-                <div id="customercount" class="delay" data-url="/reports/finance/analytic/getcustomers?yearmonth=<?= $yearmonth?>&lab_id=<?= $lab_id?>"><div style='text-align:center;'><img src='/images/img-loader64.gif' alt=''></div></div>
+                            
+            <div class="col-md-12 col-sm-12 col-xs-12">
+                <div class="info-box">
+                    <span class="info-box-icon bg-entities"><i class="fa fa-calendar"></i></span>
+                    <div class="info-box-content bg-entities">
+                        <span class="info-box-number"><?= date('F Y',strtotime($yearmonth)) ?></span>
+                    </div>
+                    <div class="info-box-content"><span class="info-box-text">Samples  Handled</span>
+                        <span class="info-box-number"><div id="samplecount" class="delay" data-url="/reports/finance/analytic/getsamples?yearmonth=<?= $yearmonth?>&lab_id=<?= $lab_id?>"><div style='text-align:center;'><img src='/images/img-loader64.gif' alt=''></div></div></span>
+                    </div>
+                </div>
+                <div class="info-box">
+                    <span class="info-box-icon box-action-content bg-green bg-hover" id="btn_addfactor" data-url="<?= $yearmonth?>"><i class="fa fa-plus"></i></span>
+                    <div class="info-box-content"><span class="info-box-text">Link A</span>
+                        <span class="info-box-number">Factor</span>
+                    </div>
+                </div>
             </div>
-            <!-- /.box-header -->
 
+        	<div class="col-md-12 col-sm-12 col-xs-12" id="factors">
+                <!-- <div class="info-box bg-red">
+                    <span class="info-box-icon box-action"><i class="fa fa-minus"></i></span>
+                    <div class="info-box-content"><span class="info-box-text">Pandemic</span>
+                        <span class="info-box-number"><a href="#" style="color:white">Limited Services</a></span>
+                    </div>
+                </div> -->
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="box box-solid">
+                <div class="box-header with-border bg-panel">
+                    
+                    <div id="customercount" class="delay" data-url="/reports/finance/analytic/getcustomers?yearmonth=<?= $yearmonth?>&lab_id=<?= $lab_id?>"><div style='text-align:center;'><img src='/images/img-loader64.gif' alt=''></div></div>
+                </div>
+                <!-- /.box-header -->
+
+            </div>
         </div>
     </div>
-	</div>
 
 	<div class="col-md-9">
         <div class="box box-solid">
-            <div class="box-header with-border" style="background-color:#00a65a !important;color:white">
+            <div class="box-header with-border bg-bigpanel">
                 <div id="tests" class="delay" data-url="/reports/finance/analytic/gettestsperformed?yearmonth=<?= $yearmonth?>&lab_id=<?= $lab_id?>"><div style='text-align:center;'><img src='/images/img-loader64.gif' alt=''></div></div>
             </div>
             <!-- /.box-header -->
@@ -87,7 +64,7 @@ use yii\helpers\Url;
 	        </div>
     	</div>
 	</div>
-
+</div>
 	
 
 
@@ -111,6 +88,15 @@ jQuery(document).ready(function ($) {
     var element_tests = document.getElementById("tests");
     var url_tests = element_tests.getAttribute("data-url");
     $('#tests').load(url_tests);
+
+    
+
+    jQuery(document).ready(function ($) {
+        $('#btn_addfactor').click(function () {
+            LoadModal("Choose a Factor","/reports/finance/analytic/addfactors?yearmonth="+(this).getAttribute("data-url"));
+        });
+    });
+
 
 });
 </script>
