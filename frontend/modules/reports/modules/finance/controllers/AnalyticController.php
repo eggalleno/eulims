@@ -218,7 +218,7 @@ class AnalyticController extends \yii\web\Controller
             }
         }
 
-        return $this->renderAjax('linkfactor2',['model'=>$reportfactor,'factor'=>$factor]);
+        return $this->renderAjax('linkfactorcomplete',['model'=>$reportfactor,'factor'=>$factor]);
     }
 
     public function actionRemovefactor($factor_id){

@@ -4,7 +4,6 @@ use yii\helpers\Html;
 use kartik\widgets\Select2;
 use yii\helpers\ArrayHelper;
 
-
 ?>
 <div class="box-header modal-white">
     <?php $form = ActiveForm::begin(); ?>
@@ -19,7 +18,7 @@ use yii\helpers\ArrayHelper;
             ])->label('Factor'); ?>
         <span class="input-group-btn" style="padding-top: 25.5px">
             
-        <button onclick="LoadModal('Create New Customer', '/reports/finance/analytic/createfactor?yearmonth=<?=$model->yearmonth?>');" class="btn btn-success" type="button" alt="New Factor"><i class="fa fa-plus"></i></button>
+        <button onclick="LoadModal('Link New Factor', '/reports/finance/analytic/createfactor?yearmonth=<?=$model->yearmonth?>');" class="btn btn-success" type="button" alt="New Factor"><i class="fa fa-plus"></i></button>
         </span>
     </div>
     <br>
