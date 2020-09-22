@@ -103,134 +103,29 @@ $this->registerJsFile("/js/finance/highcharts-more.js", [
 	</div>
 	<div class="col-md-12">
         <div class="box">
-            
             <!-- /.box-header -->
             <div class="box-body">
-
-
                 <div>
-                    
-
                     <div class="carousel-inner">
-                    	<div class="col-md-1 col-sm-4 col-xs-12">
-                    		<a class="btn-openFigures" name="<?= $year.'-01_'.$labId?>">
-                    			<div class="info-box bg-<?= $finalize[0]?>">
-                    				<span class="info-box-icon bg-entities bg-hover" >
-                    				Jan 
-	                    			</span>
-							        <!-- <span class="info-box-number"><a href="#" style="color:white;font-size:25px;" >12345</a></span> -->
-	                    		</div>
-	                    	</a>
-	                    </div>
 
-	                    <div class="col-md-1 col-sm-4 col-xs-12">
-                    		<a class="btn-openFigures" name="<?= $year.'-02_'.$labId?>">
-                    			<div class="info-box bg-<?= $finalize[1]?>">
-	                    			<span class="info-box-icon bg-entities bg-hover">Feb</span>
-						        	<div class="info-box-content"><span class="info-box-text"></span>
-							    	</div>
-	                    		</div>
-	                    	</a>
-	                    </div>
 
-                    	<div class="col-md-1 col-sm-4 col-xs-12">
-                    		<a class="btn-openFigures" name="<?= $year.'-03_'.$labId?>">
-                    			<div class="info-box bg-<?= $finalize[2]?>">
-	                    			<span class="info-box-icon bg-entities bg-hover">Mar</span>
-						        	<div class="info-box-content"><span class="info-box-text"></span>
-							    	</div>
-	                    		</div>
-	                    	</a>
-	                    </div>
-	                   
-	                    <div class="col-md-1 col-sm-4 col-xs-12">
-	                    	<a class="btn-openFigures" name="<?= $year.'-04_'.$labId?>">
-	                    		<div class="info-box bg-<?= $finalize[3]?>">
-		                    		<span class="info-box-icon bg-entities bg-hover">Apr</span>
-							        <div class="info-box-content"><span class="info-box-text"></span>
-								    </div>
-		                    	</div>
-		                    </a>
-	                    </div>
-	                    
-	                    <div class="col-md-1 col-sm-4 col-xs-12">
-	                    	<a class="btn-openFigures" name="<?= $year.'-05_'.$labId?>">
-	                    		<div class="info-box bg-<?= $finalize[4]?>">
-		                    		<span class="info-box-icon bg-entities bg-hover">May</span>
-							        <div class="info-box-content"><span class="info-box-text"></span>
-								    </div>
-		                    	</div>
-		                    </a>
-	                    </div>
-	                   
-	                    <div class="col-md-1 col-sm-4 col-xs-12">
-	                    	<a class="btn-openFigures" name="<?= $year.'-06_'.$labId?>">
-	                    		<div class="info-box bg-<?= $finalize[5]?>">
-		                    		<span class="info-box-icon bg-entities bg-hover">Jun</span>
-							        <div class="info-box-content"><span class="info-box-text"></span>
-								    </div>
-		                    	</div>
-		                    </a>
-	                    </div>
-
-                    	<div class="col-md-1 col-sm-4 col-xs-12">
-                    		<a class="btn-openFigures" name="<?= $year.'-07_'.$labId?>">
-	                    		<div class="info-box bg-<?= $finalize[6]?>">
-		                    		<span class="info-box-icon bg-entities bg-hover">Jul</span>
-							        <div class="info-box-content"><span class="info-box-text"></span>
-								    </div>
-		                    	</div>
-		                    </a>
-	                    </div>
-	                   
-	                    <div class="col-md-1 col-sm-4 col-xs-12">
-	                    	<a class="btn-openFigures" name="<?= $year.'-08_'.$labId?>">
-	                    		<div class="info-box bg-<?= $finalize[7]?>">
-		                    		<span class="info-box-icon bg-entities bg-hover">Aug</span>
-							        <div class="info-box-content"><span class="info-box-text"></span>
-								    </div>
-		                    	</div>
-		                    </a>
-	                    </div>
-	                    <div class="col-md-1 col-sm-4 col-xs-12">
-	                    	<a class="btn-openFigures" name="<?= $year.'-09_'.$labId?>" id="2020-09">
-	                    		<div class="info-box bg-<?= $finalize[8]?>">
-		                    		<span class="info-box-icon bg-entities bg-hover">Sep</span>
-							        <div class="info-box-content"><span class="info-box-text"></span>
-								    </div>
-		                    	</div>
-		                    </a>
-	                    </div>
-	                   
-	                    <div class="col-md-1 col-sm-4 col-xs-12">
-	                    	<a class="btn-openFigures" name="<?= $year.'-10_'.$labId?>">
-	                    		<div class="info-box bg-<?= $finalize[9]?>">
-		                    		<span class="info-box-icon bg-entities bg-hover">Oct</span>
-							        <div class="info-box-content"><span class="info-box-text"></span>
-								    </div>
-		                    	</div>
-		                    </a>
-	                    </div>
-
-                    	<div class="col-md-1 col-sm-4 col-xs-12">
-                    		<a class="btn-openFigures" name="<?= $year.'-11_'.$labId?>">
-	                    		<div class="info-box bg-<?= $finalize[10]?>">
-		                    		<span class="info-box-icon bg-entities bg-hover">Nov</span>
-							        <div class="info-box-content"><span class="info-box-text"></span>
-								    </div>
-		                    	</div>
-		                    </a>
-	                    </div>
-	                   
-	                    <div class="col-md-1 col-sm-4 col-xs-12">
-	                    	<a class="btn-openFigures" name="<?= $year.'-12_'.$labId?>">
-	                    		<div class="info-box bg-<?= $finalize[11]?>">
-		                    		<span class="info-box-icon bg-entities bg-hover">Dec</span>
-							        <div class="info-box-content"><span class="info-box-text"></span>
-								    </div>
-		                    	</div>
-		                    </a>
-	                    </div>
+                    	<?php
+                    	$month = 0;
+						while ( $month<= 11) {
+							echo '<div class="col-md-1 col-sm-4 col-xs-12">';
+								echo '<a class="btn-openFigures" name="'.$year.'-'.sprintf("%02d", ($month+1)).'_'.$labId.'">';
+								echo '<div class="info-box bg-'.$finalize[0].'">';
+									echo '<span class="info-box-icon bg-entities bg-hover">';
+									echo date('M',strtotime($year."-".($month+1)."-01"));
+									echo '</span>';
+								echo '</div>';
+								echo '</a>';
+								thumbsupsummary($factor_up[$month]);
+								thumbsdownsummary($factor_down[$month]);
+							echo '</div>';
+							$month++;
+						}
+                    	?>
 	                </div>
 	            </div>
 	        </div>
@@ -257,3 +152,25 @@ jQuery(document).ready(function ($) {
 
 });
 </script>
+
+<?php 
+
+function thumbsupsummary($data){
+	$i = 0;
+	while ($i < $data) {
+		echo '<i class="fa fa-thumbs-up" style="color:green"></i>';	
+		$i++;
+	}
+	return;
+}
+
+function thumbsdownsummary($data){
+	$i = 0;
+	while ($i < $data) {
+		echo '<i class="fa fa-thumbs-down" style="color:red"></i>';	
+		$i++;
+	}
+	return;
+}
+
+?>
