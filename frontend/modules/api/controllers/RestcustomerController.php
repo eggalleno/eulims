@@ -88,6 +88,13 @@ class RestcustomerController extends \yii\rest\Controller
                         'email'=>$customer->email,
                         'fullname' => $customer->customer_name,
                         'type' => "customer",
+                        'address' => $customer->address,
+                        'tel' => $customer->tel,
+                        'customerid' => $customer->customer_id,
+                        'rstld' => $customer->rstl_id,
+                        'nature' => $customer->businessNature?$customer->businessNature->nature:"none",
+                        'typeindustry' => $customer->industrytype?$customer->industrytype->industry:"none",
+                        'typecustomer' => $customer->customerType?$customer->customerType->type:"none",
                     ]);  
             } else {
                 //check if the user account is not activated
