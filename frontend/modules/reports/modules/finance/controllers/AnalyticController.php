@@ -45,6 +45,8 @@ class AnalyticController extends \yii\web\Controller
     	$discounts = [];
     	$finalize = [];
     	$monthlyname =[];
+        $factor_up = [];
+        $factor_down =[];
 		$month = 0;
 		
 		while ( $month<= 11) {
@@ -52,19 +54,36 @@ class AnalyticController extends \yii\web\Controller
 				$actualfees[] = (int)$summary[$month]->actualfees;
 				$discounts[] = (int)$summary[$month]->discount;
 				$monthlyname[]  = $summary[$month]->year."-".$summary[$month]->month;
+                //get all the ; 
+                $factor_up[] = (int)Reportfactors::find()
+                ->joinWith(['factor'=>function($query){
+                    return $query->andWhere(['type'=>'1']);
+                }])
+                ->where(['yearmonth'=>$summary[$month]->year."-".$summary[$month]->month])
+                ->count();
+                // ->all();
+                $factor_down[] = (int)Reportfactors::find()
+                ->joinWith(['factor'=>function($query){
+                    return $query->andWhere(['type'=>'0']);
+                }])
+                ->where(['yearmonth'=>$summary[$month]->year."-".$summary[$month]->month])
+                ->count();
+                // ->all();
 				$finalize[] = "green";
 			}
 			else{
 				$actualfees[] =0;
 				$discounts[] = 0;
+                $factor_up[]=null;
+                $factor_down[]=null;
 				$finalize[] = "red";
 			}
 			$month ++;
 		}
-
+        // var_dump($factor_up); exit;
 		$lab = Lab::findOne($labId);//get the lab profile
 
-		return $this->render('index',['actualfees'=>$actualfees,'discounts'=>$discounts,'finalize'=>$finalize,'labId' => $labId,'year' => $year,'reportform'=>$reportform,'labtitle'=>$lab->labname]);
+		return $this->render('index',['actualfees'=>$actualfees,'discounts'=>$discounts,'finalize'=>$finalize,'labId' => $labId,'year' => $year,'reportform'=>$reportform,'labtitle'=>$lab->labname,'factor_up'=>$factor_up,'factor_down'=>$factor_down]);
     }
 
 
@@ -204,11 +223,10 @@ class AnalyticController extends \yii\web\Controller
 
     public function actionRemovefactor($factor_id){
         $reportfactor = Reportfactors::findOne($factor_id)->delete();
-        if ($reportfactor) 
+        if ($reportfactor)
             Yii::$app->session->setFlash('success', 'Factor Successfully Deleted!');
         else
             Yii::$app->session->setFlash('error', 'Factor Failed to Delete!');
         return $this->redirect(['/reports/finance/analytic/']);
     }
-
 }

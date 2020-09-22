@@ -21,9 +21,12 @@ use yii\helpers\ArrayHelper;
             ])->label('Factor Effect'); ?>
     </div>
 
-   
+    <div class="input-group col-md-12">
         <?= $form->field($model, 'name')->label('Target'); ?>
+    </div>
+    <div class="input-group col-md-12">
         <?= $form->field($model, 'remarks'); ?>
+    </div>
         
     <div class="form-group">
         <?php if(Yii::$app->request->isAjax){ ?>

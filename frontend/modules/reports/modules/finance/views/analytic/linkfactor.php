@@ -22,7 +22,10 @@ use yii\helpers\ArrayHelper;
         <button onclick="LoadModal('Create New Customer', '/reports/finance/analytic/createfactor?yearmonth=<?=$model->yearmonth?>');" class="btn btn-success" type="button" alt="New Factor"><i class="fa fa-plus"></i></button>
         </span>
     </div>
+    <br>
+    <div class="input-group col-md-12">
         <?= $form->field($model, 'name')->label('Target'); ?>
+    </div>
         <?= $form->field($model, 'remarks'); ?>
         
     <div class="form-group">
