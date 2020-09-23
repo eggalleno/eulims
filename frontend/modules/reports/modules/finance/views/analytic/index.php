@@ -50,54 +50,74 @@ $this->registerJsFile("/js/finance/highcharts-more.js", [
    	</div>
     <div class="col-xs-12 col-md-10">
     	<div class="box-header with-border bg-graphs">
-    		<div id="divColumnChart" style="display: block">
-                                                        <?php
-                                                        echo Highcharts::widget([
-                                                            'id' => 'labColumnChart',
-                                                            'scripts' => [
-                                                                'modules/exporting',
-                                                                'themes/grid-light',
-                                                            ],
-                                                            'options' => [
-                                                            	'chart' => [
-                                                                        'type' => 'column',
-                                                                    ],
-                                                                'title' => [
-                                                                    'text' => 'Income Generated - '.$labtitle ,
-                                                                ],
-                                                                'xAxis' => [
-                                                                    'title' => [
-                                                                        'text' => 'Year'
-                                                                    ],
-                                                                    'categories' => ['January' , 'February', 'March', 'April', 'May','June', 'July', 'August', 'September', 'October','November', 'December'],
-                                                                ],
-                                                                'yAxis' => [
-                                                                    'title' => [
-                                                                        'text' => 'No of Firms'
-                                                                    ],
-                                                                    'stackLabels'=> ['enabled'=> true,]
-                                                                ],
-                                                                'labels' => [
-                                                                    'items' => [
-                                                                        [
-                                                                            'style' => [
-                                                                                'left' => '50px',
-                                                                                'top' => '18px',
-                                                                                'color' => new JsExpression('(Highcharts.theme && Highcharts.theme.textColor) || "black"'),
-                                                                            ],
-                                                                        ],
-                                                                    ],
-                                                                ],
-                                                                'plotOptions'=> ['column'=>['stacking'=>'normal']],
-                                                                'tooltip'=>['headerFormat'=>'<b>{point.x}</b><br/>','pointFormat'=>'{series.name}: {point.y}<br/>Total: {point.stackTotal}'],
-                                                                'series' => [
-													              ['name' => 'Actual Fees', 'data' => $actualfees],
-													              ['name' => 'Discounts', 'data' => $discounts],
-													          
-													          ]
-                                                            ]
-                                                        ]);
-                                                        ?>
+    		<div id="divColumnChart" style="display: block">   
+                <?php
+                echo Highcharts::widget([
+                    'id' => 'labColumnChart',
+                    'scripts' => [
+                        'modules/exporting',
+                        'themes/grid-light',
+                    ],
+                'options' => [
+                    'chart' => [
+                        'type' => 'column',
+                    ],
+                    'title' => [
+                        'text' => 'Income Generated - '.$labtitle ,
+                    ],
+                    'xAxis' => [
+                        'title' => [
+                            'text' => 'Year'
+                        ],
+                        'categories' => ['January' , 'February', 'March', 'April', 'May','June', 'July', 'August', 'September', 'October','November', 'December'],
+                    ],
+                    'yAxis' => [
+                        'title' => [
+                            'text' => 'No of Firms'
+                        ],
+                        'stackLabels'=> ['enabled'=> true,]
+                    ],
+                    'labels' => [
+                        'items' => [
+                            [
+                                'style' => [
+                                    'left' => '50px',
+                                    'top' => '18px',
+                                    'color' => new JsExpression('(Highcharts.theme && Highcharts.theme.textColor) || "black"'),
+                                ],
+                            ],
+                        ],
+                    ],
+                    'plotOptions'=> ['column'=>['stacking'=>'normal']],
+                    'tooltip'=>['headerFormat'=>'<b>{point.x}</b><br/>','pointFormat'=>'{series.name}: {point.y}<br/>Total: {point.stackTotal}'],
+                    'series' => [
+                        ['type' => 'column','name' => 'Actual Fees', 'data' => $actualfees],
+                        ['type' => 'column','name' => 'Discounts', 'data' => $discounts],
+                        [
+                            'type' => 'spline',
+                            'name' => 'Income Trend',
+                            'data' => $income,
+                            'marker' => [
+                                'lineWidth' => 10,
+                                'lineColor' => new JsExpression('Highcharts.getOptions().colors[3]'),
+                                'fillColor' => 'green',
+                            ],
+                        ],
+                        [
+                            'type' => 'spline',
+                            'name' => 'Prediction',
+                            'data' => $prediction,
+                            'marker' => [
+                                'lineWidth' => 10,
+                                'lineColor' => new JsExpression('Highcharts.getOptions().colors[5]'),
+                                'fillColor' => 'white',
+                            ],
+                        ],
+
+                    ]
+                ]
+                ]);
+                ?>
        		</div>
     	</div>
 	</div>

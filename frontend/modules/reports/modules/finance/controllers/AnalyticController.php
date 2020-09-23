@@ -26,7 +26,7 @@ class AnalyticController extends \yii\web\Controller
     }
 
     public function actionIndex()
-    {
+    {       
         $session = Yii::$app->session;
         $session->set('hideMenu',true);
     	$reportform = new Reportform();
@@ -49,6 +49,9 @@ class AnalyticController extends \yii\web\Controller
         $factor_down =[];
 		$month = 0;
 		
+        $prediction = [];
+        $income = [];
+
 		while ( $month<= 11) {
 			if(isset($summary[$month])){
 				$actualfees[] = (int)$summary[$month]->actualfees;
@@ -70,6 +73,9 @@ class AnalyticController extends \yii\web\Controller
                 ->count();
                 // ->all();
 				$finalize[] = "green";
+
+                $income[] = (int)$summary[$month]->actualfees+(int)$summary[$month]->discount;
+                $prediction[] = null;
 			}
 			else{
 				$actualfees[] =0;
@@ -77,13 +83,15 @@ class AnalyticController extends \yii\web\Controller
                 $factor_up[]=null;
                 $factor_down[]=null;
 				$finalize[] = "red";
+                $prediction[] = 0;
+                $income[]=null;
 			}
 			$month ++;
 		}
         // var_dump($factor_up); exit;
 		$lab = Lab::findOne($labId);//get the lab profile
 
-		return $this->render('index',['actualfees'=>$actualfees,'discounts'=>$discounts,'finalize'=>$finalize,'labId' => $labId,'year' => $year,'reportform'=>$reportform,'labtitle'=>$lab->labname,'factor_up'=>$factor_up,'factor_down'=>$factor_down]);
+		return $this->render('index',['actualfees'=>$actualfees,'discounts'=>$discounts,'finalize'=>$finalize,'labId' => $labId,'year' => $year,'reportform'=>$reportform,'labtitle'=>$lab->labname,'factor_up'=>$factor_up,'factor_down'=>$factor_down,'prediction'=>$prediction,'income'=>$income]);
     }
 
 
