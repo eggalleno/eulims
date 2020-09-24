@@ -20,6 +20,8 @@ use frontend\modules\reports\modules\models\AccomplishmentRstl;
 use frontend\modules\reports\modules\models\AccomplishmentRstlRealtime;
 use frontend\modules\reports\modules\models\AccomplishmentOverall;
 use frontend\modules\reports\modules\models\AccomplishmentOverallRealtime;
+use common\models\lab\Reportsummary;
+
 class AccomplishmentController extends \yii\web\Controller
 {
 	/*
@@ -139,6 +141,42 @@ class AccomplishmentController extends \yii\web\Controller
                 'laboratories' => $this->listLaboratory(),
             ]);
         }
+    }
+
+    public function actionValidate($data){  
+        $data=json_decode($data);   
+        return $this->renderAjax('validate',['data'=>$data]);   
+    }   
+
+    public function actionSaveaccomplishment($data){    
+        $data=json_decode($data);   
+        // var_dump($); exit;   
+        $summary = new Reportsummary;   
+        $summary->rstl_id =Yii::$app->user->identity->profile->rstl_id; 
+        $summary->year =$data->year;    
+        // $summary->month =$data->month;   
+        // $date = 'July';  
+        $date = date('m', strtotime($data->month)); 
+        $summary->month =$date; 
+        $summary->request =$data->requests; 
+        $summary->sample =$data->samples;   
+        $summary->test =$data->analyses;    
+        $summary->actualfees =$data->fees;  
+        $summary->gratis =$data->gratis;    
+        $summary->discount =$data->discounts;   
+        $summary->gross =$data->gross;  
+        $summary->lab_id=$data->labid;  
+        if($summary->save(false)){  
+            // echo "saved"; exit;  
+            Yii::$app->session->setFlash('success', 'Accomplishment Successfully Added');   
+
+        }else{  
+            Yii::$app->session->setFlash('danger', 'Accomplishment Failed to Save!');   
+
+        }   
+
+        return $this->redirect(['/reports/lab/accomplishment/']);   
+
     }
 
     public function actionShows($monthyear,$type=null){
