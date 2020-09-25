@@ -145,8 +145,10 @@ $pdfFooter="{PAGENO}";
 						'header'=> 'Gratis',
 						'headerOptions' => ['class' => 'text-center'],
 			    		'contentOptions' => ['class' => 'text-center'],
-			    		'value' =>function($data){
-			    			return '0.00';
+			    		'value'=> function( $model ) use($year,$lab_id){
+			    			$monthyear = $year."-".$model->monthnum;
+			    			return $model->countTables($monthyear,$lab_id,'gratis');
+
 			    		},
 			    		'pageSummary'=>true,
         				'pageSummaryFunc'=>GridView::F_SUM,
@@ -173,7 +175,8 @@ $pdfFooter="{PAGENO}";
 			    		'value'=> function( $model ) use($year,$lab_id){
 							$monthyear = $year."-".$model->monthnum;
 							$discount = $model->countTables($monthyear,$lab_id,'discount');
-			    			return ($model->total + $discount);
+							$gratis = $model->countTables($monthyear,$lab_id,'gratis');
+			    			return ($model->total + $discount + $gratis);
 			    		},
 			    		'pageSummary'=>true,
         				'pageSummaryFunc'=>GridView::F_SUM,
