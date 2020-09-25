@@ -43,6 +43,7 @@ class AnalyticController extends \yii\web\Controller
     	$summary = Reportsummary::find()->where(['year'=> $year,'lab_id'=>$labId,'rstl_id'=>$rstlId])->all();
     	$actualfees = [];
     	$discounts = [];
+        $gratis = [];
     	$finalize = [];
     	$monthlyname =[];
         $factor_up = [];
@@ -56,6 +57,7 @@ class AnalyticController extends \yii\web\Controller
 			if(isset($summary[$month])){
 				$actualfees[] = (int)$summary[$month]->actualfees;
 				$discounts[] = (int)$summary[$month]->discount;
+                $gratis[]= (int)$summary[$month]->gratis;
 				$monthlyname[]  = $summary[$month]->year."-".$summary[$month]->month;
                 //get all the ; 
                 $factor_up[] = (int)Reportfactors::find()
@@ -75,23 +77,36 @@ class AnalyticController extends \yii\web\Controller
 				$finalize[] = "green";
 
                 $income[] = (int)$summary[$month]->actualfees+(int)$summary[$month]->discount;
-                $prediction[] = null;
+                // $prediction[] = null;
 			}
 			else{
 				$actualfees[] =0;
 				$discounts[] = 0;
+                $gratis[]=0;
                 $factor_up[]=null;
                 $factor_down[]=null;
 				$finalize[] = "red";
-                $prediction[] = 0;
                 $income[]=null;
 			}
+             //prediction  get the 10 year behoavior of the income as base
+                $avg = Reportsummary::find()
+                ->select(['request'=>'AVG(gross)'])
+                ->where(['lab_id'=>$labId,'rstl_id'=>$rstlId,'month'=>sprintf("%02d", ($month+1))])
+                ->limit(10)
+                ->groupBy(['lab_id'])
+                ->orderBy('year DESC')
+                ->all();
+            //adjust the base, according to the factors assigned
+
+                if($avg)
+                    $prediction[]=$avg[0]->request;
+                else
+                    $prediction[]=null;
 			$month ++;
 		}
-        // var_dump($factor_up); exit;
 		$lab = Lab::findOne($labId);//get the lab profile
 
-		return $this->render('index',['actualfees'=>$actualfees,'discounts'=>$discounts,'finalize'=>$finalize,'labId' => $labId,'year' => $year,'reportform'=>$reportform,'labtitle'=>$lab->labname,'factor_up'=>$factor_up,'factor_down'=>$factor_down,'prediction'=>$prediction,'income'=>$income]);
+		return $this->render('index',['actualfees'=>$actualfees,'discounts'=>$discounts,'gratis'=>$gratis,'finalize'=>$finalize,'labId' => $labId,'year' => $year,'reportform'=>$reportform,'labtitle'=>$lab->labname,'factor_up'=>$factor_up,'factor_down'=>$factor_down,'prediction'=>$prediction,'income'=>$income]);
     }
 
 
