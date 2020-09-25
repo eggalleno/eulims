@@ -92,6 +92,7 @@ class AnalyticController extends \yii\web\Controller
                 $avg = Reportsummary::find()
                 ->select(['request'=>'AVG(gross)'])
                 ->where(['lab_id'=>$labId,'rstl_id'=>$rstlId,'month'=>sprintf("%02d", ($month+1))])
+                ->andWhere(['<>', 'year', date('Y')])
                 ->limit(10)
                 ->groupBy(['lab_id'])
                 ->orderBy('year DESC')
