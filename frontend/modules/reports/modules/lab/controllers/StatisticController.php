@@ -80,8 +80,46 @@ class StatisticController extends Controller
 		}
 
         //return $this->render('index');
-	}
+    }
     
+
+    public function actionDaily(){
+
+        if (Yii::$app->request->post())
+		{
+			$lab = (int) Yii::$app->request->post('lab_id');
+			$date = Yii::$app->request->post('today');
+			
+		} else {
+            $lab = 1; $date =  date("Y-m-d");
+        }
+
+        $request = Requestextension::countTables($date,$lab,'request');
+        $samples = Requestextension::countTables($date,$lab,'samples');
+        $analysis = Requestextension::countTables($date,$lab,'analysisdaily');
+
+        if (Yii::$app->request->post())
+		{
+            $response = array(
+                "status" => 200,
+                "request" => $request,
+                "sample" => $samples,
+                "analysis" => $analysis
+            );
+   
+            return json_encode($response);
+        }else{ 
+            return $this->render('samples-daily', [
+                'lab' => $lab,
+                'request' => $request,
+                'sample' => $samples,
+                'analysis' => $analysis,
+                'date' => $date,
+                'laboratories' => $this->listLaboratory(),
+            ]);
+        }
+
+    }
 
     public function actionCustomers()
     {
