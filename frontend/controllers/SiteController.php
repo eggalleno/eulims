@@ -1163,16 +1163,13 @@ class SiteController extends Controller
         ->select([
             'samplename',
             'package_rate' => 'count(sampletype_id)',
-            
         ])
-        //->joinWith(['request' => function($query){ return $query;}])
         ->innerJoin('tbl_request', 'tbl_sample.request_id = tbl_request.request_id')
         ->where('year(tbl_request.request_datetime) = '.$year.'')->andWhere(['tbl_request.lab_id' => $lab])
         ->groupBy('sampletype_id')
         ->orderBy('package_rate DESC')
         ->limit(10);
         
-
         $dataProvider = new ActiveDataProvider([
             'query' => $modelRequest,
             'pagination' => false,
