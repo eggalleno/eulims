@@ -93,24 +93,27 @@ $this->registerJsFile("/js/finance/highcharts-more.js", [
                     'series' => [
                         ['type' => 'column','name' => 'Actual Fees', 'data' => $actualfees],
                         ['type' => 'column','name' => 'Discounts', 'data' => $discounts],
+                        ['type' => 'column','name' => 'Gratis', 'data' => $gratis],
+                        // [
+                        //     'type' => 'spline',
+                        //     'tooltip'=>['headerFormat'=>'<b>{point.x}</b><br/>','pointFormat'=>'{series.name}: {point.y}'],
+                        //     'name' => 'Income Trend',
+                        //     'data' => $income,
+                        //     'marker' => [
+                        //         'lineWidth' => 5,
+                        //         'lineColor' => 'green',
+                        //         'fillColor' => 'green', 
+                        //     ],
+                        // ],
                         [
                             'type' => 'spline',
-                            'name' => 'Income Trend',
-                            'data' => $income,
-                            'marker' => [
-                                'lineWidth' => 10,
-                                'lineColor' => new JsExpression('Highcharts.getOptions().colors[3]'),
-                                'fillColor' => 'green',
-                            ],
-                        ],
-                        [
-                            'type' => 'spline',
+                            'tooltip'=>['headerFormat'=>'<b>{point.x}</b><br/>','pointFormat'=>'{series.name}: {point.y}'],
                             'name' => 'Prediction',
                             'data' => $prediction,
                             'marker' => [
-                                'lineWidth' => 10,
-                                'lineColor' => new JsExpression('Highcharts.getOptions().colors[5]'),
-                                'fillColor' => 'white',
+                                'lineWidth' => 5,
+                                'lineColor' => 'red',
+                                'fillColor' => 'red',
                             ],
                         ],
 
@@ -157,12 +160,10 @@ $this->registerJsFile("/js/finance/highcharts-more.js", [
 
 
 <script type="text/javascript">
-	function OpenMonth(header,url,closebutton,width){
-   
+	function OpenMonth(header,url,closebutton,width){   
     $('#monthlyContent').html("<div style='text-align:center;'><img src='/images/img-loader64.gif' alt=''></div>");
     $('#monthlyContent').load(url);
 }
-
 
 jQuery(document).ready(function ($) {
     $('.btn-openFigures').click(function () {
