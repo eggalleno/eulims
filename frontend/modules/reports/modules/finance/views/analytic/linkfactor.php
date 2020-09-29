@@ -18,7 +18,7 @@ use yii\helpers\ArrayHelper;
             ])->label('Factor'); ?>
         <span class="input-group-btn" style="padding-top: 25.5px">
             
-        <button onclick="LoadModal('Link New Factor', '/reports/finance/analytic/createfactor?yearmonth=<?=$model->yearmonth?>');" class="btn btn-success" type="button" alt="New Factor"><i class="fa fa-plus"></i></button>
+        <button onclick="LoadModal('Link New Factor', '/reports/finance/analytic/createfactor?yearmonth=<?=$model->yearmonth?>&labid=<?=$lab_id?>');" class="btn btn-success" type="button" alt="New Factor"><i class="fa fa-plus"></i></button>
         </span>
     </div>
     <br>

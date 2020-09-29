@@ -12,6 +12,7 @@ use common\models\lab\Factors;
  * @property string $name
  * @property string $remarks
  * @property int $factor_id
+ * @property int $lab_id 
  */
 class Reportfactors extends \yii\db\ActiveRecord
 {
@@ -38,7 +39,7 @@ class Reportfactors extends \yii\db\ActiveRecord
     {
         return [
             [['yearmonth', 'factor_id','name'], 'required'],
-            [['factor_id'], 'integer'],
+            [['factor_id', 'lab_id'], 'integer'],
             [['yearmonth'], 'string', 'max' => 10],
             [['name'], 'string', 'max' => 50],
             [['remarks'], 'string', 'max' => 200],
@@ -57,6 +58,7 @@ class Reportfactors extends \yii\db\ActiveRecord
             'name' => 'Name',
             'remarks' => 'Remarks',
             'factor_id' => 'Factor ID',
+             'lab_id' => 'Lab ID', 
         ];
     }
 

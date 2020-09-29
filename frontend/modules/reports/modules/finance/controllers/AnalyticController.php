@@ -21,7 +21,7 @@ class AnalyticController extends \yii\web\Controller
     {
     	$exploded = explode("_", $data);
     	$rstlId = Yii::$app->user->identity->profile->rstl_id; //get the rstlid
-        $factors = Reportfactors::find()->with('factor')->where(['yearmonth'=>$exploded[0]])->all();//get the factors for this year
+        $factors = Reportfactors::find()->with('factor')->where(['yearmonth'=>$exploded[0],'lab_id'=>$exploded[1]])->all();//get the factors for this year
 
         $toguide = 0;
         $session = Yii::$app->session; 
@@ -74,14 +74,14 @@ class AnalyticController extends \yii\web\Controller
                 ->joinWith(['factor'=>function($query){
                     return $query->andWhere(['type'=>'1']);
                 }])
-                ->where(['yearmonth'=>$summary[$month]->year."-".$summary[$month]->month])
+                ->where(['yearmonth'=>$summary[$month]->year."-".$summary[$month]->month,'lab_id'=>$labId])
                 ->count();
                 // ->all();
                 $factor_down[] = (int)Reportfactors::find()
                 ->joinWith(['factor'=>function($query){
                     return $query->andWhere(['type'=>'0']);
                 }])
-                ->where(['yearmonth'=>$summary[$month]->year."-".$summary[$month]->month])
+                ->where(['yearmonth'=>$summary[$month]->year."-".$summary[$month]->month,'lab_id'=>$labId])
                 ->count();
                 // ->all();
 				$finalize[] = "green";
@@ -217,9 +217,10 @@ class AnalyticController extends \yii\web\Controller
     
     }
 
-    public function actionAddfactors($yearmonth){
+    public function actionAddfactors($yearmonth,$labid){
         $reportfactor = new Reportfactors;
         $reportfactor->yearmonth = $yearmonth;
+        $reportfactor->lab_id=$labid;
         $factors = Factors::find()->all();
 
         if ($reportfactor->load(Yii::$app->request->post())) {
@@ -231,12 +232,13 @@ class AnalyticController extends \yii\web\Controller
             return $this->redirect(['/reports/finance/analytic/']);
         }
 
-        return $this->renderAjax('linkfactor',['model'=>$reportfactor,'factors'=>$factors]);
+        return $this->renderAjax('linkfactor',['model'=>$reportfactor,'factors'=>$factors,'lab_id'=>$labid]);
     }
 
-    public function actionCreatefactor($yearmonth){
+    public function actionCreatefactor($yearmonth,$labid){
         $reportfactor = new Reportfactors;
         $reportfactor->yearmonth = $yearmonth;
+        $reportfactor->lab_id=$labid;
         $factor =  new Factors;
 
         if (($factor->load(Yii::$app->request->post()))&&($reportfactor->load(Yii::$app->request->post()))) {

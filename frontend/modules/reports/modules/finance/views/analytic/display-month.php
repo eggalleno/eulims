@@ -27,7 +27,7 @@ use yii\helpers\Html;
                     </div>
                 </div>
                 <div class="info-box" data-intro="You can add new factor by clicking this button">
-                    <span class="info-box-icon box-action-content bg-green bg-hover" id="btn_addfactor" data-url="<?= $yearmonth?>"><i class="fa fa-plus"></i></span>
+                    <span class="info-box-icon box-action-content bg-green bg-hover" id="btn_addfactor" data-url="<?= "yearmonth=".$yearmonth."&labid=".$lab_id ?>"><i class="fa fa-plus"></i></span>
                     <div class="info-box-content"><span class="info-box-text">Link A</span>
                         <span class="info-box-number">Factor</span>
                     </div>
@@ -111,7 +111,7 @@ jQuery(document).ready(function ($) {
 
     jQuery(document).ready(function ($) {
         $('#btn_addfactor').click(function () {
-            LoadModal("Choose a Factor","/reports/finance/analytic/addfactors?yearmonth="+(this).getAttribute("data-url"));
+            LoadModal("Choose a Factor","/reports/finance/analytic/addfactors?"+(this).getAttribute("data-url"));
         });
 
         setTimeout(function() {
