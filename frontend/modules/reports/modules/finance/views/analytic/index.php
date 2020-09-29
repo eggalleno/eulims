@@ -25,7 +25,7 @@ $this->registerJsFile("/js/finance/highcharts-more.js", [
 
 <div class="row">
 	<div class="col-xs-12 col-md-2">
-		<div class="box-header with-border bg-bigpanel">
+		<div id ="toremove3" class="box-header with-border bg-bigpanel" data-intro="You can search or change the laboratory using this search form">
 		    <?php $form = ActiveForm::begin(); ?>
 
 	        <?= $form->field($reportform, 'lab_id')->widget(Select2::classname(), [
@@ -50,7 +50,7 @@ $this->registerJsFile("/js/finance/highcharts-more.js", [
    	</div>
     <div class="col-xs-12 col-md-10">
     	<div class="box-header with-border bg-graphs">
-    		<div id="divColumnChart" style="display: block">   
+    		<div id="toremove1" style="display: block" data-intro="This panel shows Monthly Generated Income">   
                 <?php
                 echo Highcharts::widget([
                     'id' => 'labColumnChart',
@@ -127,16 +127,18 @@ $this->registerJsFile("/js/finance/highcharts-more.js", [
 	<div class="col-md-12">
         <div class="box">
             <!-- /.box-header -->
-            <div class="box-body">
+            <div class="box-body" id="toremove2" data-intro="Months with Green Color are validated by the Lab Managers while Red Ones are not! <br/> Thumbs Icon below are the factors for that month. <br/>Click a month to preview the summary">
                 <div>
                     <div class="carousel-inner">
-
-
                     	<?php
                     	$month = 0;
 						while ( $month<= 11) {
-							echo '<div class="col-md-1 col-sm-4 col-xs-12">';
-								echo '<a class="btn-openFigures" name="'.$year.'-'.sprintf("%02d", ($month+1)).'_'.$labId.'">';
+                            echo '<div class="col-md-1 col-sm-4 col-xs-12">';
+                                if($month==0)  
+								    echo '<a class="btn-openFigures" name="'.$year.'-'.sprintf("%02d", ($month+1)).'_'.$labId.'" id="btnjan">';
+                                else
+                                    echo '<a class="btn-openFigures" name="'.$year.'-'.sprintf("%02d", ($month+1)).'_'.$labId.'">';
+
 								echo '<div class="info-box bg-'.$finalize[0].'">';
 									echo '<span class="info-box-icon bg-entities bg-hover">';
 									echo date('M',strtotime($year."-".($month+1)."-01"));
@@ -167,9 +169,32 @@ $this->registerJsFile("/js/finance/highcharts-more.js", [
 
 jQuery(document).ready(function ($) {
     $('.btn-openFigures').click(function () {
-    	// alert("haha");
+        var toremove1 = document.getElementById('toremove1');
+        var toremove2 = document.getElementById('toremove2');
+        var toremove3 = document.getElementById('toremove3');
+
+        toremove1.removeAttribute("data-intro")
+        toremove2.removeAttribute("data-intro")
+        toremove3.removeAttribute("data-intro")
         OpenMonth("Monthly Report", "/reports/finance/analytic/displaymonth?data="+this.name,true,'600px');
     });
+
+    setTimeout(function() {
+        introJs().setOption('doneLabel', 'Click January').start().oncomplete(function() {
+        var toremove1 = document.getElementById('toremove1');
+        var toremove2 = document.getElementById('toremove2');
+        var toremove3 = document.getElementById('toremove3');
+
+        toremove1.removeAttribute("data-intro")
+        toremove2.removeAttribute("data-intro")
+        toremove3.removeAttribute("data-intro")
+
+        var x = document.getElementById("btnjan"); 
+        OpenMonth("Monthly Report", "/reports/finance/analytic/displaymonth?data="+x.name,true,'600px');
+          
+        });
+    }, 1000);
+
 
 });
 </script>

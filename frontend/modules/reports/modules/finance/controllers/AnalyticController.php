@@ -22,7 +22,17 @@ class AnalyticController extends \yii\web\Controller
     	$exploded = explode("_", $data);
     	$rstlId = Yii::$app->user->identity->profile->rstl_id; //get the rstlid
         $factors = Reportfactors::find()->with('factor')->where(['yearmonth'=>$exploded[0]])->all();//get the factors for this year
-        return $this->renderAjax('display-month',['yearmonth'=>$exploded[0],'lab_id'=>$exploded[1],'rstlId'=>$rstlId,'factors'=>$factors]);
+
+        $toguide = 0;
+        $session = Yii::$app->session; 
+        $session->get('firstload', 'yes');
+        if($session->get('firstload')){
+            $toguide=1;
+            $session->remove('firstload');
+        }
+
+
+        return $this->renderAjax('display-month',['yearmonth'=>$exploded[0],'lab_id'=>$exploded[1],'rstlId'=>$rstlId,'factors'=>$factors,'toguide'=>$toguide]);
     }
 
     public function actionIndex()
@@ -106,6 +116,9 @@ class AnalyticController extends \yii\web\Controller
 			$month ++;
 		}
 		$lab = Lab::findOne($labId);//get the lab profile
+
+        $session = Yii::$app->session; 
+        $session->set('firstload', 'yes');
 
 		return $this->render('index',['actualfees'=>$actualfees,'discounts'=>$discounts,'gratis'=>$gratis,'finalize'=>$finalize,'labId' => $labId,'year' => $year,'reportform'=>$reportform,'labtitle'=>$lab->labname,'factor_up'=>$factor_up,'factor_down'=>$factor_down,'prediction'=>$prediction,'income'=>$income]);
     }
