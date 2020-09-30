@@ -164,7 +164,7 @@ class ChatController extends Controller
         if ($model->load(Yii::$app->request->post())) {
 	
 			$userid=Yii::$app->user->id;
-			$recipientid=$model->reciever_userid;
+			$recipientid=$model->reciever_userid; //ibahin
 		
 			$arr = [$userid,$recipientid];
 			sort($arr);
@@ -251,9 +251,8 @@ class ChatController extends Controller
 	
 	public function Getallmessage(){
 		$query = Chat::find()
-                            ->select(['contact_id','message','sender_userid','reciever_userid', 'status_id'])
+                            ->select(['contact_id','message','sender_userid','status_id'])
                             ->andWhere(['or',
-                                ['reciever_userid'=>Yii::$app->user->id],
                                 ['sender_userid'=>Yii::$app->user->id]
                             ])
 							->groupBy('contact_id')
@@ -266,10 +265,9 @@ class ChatController extends Controller
     }
     public function actionGetSearchMessage($id){
         $query = Chat::find()
-            ->select(['contact_id','message','sender_userid','reciever_userid', 'status_id'])
+            ->select(['contact_id','message','sender_userid','status_id'])
             ->andWhere(['or',
                 ['like', 'message', $id. '%', false],
-                ['reciever_userid'=>Yii::$app->user->id],
                 ['sender_userid'=>Yii::$app->user->id]
             ])
             ->limit(6)
@@ -286,7 +284,6 @@ class ChatController extends Controller
 	public function actionGetsendermessage($id)
     {
 		$query = Chat::find()
-		//->where(['reciever_userid' => Yii::$app->user->id, 'sender_userid' => $id])
 							->andWhere(['or',
 								   ['contact_id'=>$id]
 							   ])
@@ -305,7 +302,6 @@ class ChatController extends Controller
     public function actionGetGCmessage($gcid, $id)
     {
         $query = Chat::find()
-            //->where(['reciever_userid' => Yii::$app->user->id, 'sender_userid' => $id])
             ->andWhere(['or',
                 ['group_id'=>$gcid]
             ])
@@ -326,7 +322,7 @@ class ChatController extends Controller
     {
 		$model = new Chat();
 		$model->sender_userid= Yii::$app->profile->id;
-		$model->reciever_userid= $senderid; //
+		//$model->reciever_userid= $senderid; //
 		$model->status_id=1;//sent
         $arr = [Yii::$app->user->id,$senderid];
         sort($arr);

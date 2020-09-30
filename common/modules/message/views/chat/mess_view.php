@@ -15,16 +15,18 @@ use yii\widgets\DetailView;
 $id="";
 $name="";
 $receiver="";
-if($model->sender_userid == Yii::$app->user->id){
-	$id=$model->reciever_userid;
-	$receiver=$model->sender_userid;
-	$name=($model->getProfile($model->reciever_userid)->fullname);
+/*if($model->sender_userid == Yii::$app->user->id){
+	//$id=$model->reciever_userid;
+	//$receiver=$model->sender_userid;
+	//$name=($model->getProfile($model->reciever_userid)->fullname);
+	$name="Later ko na isipin";
 }
 else{
 	$id=$model->sender_userid;
 	$receiver=$model->reciever_userid;
     $name=($model->getProfile($model->sender_userid)->fullname);
-}
+} */
+
 ?>
 <script type="text/javascript">
    /* $(document).ready(function(){
