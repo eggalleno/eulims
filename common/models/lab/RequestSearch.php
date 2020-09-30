@@ -20,8 +20,8 @@ class RequestSearch extends exRequest
     public function rules()
     {
         return [
-            [['request_id', 'request_datetime', 'rstl_id', 'lab_id', 'customer_id', 'payment_type_id', 'discount_id', 'purpose_id', 'created_at', 'posted', 'status_id','request_type_id'], 'integer'],
-            [['request_ref_num', 'report_due', 'conforme', 'receivedBy'], 'safe'],
+            [['request_id', 'rstl_id', 'lab_id', 'customer_id', 'payment_type_id', 'discount_id', 'purpose_id', 'created_at', 'posted', 'status_id','request_type_id'], 'integer'],
+            [['request_datetime', 'request_ref_num', 'report_due', 'conforme', 'receivedBy'], 'safe'],
             [['modeofrelease_ids', 'receivedBy'], 'string', 'max' => 50],
             [['discount', 'total'], 'number'],
         ];
@@ -51,7 +51,7 @@ class RequestSearch extends exRequest
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
             //'sort'=> ['defaultOrder' => ['request_datetime'=>SORT_DESC]]
-            'sort'=> ['defaultOrder' => ['request_id'=>SORT_DESC]]
+            'sort'=> ['defaultOrder' => ['request_datetime'=>SORT_DESC]]
         ]);
 
         $this->load($params);
@@ -69,7 +69,6 @@ class RequestSearch extends exRequest
         // grid filtering conditions
         $query->andFilterWhere([
             'request_id' => $this->request_id,
-            'request_datetime' => $this->request_datetime,
             'rstl_id' => Yii::$app->user->identity->profile->rstl_id,
             'lab_id' => $this->lab_id,
             'customer_id' => $this->customer_id,
@@ -88,7 +87,8 @@ class RequestSearch extends exRequest
 
         $query->andFilterWhere(['like','request_ref_num', $this->request_ref_num])
             ->andFilterWhere(['like', 'conforme', $this->conforme])
-            ->andFilterWhere(['like', 'receivedBy', $this->receivedBy]);
+            ->andFilterWhere(['like', 'receivedBy', $this->receivedBy])
+            ->andFilterWhere(['like', 'request_datetime', $this->request_datetime]);
 
         //get the roles of the current logged in user
         $roles = \Yii::$app->authManager->getRolesByUser(\Yii::$app->user->id);

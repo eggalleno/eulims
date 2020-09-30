@@ -38,6 +38,20 @@ foreach ($roles as $role) {
         $Button="{view}{update}{delete}";
 
 }
+
+$js=<<<JS
+
+    $(document).on('pjax:complete', function() {
+        $('#requestsearch-request_datetime').kvDatepicker({
+            format : 'yyyy-mm-dd',
+            autoclose : true,
+            allowClear : true
+        });
+    });
+JS;
+
+$this->registerJs($js,\yii\web\View::POS_READY);
+
 ?>
 
 <div class="request-index">
@@ -50,7 +64,8 @@ foreach ($roles as $role) {
             <span class="badge btn-danger">Urgent Action Needed</span>
         </div>
     </fieldset>
-    <?= GridView::widget([
+    <?php 
+    echo  GridView::widget([
         'dataProvider' => $dataProvider,
         'id'=>'RequestGrid',
         'filterModel' => $searchModel,
@@ -72,6 +87,7 @@ foreach ($roles as $role) {
             'options' => [
                     'enablePushState' => false,
               ],
+              
         ],
         'rowOptions' => function($model){
             $stats = Status::findOne($model->status_id);
@@ -112,15 +128,14 @@ foreach ($roles as $role) {
                     return ($model->request_type_id == 2 && $model->request_datetime == '0000-00-00 00:00:00') ? null : date('d/m/Y H:i:s',strtotime($model->request_datetime));
                 },
                 'filter'=>DatePicker::widget([
+                    'attribute'=>'request_datetime',
                     'model' => $searchModel,
-                    'attribute' => 'request_datetime',
-                    'value' => date('d-M-Y', strtotime('+2 days')),
-                    'options' => ['placeholder' => 'Select date ...'],
+                    'type' => DatePicker::TYPE_INPUT,
                     'pluginOptions' => [
                         'format' => 'yyyy-mm-dd',
-                        'todayHighlight' => true
-                    ],
-                    //'contentOptions' => ['style' => 'width: 20%;word-wrap: break-word;white-space:pre-line;'],
+                        'autoclose'=>true,
+                        'allowClear' => true
+                    ]
                 ]),
             ],
             [
@@ -288,5 +303,6 @@ foreach ($roles as $role) {
                 ],
             ],
         ],
-]); ?>
+]); 
+?>
 </div>

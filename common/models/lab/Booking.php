@@ -9,6 +9,8 @@ use yii\db\Query;
 use common\models\lab\CustomerBooking;
 use common\models\lab\Modeofrelease;
 use common\models\lab\Purpose;
+use common\models\lab\Sampletype;
+
 /**
  * This is the model class for table "tbl_booking".
  *
@@ -24,6 +26,7 @@ use common\models\lab\Purpose;
  */
 class Booking extends \yii\db\ActiveRecord
 {
+    public $mypurpose;
 	public $captcha;
     /**
      * {@inheritdoc}
@@ -102,11 +105,15 @@ class Booking extends \yii\db\ActiveRecord
     }
     public function getModeofrelease()
     {
-        return $this->hasOne(Modeofrelease::className(), ['modeofrelease_id' => 'modeofrelease_id']);
+        return $this->hasOne(Modeofrelease::className(), ['modeofrelease_id' => 'modeofrelease_ids']);
     }
 
     public function getPurpose(){
-        return $this->hasOne(Purpose::className(), ['purpose' => 'purpose_id']);
+        return $this->hasOne(Purpose::className(), ['purpose_id' => 'purpose']);
+    }
+
+    public function getSampletype(){
+        return $this->hasOne(Sampletype::className(),['sampletype_id' => 'sampletype_id']);
     }
 
 

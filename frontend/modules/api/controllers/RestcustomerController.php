@@ -88,6 +88,13 @@ class RestcustomerController extends \yii\rest\Controller
                         'email'=>$customer->email,
                         'fullname' => $customer->customer_name,
                         'type' => "customer",
+                        'address' => $customer->address,
+                        'tel' => $customer->tel,
+                        'customerid' => $customer->customer_id,
+                        'rstld' => $customer->rstl_id,
+                        'nature' => $customer->businessNature?$customer->businessNature->nature:"none",
+                        'typeindustry' => $customer->industrytype?$customer->industrytype->industry:"none",
+                        'typecustomer' => $customer->customerType?$customer->customerType->type:"none",
                     ]);  
             } else {
                 //check if the user account is not activated
@@ -305,6 +312,26 @@ class RestcustomerController extends \yii\rest\Controller
 
     public function actionGetbookings(){
         $my_var = Booking::find()->where(['customer_id'=>$this->getuserid()])->orderby('scheduled_date DESC')->all();
+        return $this->asJson(
+            $my_var
+        );
+    }
+
+    public function actionGetbookingdetails(){
+        $purposeqry = Purpose::find()->select(['purpose_id','name','active'])->where(['active'=>1])->orderBy('name ASC')->all();
+        $modeofreleaseqry = Modeofrelease::find()->select(['modeofrelease_id','mode','status'])->where(['status'=>1])->orderBy('mode ASC')->all();
+
+         $my_var = Booking::find()
+         ->select(['booking_id','scheduled_date','booking_reference', 'description', 'rstl_id', 'date_created', 'qty_sample', 'customer_id', 'booking_status', 'samplename', 'reason','modeofrelease_ids'=> 'tbl_modeofrelease.mode', 'purpose'=>'tbl_purpose.name', 'sampletype_id' =>'tbl_sampletype.type'])
+         ->where(['customer_id'=>$this->getuserid()])
+         ->joinWith(['modeofrelease'])
+         ->joinWith(['purpose'])
+         ->joinWith(['sampletype'])
+         ->orderby('scheduled_date DESC')
+         ->all();
+
+         // var_dump($my_var); exit;
+
         return $this->asJson(
             $my_var
         );

@@ -56,6 +56,16 @@ if($TotalMsg==0){
     $TotalMsg='';
 }
 $GLOBALS['rstl_id']= 11;
+
+
+
+//added the intro js and css
+$this->registerCssFile("/css/introjs.css", [
+], 'css-intro');
+
+
+$this->registerJsFile("/js/intro.js", [
+], 'js-intro');
 ?>
 
 <header class="main-header">

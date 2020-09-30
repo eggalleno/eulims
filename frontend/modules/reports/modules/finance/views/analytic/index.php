@@ -19,15 +19,13 @@ $this->registerJsFile("/js/finance/highcharts.js", [
 
 $this->registerJsFile("/js/finance/highcharts-more.js", [
 ], 'js-highcharts-more');
-
-
 ?>
 
 
 
 <div class="row">
 	<div class="col-xs-12 col-md-2">
-		<div class="box-header with-border bg-bigpanel">
+		<div id ="toremove3" class="box-header with-border bg-bigpanel" data-intro="You can search or change the laboratory using this search form">
 		    <?php $form = ActiveForm::begin(); ?>
 
 	        <?= $form->field($reportform, 'lab_id')->widget(Select2::classname(), [
@@ -49,197 +47,110 @@ $this->registerJsFile("/js/finance/highcharts-more.js", [
 
 			<?php ActiveForm::end(); ?>
 		</div>
-
-		<div class="info-box">
-            <span class="info-box-icon box-action-content bg-green bg-hover" id="btn_createfactor"><i class="fa fa-plus"></i></span>
-            <div class="info-box-content"><span class="info-box-text">Create New</span>
-                <span class="info-box-number">Factor</span>
-            </div>
-        </div>
    	</div>
     <div class="col-xs-12 col-md-10">
     	<div class="box-header with-border bg-graphs">
-    		<div id="divColumnChart" style="display: block">
-                                                        <?php
-                                                        echo Highcharts::widget([
-                                                            'id' => 'labColumnChart',
-                                                            'scripts' => [
-                                                                'modules/exporting',
-                                                                'themes/grid-light',
-                                                            ],
-                                                            'options' => [
-                                                            	'chart' => [
-                                                                        'type' => 'column',
-                                                                    ],
-                                                                'title' => [
-                                                                    'text' => 'Income Generated - '.$labtitle ,
-                                                                ],
-                                                                'xAxis' => [
-                                                                    'title' => [
-                                                                        'text' => 'Year'
-                                                                    ],
-                                                                    'categories' => ['January' , 'February', 'March', 'April', 'May','June', 'July', 'August', 'September', 'October','November', 'December'],
-                                                                ],
-                                                                'yAxis' => [
-                                                                    'title' => [
-                                                                        'text' => 'No of Firms'
-                                                                    ],
-                                                                    'stackLabels'=> ['enabled'=> true,]
-                                                                ],
-                                                                'labels' => [
-                                                                    'items' => [
-                                                                        [
-                                                                            'style' => [
-                                                                                'left' => '50px',
-                                                                                'top' => '18px',
-                                                                                'color' => new JsExpression('(Highcharts.theme && Highcharts.theme.textColor) || "black"'),
-                                                                            ],
-                                                                        ],
-                                                                    ],
-                                                                ],
-                                                                'plotOptions'=> ['column'=>['stacking'=>'normal']],
-                                                                'tooltip'=>['headerFormat'=>'<b>{point.x}</b><br/>','pointFormat'=>'{series.name}: {point.y}<br/>Total: {point.stackTotal}'],
-                                                                'series' => [
-													              ['name' => 'Actual Fees', 'data' => $actualfees],
-													              ['name' => 'Discounts', 'data' => $discounts],
-													          
-													          ]
-                                                            ]
-                                                        ]);
-                                                        ?>
+    		<div id="toremove1" style="display: block" data-intro="This panel shows Monthly Generated Income">   
+                <?php
+                echo Highcharts::widget([
+                    'id' => 'labColumnChart',
+                    'scripts' => [
+                        'modules/exporting',
+                        'themes/grid-light',
+                    ],
+                'options' => [
+                    'chart' => [
+                        'type' => 'column',
+                    ],
+                    'title' => [
+                        'text' => 'Income Generated - '.$labtitle ,
+                    ],
+                    'xAxis' => [
+                        'title' => [
+                            'text' => 'Year'
+                        ],
+                        'categories' => ['January' , 'February', 'March', 'April', 'May','June', 'July', 'August', 'September', 'October','November', 'December'],
+                    ],
+                    'yAxis' => [
+                        'title' => [
+                            'text' => 'No of Firms'
+                        ],
+                        'stackLabels'=> ['enabled'=> true,]
+                    ],
+                    'labels' => [
+                        'items' => [
+                            [
+                                'style' => [
+                                    'left' => '50px',
+                                    'top' => '18px',
+                                    'color' => new JsExpression('(Highcharts.theme && Highcharts.theme.textColor) || "black"'),
+                                ],
+                            ],
+                        ],
+                    ],
+                    'plotOptions'=> ['column'=>['stacking'=>'normal']],
+                    'tooltip'=>['headerFormat'=>'<b>{point.x}</b><br/>','pointFormat'=>'{series.name}: {point.y}<br/>Total: {point.stackTotal}'],
+                    'series' => [
+                        ['type' => 'column','name' => 'Actual Fees', 'data' => $actualfees],
+                        ['type' => 'column','name' => 'Discounts', 'data' => $discounts],
+                        ['type' => 'column','name' => 'Gratis', 'data' => $gratis],
+                        // [
+                        //     'type' => 'spline',
+                        //     'tooltip'=>['headerFormat'=>'<b>{point.x}</b><br/>','pointFormat'=>'{series.name}: {point.y}'],
+                        //     'name' => 'Income Trend',
+                        //     'data' => $income,
+                        //     'marker' => [
+                        //         'lineWidth' => 5,
+                        //         'lineColor' => 'green',
+                        //         'fillColor' => 'green', 
+                        //     ],
+                        // ],
+                        [
+                            'type' => 'spline',
+                            'tooltip'=>['headerFormat'=>'<b>{point.x}</b><br/>','pointFormat'=>'{series.name}: {point.y}'],
+                            'name' => 'Prediction',
+                            'data' => $prediction,
+                            'marker' => [
+                                'lineWidth' => 5,
+                                'lineColor' => 'red',
+                                'fillColor' => 'red',
+                            ],
+                        ],
+
+                    ]
+                ]
+                ]);
+                ?>
        		</div>
     	</div>
 	</div>
 	<div class="col-md-12">
         <div class="box">
-            
             <!-- /.box-header -->
-            <div class="box-body">
-
-
+            <div class="box-body" id="toremove2" data-intro="Months with Green Color are validated by the Lab Managers while Red Ones are not! <br/> Thumbs Icon below are the factors for that month. <br/>Click a month to preview the summary">
                 <div>
-                    
-
                     <div class="carousel-inner">
-                    	<div class="col-md-1 col-sm-4 col-xs-12">
-                    		<a class="btn-openFigures" name="<?= $year.'-01_'.$labId?>">
-                    			<div class="info-box bg-<?= $finalize[0]?>">
-                    				<span class="info-box-icon bg-entities bg-hover" >
-                    				Jan 
-	                    			</span>
-							        <!-- <span class="info-box-number"><a href="#" style="color:white;font-size:25px;" >12345</a></span> -->
-	                    		</div>
-	                    	</a>
-	                    </div>
+                    	<?php
+                    	$month = 0;
+						while ( $month<= 11) {
+                            echo '<div class="col-md-1 col-sm-4 col-xs-12">';
+                                if($month==0)  
+								    echo '<a class="btn-openFigures" name="'.$year.'-'.sprintf("%02d", ($month+1)).'_'.$labId.'" id="btnjan">';
+                                else
+                                    echo '<a class="btn-openFigures" name="'.$year.'-'.sprintf("%02d", ($month+1)).'_'.$labId.'">';
 
-	                    <div class="col-md-1 col-sm-4 col-xs-12">
-                    		<a class="btn-openFigures" name="<?= $year.'-02_'.$labId?>">
-                    			<div class="info-box bg-<?= $finalize[1]?>">
-	                    			<span class="info-box-icon bg-entities bg-hover">Feb</span>
-						        	<div class="info-box-content"><span class="info-box-text"></span>
-							    	</div>
-	                    		</div>
-	                    	</a>
-	                    </div>
-
-                    	<div class="col-md-1 col-sm-4 col-xs-12">
-                    		<a class="btn-openFigures" name="<?= $year.'-03_'.$labId?>">
-                    			<div class="info-box bg-<?= $finalize[2]?>">
-	                    			<span class="info-box-icon bg-entities bg-hover">Mar</span>
-						        	<div class="info-box-content"><span class="info-box-text"></span>
-							    	</div>
-	                    		</div>
-	                    	</a>
-	                    </div>
-	                   
-	                    <div class="col-md-1 col-sm-4 col-xs-12">
-	                    	<a class="btn-openFigures" name="<?= $year.'-04_'.$labId?>">
-	                    		<div class="info-box bg-<?= $finalize[3]?>">
-		                    		<span class="info-box-icon bg-entities bg-hover">Apr</span>
-							        <div class="info-box-content"><span class="info-box-text"></span>
-								    </div>
-		                    	</div>
-		                    </a>
-	                    </div>
-	                    
-	                    <div class="col-md-1 col-sm-4 col-xs-12">
-	                    	<a class="btn-openFigures" name="<?= $year.'-05_'.$labId?>">
-	                    		<div class="info-box bg-<?= $finalize[4]?>">
-		                    		<span class="info-box-icon bg-entities bg-hover">May</span>
-							        <div class="info-box-content"><span class="info-box-text"></span>
-								    </div>
-		                    	</div>
-		                    </a>
-	                    </div>
-	                   
-	                    <div class="col-md-1 col-sm-4 col-xs-12">
-	                    	<a class="btn-openFigures" name="<?= $year.'-06_'.$labId?>">
-	                    		<div class="info-box bg-<?= $finalize[5]?>">
-		                    		<span class="info-box-icon bg-entities bg-hover">Jun</span>
-							        <div class="info-box-content"><span class="info-box-text"></span>
-								    </div>
-		                    	</div>
-		                    </a>
-	                    </div>
-
-                    	<div class="col-md-1 col-sm-4 col-xs-12">
-                    		<a class="btn-openFigures" name="<?= $year.'-07_'.$labId?>">
-	                    		<div class="info-box bg-<?= $finalize[6]?>">
-		                    		<span class="info-box-icon bg-entities bg-hover">Jul</span>
-							        <div class="info-box-content"><span class="info-box-text"></span>
-								    </div>
-		                    	</div>
-		                    </a>
-	                    </div>
-	                   
-	                    <div class="col-md-1 col-sm-4 col-xs-12">
-	                    	<a class="btn-openFigures" name="<?= $year.'-08_'.$labId?>">
-	                    		<div class="info-box bg-<?= $finalize[7]?>">
-		                    		<span class="info-box-icon bg-entities bg-hover">Aug</span>
-							        <div class="info-box-content"><span class="info-box-text"></span>
-								    </div>
-		                    	</div>
-		                    </a>
-	                    </div>
-	                    <div class="col-md-1 col-sm-4 col-xs-12">
-	                    	<a class="btn-openFigures" name="<?= $year.'-09_'.$labId?>">
-	                    		<div class="info-box bg-<?= $finalize[8]?>">
-		                    		<span class="info-box-icon bg-entities bg-hover">Sep</span>
-							        <div class="info-box-content"><span class="info-box-text"></span>
-								    </div>
-		                    	</div>
-		                    </a>
-	                    </div>
-	                   
-	                    <div class="col-md-1 col-sm-4 col-xs-12">
-	                    	<a class="btn-openFigures" name="<?= $year.'-10_'.$labId?>">
-	                    		<div class="info-box bg-<?= $finalize[9]?>">
-		                    		<span class="info-box-icon bg-entities bg-hover">Oct</span>
-							        <div class="info-box-content"><span class="info-box-text"></span>
-								    </div>
-		                    	</div>
-		                    </a>
-	                    </div>
-
-                    	<div class="col-md-1 col-sm-4 col-xs-12">
-                    		<a class="btn-openFigures" name="<?= $year.'-11_'.$labId?>">
-	                    		<div class="info-box bg-<?= $finalize[10]?>">
-		                    		<span class="info-box-icon bg-entities bg-hover">Nov</span>
-							        <div class="info-box-content"><span class="info-box-text"></span>
-								    </div>
-		                    	</div>
-		                    </a>
-	                    </div>
-	                   
-	                    <div class="col-md-1 col-sm-4 col-xs-12">
-	                    	<a class="btn-openFigures" name="<?= $year.'-12_'.$labId?>">
-	                    		<div class="info-box bg-<?= $finalize[11]?>">
-		                    		<span class="info-box-icon bg-entities bg-hover">Dec</span>
-							        <div class="info-box-content"><span class="info-box-text"></span>
-								    </div>
-		                    	</div>
-		                    </a>
-	                    </div>
+								echo '<div class="info-box bg-'.$finalize[0].'">';
+									echo '<span class="info-box-icon bg-entities bg-hover">';
+									echo date('M',strtotime($year."-".($month+1)."-01"));
+									echo '</span>';
+								echo '</div>';
+								echo '</a>';
+								thumbsupsummary($factor_up[$month]);
+								thumbsdownsummary($factor_down[$month]);
+							echo '</div>';
+							$month++;
+						}
+                    	?>
 	                </div>
 	            </div>
 	        </div>
@@ -251,18 +162,61 @@ $this->registerJsFile("/js/finance/highcharts-more.js", [
 
 
 <script type="text/javascript">
-	function OpenMonth(header,url,closebutton,width){
-   
+	function OpenMonth(header,url,closebutton,width){   
     $('#monthlyContent').html("<div style='text-align:center;'><img src='/images/img-loader64.gif' alt=''></div>");
     $('#monthlyContent').load(url);
 }
 
-
 jQuery(document).ready(function ($) {
     $('.btn-openFigures').click(function () {
-    	// alert("haha");
+        var toremove1 = document.getElementById('toremove1');
+        var toremove2 = document.getElementById('toremove2');
+        var toremove3 = document.getElementById('toremove3');
+
+        toremove1.removeAttribute("data-intro")
+        toremove2.removeAttribute("data-intro")
+        toremove3.removeAttribute("data-intro")
         OpenMonth("Monthly Report", "/reports/finance/analytic/displaymonth?data="+this.name,true,'600px');
     });
 
+    setTimeout(function() {
+        introJs().setOption('doneLabel', 'Click January').start().oncomplete(function() {
+        var toremove1 = document.getElementById('toremove1');
+        var toremove2 = document.getElementById('toremove2');
+        var toremove3 = document.getElementById('toremove3');
+
+        toremove1.removeAttribute("data-intro")
+        toremove2.removeAttribute("data-intro")
+        toremove3.removeAttribute("data-intro")
+
+        var x = document.getElementById("btnjan"); 
+        OpenMonth("Monthly Report", "/reports/finance/analytic/displaymonth?data="+x.name,true,'600px');
+          
+        });
+    }, 1000);
+
+
 });
 </script>
+
+<?php 
+
+function thumbsupsummary($data){
+	$i = 0;
+	while ($i < $data) {
+		echo '<i class="fa fa-thumbs-up" style="color:green"></i>';	
+		$i++;
+	}
+	return;
+}
+
+function thumbsdownsummary($data){
+	$i = 0;
+	while ($i < $data) {
+		echo '<i class="fa fa-thumbs-down" style="color:red"></i>';	
+		$i++;
+	}
+	return;
+}
+
+?>

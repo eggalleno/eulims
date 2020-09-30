@@ -3,14 +3,16 @@
 namespace common\models\lab;
 
 use Yii;
-
+use common\models\lab\Factors;
 /**
  * This is the model class for table "tbl_reportfactors".
  *
  * @property int $accompfactor_id
- * @property int $yearmonth
+ * @property string $yearmonth
  * @property string $name
  * @property string $remarks
+ * @property int $factor_id
+ * @property int $lab_id 
  */
 class Reportfactors extends \yii\db\ActiveRecord
 {
@@ -36,10 +38,12 @@ class Reportfactors extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['yearmonth','name'], 'required'],
-            [['yearmonth'], 'integer'],
+            [['yearmonth', 'factor_id','name'], 'required'],
+            [['factor_id', 'lab_id'], 'integer'],
+            [['yearmonth'], 'string', 'max' => 10],
             [['name'], 'string', 'max' => 50],
             [['remarks'], 'string', 'max' => 200],
+            [['factor_id'], 'exist', 'skipOnError' => true, 'targetClass' => Factors::className(), 'targetAttribute' => ['factor_id' => 'factor_id']],
         ];
     }
 
@@ -50,9 +54,16 @@ class Reportfactors extends \yii\db\ActiveRecord
     {
         return [
             'accompfactor_id' => 'Accompfactor ID',
-            'yearmonth' => 'Year and Month',
+            'yearmonth' => 'Yearmonth',
             'name' => 'Name',
             'remarks' => 'Remarks',
+            'factor_id' => 'Factor ID',
+             'lab_id' => 'Lab ID', 
         ];
+    }
+
+    public function getFactor()
+    {
+        return $this->hasOne(Factors::className(), ['factor_id' => 'factor_id']);
     }
 }

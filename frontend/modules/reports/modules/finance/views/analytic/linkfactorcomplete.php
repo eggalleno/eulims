@@ -4,24 +4,23 @@ use yii\helpers\Html;
 use kartik\widgets\Select2;
 use yii\helpers\ArrayHelper;
 
+
 ?>
 <div class="box-header modal-white">
     <?php $form = ActiveForm::begin(); ?>
     <div class="input-group">
-        <?= $form->field($model, 'factor_id')->widget(Select2::classname(), [
-                'data' => ArrayHelper::map($factors,'factor_id','title'),
+
+        <?= $form->field($factor, 'title')->label('Factor Name'); ?>
+        <?= $form->field($factor, 'type')->widget(Select2::classname(), [
+                'data' => ['0'=>'Negative','1'=>'Positive'],
                 'language' => 'en',
-                'options' => ['placeholder' => 'Select Factor','readonly'=>'readonly'],
+                'options' => ['placeholder' => 'Select Effect'],
                 'pluginOptions' => [
                     'allowClear' => false
                 ]
-            ])->label('Factor'); ?>
-        <span class="input-group-btn" style="padding-top: 25.5px">
-            
-        <button onclick="LoadModal('Link New Factor', '/reports/finance/analytic/createfactor?yearmonth=<?=$model->yearmonth?>&labid=<?=$lab_id?>');" class="btn btn-success" type="button" alt="New Factor"><i class="fa fa-plus"></i></button>
-        </span>
+            ])->label('Factor Effect'); ?>
     </div>
-    <br>
+    
     <div class="input-group col-md-12">
         <?= $form->field($model, 'name')->label('Target'); ?>
     </div>

@@ -7,7 +7,7 @@ use yii\web\Controller;
 use common\models\lab\Sample;
 use common\models\lab\SampleSearch;
 use common\models\lab\Request;
-use frontend\modules\reports\modules\models\Requestextend;
+use frontend\modules\reports\modules\models\Requestextension;
 use common\models\lab\Lab;
 use yii\web\NotFoundHttpException;
 use yii\helpers\ArrayHelper;
@@ -37,7 +37,8 @@ class AccomplishmentController extends \yii\web\Controller
 
     public function actionIndex()
     {
-    	$model = new Requestextend;
+        set_time_limit(0);
+        $model = new Requestextension;
     	$rstlId = Yii::$app->user->identity->profile->rstl_id;
     	
 		if (Yii::$app->request->get())
@@ -50,7 +51,7 @@ class AccomplishmentController extends \yii\web\Controller
 			$year = date('Y'); //current year
 		}
 
-		$modelRequest = Requestextend::find()
+		$modelRequest = Requestextension::find()
 		->select([
 			'monthnum'=>'DATE_FORMAT(`request_datetime`, "%m")',
 			'month'=>'DATE_FORMAT(`request_datetime`, "%M")',
@@ -62,9 +63,7 @@ class AccomplishmentController extends \yii\web\Controller
 		->groupBy(['DATE_FORMAT(request_datetime, "%Y-%m")'])
 		->orderBy('request_datetime ASC');
 
-
-	
-		// var_dump($modelRequest); exit;
+         
 		$dataProvider = new ActiveDataProvider([
             'query' => $modelRequest,
             'pagination' => false,
@@ -87,8 +86,6 @@ class AccomplishmentController extends \yii\web\Controller
 	            'laboratories' => $this->listLaboratory(),
 	        ]);
 		}
-
-        //return $this->render('index');
 	}
 
     public function actionFirms(){
@@ -146,39 +143,39 @@ class AccomplishmentController extends \yii\web\Controller
         }
     }
 
-    public function actionValidate($data){
-        $data=json_decode($data);
-        return $this->renderAjax('validate',['data'=>$data]);
-    }
+    public function actionValidate($data){  
+        $data=json_decode($data);   
+        return $this->renderAjax('validate',['data'=>$data]);   
+    }   
 
-    public function actionSaveaccomplishment($data){
-        $data=json_decode($data);
-        // var_dump($); exit;
-        $summary = new Reportsummary;
-        $summary->rstl_id =Yii::$app->user->identity->profile->rstl_id;
-        $summary->year =$data->year;
-        // $summary->month =$data->month;
-        // $date = 'July';
-        $date = date('m', strtotime($data->month));
-        $summary->month =$date;
-        $summary->request =$data->requests;
-        $summary->sample =$data->samples;
-        $summary->test =$data->analyses;
-        $summary->actualfees =$data->fees;
-        $summary->gratis =$data->gratis;
-        $summary->discount =$data->discounts;
-        $summary->gross =$data->gross;
-        $summary->lab_id=$data->labid;
-        if($summary->save(false)){
-            // echo "saved"; exit;
-            Yii::$app->session->setFlash('success', 'Accomplishment Successfully Added');
+    public function actionSaveaccomplishment($data){    
+        $data=json_decode($data);   
+        // var_dump($); exit;   
+        $summary = new Reportsummary;   
+        $summary->rstl_id =Yii::$app->user->identity->profile->rstl_id; 
+        $summary->year =$data->year;    
+        // $summary->month =$data->month;   
+        // $date = 'July';  
+        $date = date('m', strtotime($data->month)); 
+        $summary->month =$date; 
+        $summary->request =$data->requests; 
+        $summary->sample =$data->samples;   
+        $summary->test =$data->analyses;    
+        $summary->actualfees =$data->fees;  
+        $summary->gratis =$data->gratis;    
+        $summary->discount =$data->discounts;   
+        $summary->gross =$data->gross;  
+        $summary->lab_id=$data->labid;  
+        if($summary->save(false)){  
+            // echo "saved"; exit;  
+            Yii::$app->session->setFlash('success', 'Accomplishment Successfully Added');   
 
-        }else{
-            Yii::$app->session->setFlash('danger', 'Accomplishment Failed to Save!');
+        }else{  
+            Yii::$app->session->setFlash('danger', 'Accomplishment Failed to Save!');   
 
-        }
+        }   
 
-        return $this->redirect(['/reports/lab/accomplishment/']);
+        return $this->redirect(['/reports/lab/accomplishment/']);   
 
     }
 

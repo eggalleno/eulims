@@ -20,12 +20,23 @@ class AnalyticController extends \yii\web\Controller
     public function actionDisplaymonth($data)
     {
     	$exploded = explode("_", $data);
-    	$rstlId = Yii::$app->user->identity->profile->rstl_id;
-        return $this->renderAjax('display-month',['yearmonth'=>$exploded[0],'lab_id'=>$exploded[1],'rstlId'=>$rstlId]);
+    	$rstlId = Yii::$app->user->identity->profile->rstl_id; //get the rstlid
+        $factors = Reportfactors::find()->with('factor')->where(['yearmonth'=>$exploded[0],'lab_id'=>$exploded[1]])->all();//get the factors for this year
+
+        $toguide = 0;
+        $session = Yii::$app->session; 
+        $session->get('firstload', 'yes');
+        if($session->get('firstload')){
+            $toguide=1;
+            $session->remove('firstload');
+        }
+
+
+        return $this->renderAjax('display-month',['yearmonth'=>$exploded[0],'lab_id'=>$exploded[1],'rstlId'=>$rstlId,'factors'=>$factors,'toguide'=>$toguide]);
     }
 
     public function actionIndex()
-    {
+    {       
         $session = Yii::$app->session;
         $session->set('hideMenu',true);
     	$reportform = new Reportform();
@@ -38,33 +49,78 @@ class AnalyticController extends \yii\web\Controller
 			$year = date('Y'); //current year
 		}
 
-    	//get the rstlid of the user
-
     	//get all the sum of income generated per month
     	$summary = Reportsummary::find()->where(['year'=> $year,'lab_id'=>$labId,'rstl_id'=>$rstlId])->all();
     	$actualfees = [];
     	$discounts = [];
+        $gratis = [];
     	$finalize = [];
     	$monthlyname =[];
+        $factor_up = [];
+        $factor_down =[];
 		$month = 0;
 		
+        $prediction = [];
+        $income = [];
+
 		while ( $month<= 11) {
 			if(isset($summary[$month])){
 				$actualfees[] = (int)$summary[$month]->actualfees;
 				$discounts[] = (int)$summary[$month]->discount;
+                $gratis[]= (int)$summary[$month]->gratis;
 				$monthlyname[]  = $summary[$month]->year."-".$summary[$month]->month;
+                //get all the ; 
+                $factor_up[] = (int)Reportfactors::find()
+                ->joinWith(['factor'=>function($query){
+                    return $query->andWhere(['type'=>'1']);
+                }])
+                ->where(['yearmonth'=>$summary[$month]->year."-".$summary[$month]->month,'lab_id'=>$labId])
+                ->count();
+                // ->all();
+                $factor_down[] = (int)Reportfactors::find()
+                ->joinWith(['factor'=>function($query){
+                    return $query->andWhere(['type'=>'0']);
+                }])
+                ->where(['yearmonth'=>$summary[$month]->year."-".$summary[$month]->month,'lab_id'=>$labId])
+                ->count();
+                // ->all();
 				$finalize[] = "green";
+
+                $income[] = (int)$summary[$month]->actualfees+(int)$summary[$month]->discount;
+                // $prediction[] = null;
 			}
 			else{
 				$actualfees[] =0;
 				$discounts[] = 0;
+                $gratis[]=0;
+                $factor_up[]=null;
+                $factor_down[]=null;
 				$finalize[] = "red";
+                $income[]=null;
 			}
+             //prediction  get the 10 year behoavior of the income as base
+                $avg = Reportsummary::find()
+                ->select(['request'=>'AVG(gross)'])
+                ->where(['lab_id'=>$labId,'rstl_id'=>$rstlId,'month'=>sprintf("%02d", ($month+1))])
+                ->andWhere(['<', 'year', $year])
+                ->limit(10)
+                ->groupBy(['lab_id'])
+                ->orderBy('year DESC')
+                ->all();
+            //adjust the base, according to the factors assigned
+
+                if($avg)
+                    $prediction[]=$avg[0]->request;
+                else
+                    $prediction[]=null;
 			$month ++;
 		}
+		$lab = Lab::findOne($labId);//get the lab profile
 
-		$lab = Lab::findOne($labId);
-		return $this->render('index',['actualfees'=>$actualfees,'discounts'=>$discounts,'finalize'=>$finalize,'labId' => $labId,'year' => $year,'reportform'=>$reportform,'labtitle'=>$lab->labname]);
+        $session = Yii::$app->session; 
+        $session->set('firstload', 'yes');
+
+		return $this->render('index',['actualfees'=>$actualfees,'discounts'=>$discounts,'gratis'=>$gratis,'finalize'=>$finalize,'labId' => $labId,'year' => $year,'reportform'=>$reportform,'labtitle'=>$lab->labname,'factor_up'=>$factor_up,'factor_down'=>$factor_down,'prediction'=>$prediction,'income'=>$income]);
     }
 
 
@@ -161,22 +217,55 @@ class AnalyticController extends \yii\web\Controller
     
     }
 
-   public function actionAddfactors($yearmonth){
-    $reportfactor = new Reportfactors;
-    $reportfactor->yearmonth = $yearmonth;
-    $factors = Factors::find()->all();
+    public function actionAddfactors($yearmonth,$labid){
+        $reportfactor = new Reportfactors;
+        $reportfactor->yearmonth = $yearmonth;
+        $reportfactor->lab_id=$labid;
+        $factors = Factors::find()->all();
 
-    if ($reportfactor->load(Yii::$app->request->post())) {
-        if($reportfactor->save(false))
-            Yii::$app->session->setFlash('success', 'Factor Successfully Added');
-        else
-            Yii::$app->session->setFlash('danger', 'Linking Factor Failed');
+        if ($reportfactor->load(Yii::$app->request->post())) {
+            if($reportfactor->save(false))
+                Yii::$app->session->setFlash('success', 'Factor Successfully Added');
+            else
+                Yii::$app->session->setFlash('danger', 'Linking Factor Failed');
 
-        return $this->redirect(['/reports/finance/analytic/']);
+            return $this->redirect(['/reports/finance/analytic/']);
+        }
+
+        return $this->renderAjax('linkfactor',['model'=>$reportfactor,'factors'=>$factors,'lab_id'=>$labid]);
     }
 
+    public function actionCreatefactor($yearmonth,$labid){
+        $reportfactor = new Reportfactors;
+        $reportfactor->yearmonth = $yearmonth;
+        $reportfactor->lab_id=$labid;
+        $factor =  new Factors;
 
-    return $this->renderAjax('linkfactor',['model'=>$reportfactor,'factors'=>$factors]);
-   }
+        if (($factor->load(Yii::$app->request->post()))&&($reportfactor->load(Yii::$app->request->post()))) {
+            if($factor->save()){
+                $reportfactor->factor_id = $factor->factor_id;
+                if($reportfactor->save(false)){
+                    Yii::$app->session->setFlash('success', 'Factor Successfully Added');
+                    return $this->redirect(['/reports/finance/analytic/']);
+                }
+                else{
+                    Yii::$app->session->setFlash('danger', 'Linking Factor Failed');
+                }
+            }
+            else{
+                Yii::$app->session->setFlash('danger', 'Linking Factor Failed');
+            }
+        }
 
+        return $this->renderAjax('linkfactorcomplete',['model'=>$reportfactor,'factor'=>$factor]);
+    }
+
+    public function actionRemovefactor($factor_id){
+        $reportfactor = Reportfactors::findOne($factor_id)->delete();
+        if ($reportfactor)
+            Yii::$app->session->setFlash('success', 'Factor Successfully Deleted!');
+        else
+            Yii::$app->session->setFlash('error', 'Factor Failed to Delete!');
+        return $this->redirect(['/reports/finance/analytic/']);
+    }
 }
