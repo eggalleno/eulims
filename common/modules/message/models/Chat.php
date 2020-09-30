@@ -9,7 +9,6 @@ use common\models\system\User;
  * This is the model class for table "tbl_chat".
  *
  * @property int $chat_id
- * @property int $sender_userid
  * @property int $reciever_userid
  * @property string $message
  * @property string $timestamp
@@ -25,6 +24,7 @@ use common\models\system\User;
  */
 class Chat extends \yii\db\ActiveRecord
 {
+	public $receiverid;
     /**
      * {@inheritdoc}
      */
@@ -48,9 +48,9 @@ class Chat extends \yii\db\ActiveRecord
     {
         return [
             [['sender_userid', 'message', 'status_id'], 'required'],
-            [['sender_userid', 'reciever_userid', 'status_id', 'contact_id', 'group_id', 'convo_id'], 'integer'],
+            [['sender_userid','status_id', 'contact_id', 'group_id'], 'integer'],
             [['message'], 'string'],
-            [['timestamp'], 'safe'],
+            [['timestamp','receiverid'], 'safe'],
             [['chat_id'], 'unique'],
            
         ];
@@ -64,7 +64,6 @@ class Chat extends \yii\db\ActiveRecord
         return [
             'chat_id' => 'Chat ID',
             'sender_userid' => 'Sender Userid',
-            'reciever_userid' => 'To:',
             'message' => 'Message',
             'timestamp' => 'Timestamp',
             'status_id' => 'Status ID',
