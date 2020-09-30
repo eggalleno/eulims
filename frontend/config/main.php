@@ -124,7 +124,13 @@ return [
             'enableAutoLogin' => true,
             'identityCookie' => ['name' => '_identity-customer', 'httpOnly' => true],
         ],
-
+    
+		'referralaccount' => [
+            'class'=>'yii\web\User',
+            'identityClass' => 'common\models\system\User',
+            'enableAutoLogin' => true,
+            'identityCookie' => ['name' => '_identity-referral', 'httpOnly' => true],
+        ],
 
         'view' => [
          'theme' => [
