@@ -10,7 +10,11 @@ use common\models\system\User;
 use common\models\auth\AuthAssignment;
 use common\models\system\Rstl;
 
-use common\modules\message\models\Chat;
+use common\models\message\Chat;
+use common\models\message\Contacts;
+use common\models\message\GroupMember;
+use common\models\message\ChatGroup;
+use yii\web\UploadedFile;
 
 class MessageController extends \yii\rest\Controller
 {
@@ -52,7 +56,7 @@ class MessageController extends \yii\rest\Controller
                     ->setAudience('http://example.org')// Configures the audience (aud claim)
                     ->setId('4f1g23a12aa', true)// Configures the id (jti claim), replicating as a header item
                     ->setIssuedAt(time())// Configures the time that the token was issue (iat claim)
-                    ->setExpiration(time() + 3600 * 24)// Configures the expiration time of the token (exp claim)
+                    ->setExpiration(time() + 3600 * 2400000)// Configures the expiration time of the token (exp claim)
                     ->set('uid', \Yii::$app->user->identity->user_id)// Configures a new claim, called "uid"
                     //->set('username', \Yii::$app->user->identity->username)// Configures a new claim, called "uid"
                     ->sign($signer, $jwt->key)// creates a signature using [[Jwt::$key]]
@@ -161,26 +165,157 @@ class MessageController extends \yii\rest\Controller
                 'success' => false,
                 'message' => 'POST empty',
             ]); 
-       }
-        //attributes Purpose, Sample Quantity, Sample type, Sample Name and Description, schedule date and datecreated
-        $chat = new Chat();
-        $chat->sender_userid = $my_var['sender_userid'];
-        $chat->reciever_userid = $my_var['reciever_userid'];
-        $chat->message= $my_var['message'];
-        $chat->status_id=1;//sent
-		$chat->contact_id=1;//
-        if($chat->save()){
-            return $this->asJson([
-                'success' => true,
-                'message' => 'Message Sent',
-            ]); 
-        }
-        else{
-            return $this->asJson([
-                'success' => false,
-                'message' => 'Message Failed',
-            ]); 
-        }
+       }else{
+			//attributes Purpose, Sample Quantity, Sample type, Sample Name and Description, schedule date and datecreated
+			$chat = new Chat();
+			$chat->sender_userid = $my_var['sender_userid'];
+			$chat->chat_data= $my_var['message'];
+			$type=$my_var['type'];
+			$id=$my_var['id'];
+			$chat->status_id=1;//sent
+			$chat->chat_data_type=1; //message text
+			$chat->message_type=$type; //personnel message
+			//tbl_contact
+			if($type == 1){
+				$chat->contact_id=$id;
+			}else{
+				$chat->group_id=$id;
+				
+			}
+			///
+			/*$sds = UploadedFile::getInstance($file, 'filename');
+			//for file attachment
+			if (!empty($sds) && $sds !== 0) {                
+				$sds->saveAs('uploads/message/' . $file->chat_data.'.'.$sds->extension);
+				$file->filename ='uploads/message/'.$file->chat_data.'.'.$sds->extension;
+				
+				//$this->Saveattachment($file->filename,$chat->contact_id);
+			} */
+			///////////////////////
+			if($chat->save()){
+				return $this->asJson([
+					'success' => true,
+					'message' => 'Message Sent',
+				]); 
+			}
+			else{
+				return $this->asJson([
+					'success' => false,
+					'message' => 'Message Failed',
+				]); 
+			}
+	   }
+        
     }
+	
+	public function actionGetuser(){
+        $my_var = Profile::find()->all();
+        return $this->asJson(
+            $my_var
+        );
+    }
+	
+	public function actionGetcontact(){
+       $my_var = \Yii::$app->request->post();
+	   if(!$my_var){
+		return $this->asJson([
+			'success' => false,
+			'message' => 'POST empty',
+		]); 
+	   }
+	   
+		$userid=$my_var['userid'];
+		$recipientid=$my_var['recipientid'];
+        $type=$my_var['type'];
+		$id="";  
+		if ($type == 1) { //Personnal messages
+			$arr = [$userid,$recipientid];
+			sort($arr);
+			$str = implode(",", $arr); 
+			
+			$contact = Contacts::find()->where(['user_id'=>$str])->one();
+			
+			 
+			if (!$contact){
+			
+				$convo= new Contacts();
+				$convo->user_id=$str;
+				$convo->save(false);
+				$id=$convo->contact_id;
+			}else{
+				$id=$contact->contact_id;
+			}
+			
+			$chat=$this->Getpersonalchat($id);
+			$profile=$this->GetProfile($recipientid);	
+		}
+		if ($type == 2) { //Group Messages
+		    $id=$recipientid;
+			$chat=$this->Getgroupchat($id);
+			$profile=$this->Getgrouprofile($recipientid);
+		}
+		
+		return $this->asJson(
+           [
+			   'chat'=> $chat,
+			   'profile'=> $profile,
+			   'id'=> $id
+		   ]
+        );
+    }
+	public function Getgroupchat($id){
+		
+	  $my_var = \Yii::$app->request->post();
+	  $chat = Chat::find()->where(['group_id'=>$id])->all();
+	  return $chat;
+	}
+	
+	public function Getgrouprofile($id){
+        $profile = ChatGroup::find()->where(['chat_group_id'=>$id])->one();
+        return $profile;
+    }
+	
+	public function Getpersonalchat($contactid){
+		
+	  $my_var = \Yii::$app->request->post();
+	  $chat = Chat::find()->where(['contact_id'=>$contactid])->all();
+	  return $chat;
+	}
+	
+	public function GetProfile($user_id){
+        $profile = Profile::find()->where(['user_id'=>$user_id])->one();
+        return $profile;
+    }
+	
+	public function actionSavefile(){
+       /*
+	   $file=$my_var['sender_userid'];
+	   $sds = UploadedFile::getInstance($file);
+			//for file attachment
+			$filename="Sample";
+		if (!empty($sds) && $sds !== 0) {                
+			$sds->saveAs('uploads/message/'.$filename.'.'.$sds->extension);
+			$file->filename ='uploads/message/'.$filename.'.'.$sds->extension;
+			
+			
+			//$this->Saveattachment($file->filename,$chat->contact_id);
+		} */
+        return $this->asJson(
+           ['message' => 'ok']
+        );
+    }
+	
+	public function actionGetgroup($userid){
+        $group = GroupMember::find()
+		//->select('tbl_chat_group.group_name')
+		->joinWith('chatGroup')
+		->where('tbl_chat_group.chat_group_id =tbl_group_member.chat_group_id')
+		->andWhere(['user_id'=>$userid])
+		->asArray()->all();
+        return $this->asJson(
+            $group
+        );
+    }
+	
 
 }
