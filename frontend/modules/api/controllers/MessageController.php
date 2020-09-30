@@ -18,13 +18,13 @@ use yii\web\UploadedFile;
 
 class MessageController extends \yii\rest\Controller
 {
-	 public function behaviors()
+	public function behaviors()
     {
         $behaviors = parent::behaviors();
         $behaviors['authenticator'] = [
             'class' => \sizeg\jwt\JwtHttpBearerAuth::class,
             'except' => ['login', 'server'],
-            'user'=> [\Yii::$app->referralaccount]
+            'user'=> \Yii::$app->referralaccount
         ];
 
         return $behaviors;

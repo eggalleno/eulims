@@ -9,8 +9,8 @@ class RestreferralController extends \yii\rest\Controller
         $behaviors = parent::behaviors();
         $behaviors['authenticator'] = [
             'class' => \sizeg\jwt\JwtHttpBearerAuth::class,
-            //'except' => ['index'],
-            'user'=> [\Yii::$app->referralaccount]
+            // 'except' => ['index'],
+            'user'=> \Yii::$app->referralaccount
         ];
 
         return $behaviors;
