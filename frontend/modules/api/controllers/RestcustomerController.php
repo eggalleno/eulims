@@ -227,16 +227,9 @@ class RestcustomerController extends \yii\rest\Controller
 
      public function actionGetwallettransaction($id){
         $transactions = Customertransaction::find()->where(['customerwallet_id'=>$id])->orderby('date DESC')->all();
-        if($transactions){
-            return $this->asJson(
+        return $this->asJson(
                 $transactions
             ); 
-        }else{
-            return $this->asJson([
-                'success' => false,
-                'message' => 'No Request Found',
-            ]); 
-        }
     }
     //************************************************
 
