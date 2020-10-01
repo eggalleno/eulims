@@ -144,7 +144,8 @@ $pdfFooter="{PAGENO}";
 					[ //logically it wll return 0, but we will get back to this if there's anything needed
 						'header'=> 'Gratis',
 						'headerOptions' => ['class' => 'text-center'],
-			    		'contentOptions' => ['class' => 'text-center'],
+						'contentOptions' => ['class' => 'text-center'],
+						'format'=>['decimal', 2],
 			    		'value'=> function( $model ) use($year,$lab_id){
 			    			$monthyear = $year."-".$model->monthnum;
 			    			return $model->countTables($monthyear,$lab_id,'gratis');
