@@ -214,16 +214,30 @@ class RestcustomerController extends \yii\rest\Controller
 
     public function actionGetcustomerwallet(){
         $transactions = Customerwallet::find()->where(['customer_id'=>$this->getuserid()])->one();
-        return $this->asJson(
-            $transactions
-        );
+        if($transactions){
+            return $this->asJson(
+                $transactions
+            ); 
+        }else{
+            return $this->asJson([
+                'success' => false,
+                'message' => '0.00',
+            ]); 
+        }
     }
 
      public function actionGetwallettransaction($id){
         $transactions = Customertransaction::find()->where(['customerwallet_id'=>$id])->orderby('date DESC')->all();
-        return $this->asJson(
-            $transactions
-        );
+        if($transactions){
+            return $this->asJson(
+                $transactions
+            ); 
+        }else{
+            return $this->asJson([
+                'success' => false,
+                'message' => 'No Request Found',
+            ]); 
+        }
     }
     //************************************************
 
@@ -256,7 +270,7 @@ class RestcustomerController extends \yii\rest\Controller
         if($bookling->save(false)){
             return $this->asJson([
                 'success' => true,
-                'message' => 'Booked Successfully',
+                'message' => 'You have booked successfully',
             ]); 
         }
         else{
