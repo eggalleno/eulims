@@ -11,6 +11,8 @@ use yii\filters\VerbFilter;
 use common\models\system\LoginForm;
 use linslin\yii2\curl;
 use yii\helpers\Json;
+
+use common\components\Notification;
 /**
  * InfoController implements the CRUD actions for Chat model.
  */
@@ -42,6 +44,15 @@ class InfoController extends Controller
 		$session = Yii::$app->session;
 
 		if(isset($_SESSION['usertoken'])){
+			
+			/*$notif= new Notification();
+			
+			$res=$notif->sendSMS("", "wis", "09171044790", "title", "Hello World", "eULIMS", $this->module->id,$this->action->id);
+			echo($this->module->id);
+			echo($this->action->id);
+			
+			exit; */
+			
 			$token=$_SESSION['usertoken'];
 			$userid= Yii::$app->user->identity->profile->user_id;
 			//get profile

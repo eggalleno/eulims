@@ -56,7 +56,7 @@ class ChatController extends Controller
 			
 			$file= new ChatAttachment();
 			$chat=new Chat();
-			/*if ($chat->load(Yii::$app->request->post()) and $file->load(Yii::$app->request->post())) {
+			if ($chat->load(Yii::$app->request->post()) and $file->load(Yii::$app->request->post())) {
 				$sds = UploadedFile::getInstance($file, 'filename');
 
 				//save message

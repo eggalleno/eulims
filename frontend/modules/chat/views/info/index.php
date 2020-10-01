@@ -45,8 +45,9 @@ $this->registerJsFile("/js/chat.js", [
 			<div class="scroll-style1" id="popchatbody">
 			
 			</div>
+			<input type="file" name="filetoupload">
 			<div class="chat-popup-footer">
-				<i class="fa fa-paperclip" id="fileupload"></i>
+				<button type="button" class="btn" id="subm"><i class="fa fa-paperclip"></i></button>
 				<textarea id="chatareapop" placeholder="Type message.." name="msg" required></textarea>
 				<button type="button" class="btn" id="sendmes"><i class="fa fa-send-o"></i></button>
 			</div>
@@ -203,33 +204,6 @@ $("#file").click(function(){
    // mes(id);
 //}, 3000);
 
-$('#subm').click(function(e){
-    var formData = new FormData($('form')[0]);
-    //console.log(formData);
-	 var token=<?php echo json_encode($_SESSION['usertoken'])?>;
-	//alert(type);
-    $.ajax({
-        url: "http://www.eulims.local/api/message/savefile", //API LINK FROM THE CENTRAL
-		type: 'POST',
-		dataType: "JSON",
-		beforeSend: function (xhr) {
-			xhr.setRequestHeader('Authorization', 'Bearer '+ token);
-		}, 
-		data: formData,
-		success: function(response) {
-			alert(response.message);
-			
-			
-		},
-		error: function(xhr, status, error) {
-			alert(error);
-		},
-        cache: false,
-        contentType: false,
-        processData: false
-    }); 
-});
-
 function openForm() {
 	document.getElementById("myForm").style.display = "block";
 }
@@ -285,7 +259,40 @@ function groupcontacts(){ //Group Messages
 $("#sendmes").click(function(){
 	sendmessage();
 });
-$("#fileupload").click(function(){
-	alert("Hey");
+
+$('#subm').click(function(e){
+	var token=<?php echo json_encode($_SESSION['usertoken'])?>;
+    var formData = new FormData($('form')[0]);
+	//var formData = new FormData();
+	//formData.append('image', $('input[type=file]')[0].files[0]);
+	//formData.append('key1', 'value1');
+	//formData.append('key2', 'value2');
+	/*for (var pair of formData.entries()) {
+    console.log(pair[0]+ ', ' + pair[1]); 
+	} */
+    //console.log(formData);
+	
+	$.ajax({
+        url: "http://www.eulims.local/api/message/savefile", //API LINK FROM THE CENTRAL
+		type: 'POST',
+		dataType: "JSON",
+		beforeSend: function (xhr) {
+			xhr.setRequestHeader('Authorization', 'Bearer '+ token);
+		}, 
+		data: formData,
+		success: function(response) {
+			alert(response.message);
+			
+			
+		},
+		error: function(xhr, status, error) {
+			alert(error);
+		},
+        cache: false,
+        contentType: false,
+        processData: false
+    });  
+	
 });
+
  </script>
