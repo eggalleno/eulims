@@ -24,7 +24,9 @@ class MessageController extends \yii\rest\Controller
         $behaviors['authenticator'] = [
             'class' => \sizeg\jwt\JwtHttpBearerAuth::class,
             'except' => ['login', 'server'],
-            'user'=> \Yii::$app->referralaccount
+            'user'=> [\Yii::$app->referralaccount]
+
+
         ];
 
         return $behaviors;
@@ -288,8 +290,17 @@ class MessageController extends \yii\rest\Controller
     }
 	
 	public function actionSavefile(){
-       /*
-	   $file=$my_var['sender_userid'];
+        $my_var = \Yii::$app->request->post();
+		$_FILES['filetoupload']; 
+		//var_dump($my_var);
+		//exit;
+		/*//$sds = UploadedFile::getInstance($my_var, 'filename');
+		$file=$my_var['sender_userid'];
+	    $sds = UploadedFile::getInstance($file);
+		$sds->saveAs('uploads/message/' . $chat->chat_id.'.'.$sds->extension);
+		//$file->filename ='uploads/message/'.$chat->chat_id.'.'.$sds->extension; */
+
+	   $file=$my_var['filetoupload'];
 	   $sds = UploadedFile::getInstance($file);
 			//for file attachment
 			$filename="Sample";
@@ -299,10 +310,12 @@ class MessageController extends \yii\rest\Controller
 			
 			
 			//$this->Saveattachment($file->filename,$chat->contact_id);
-		} */
+		} 
         return $this->asJson(
            ['message' => 'ok']
-        );
+        ); 
+		//var_dump($my_var['formData']);
+		//exit;
     }
 	
 	public function actionGetgroup($userid){

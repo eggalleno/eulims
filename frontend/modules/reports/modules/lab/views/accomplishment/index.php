@@ -85,7 +85,7 @@ $pdfFooter="{PAGENO}";
 						'template' => '{view}',
 						'buttons'=>[
 							'view'=>function ($url, $model) use($lab_id) {
-								return Html::button('<span class="glyphicon glyphicon-print"></span>', ['value'=>Url::to(['/lab/tagging/monthlyreport','month'=>Yii::$app->formatter->asDate($model->request_datetime, 'php:M'), 'year'=>Yii::$app->formatter->asDate($model->request_datetime, 'php:Y'), 'lab_id' => $lab_id]), 'class' => 'btn btn-primary modal_method','onclick'=>'LoadModal(this.title, this.value ,true, 1850);','title' => Yii::t('app', "Monthly Report")]);
+								return Html::button('<span class="glyphicon glyphicon-print"></span>', ['value'=>Url::to(['/lab/tagging/monthlyreport','month'=>Yii::$app->formatter->asDate($model->request_datetime, 'php:M'), 'year'=>Yii::$app->formatter->asDate($model->request_datetime, 'php:Y'), 'lab_id' => $lab_id]), 'class' => 'btn btn-primary','onclick'=>'LoadModal(this.title, this.value ,true, 1850);','title' => Yii::t('app', "Monthly Report")]);
 							},
 						   
 						],
@@ -144,7 +144,8 @@ $pdfFooter="{PAGENO}";
 					[ //logically it wll return 0, but we will get back to this if there's anything needed
 						'header'=> 'Gratis',
 						'headerOptions' => ['class' => 'text-center'],
-			    		'contentOptions' => ['class' => 'text-center'],
+						'contentOptions' => ['class' => 'text-center'],
+						'format'=>['decimal', 2],
 			    		'value'=> function( $model ) use($year,$lab_id){
 			    			$monthyear = $year."-".$model->monthnum;
 			    			return $model->countTables($monthyear,$lab_id,'gratis');
