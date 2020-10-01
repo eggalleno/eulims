@@ -1,5 +1,4 @@
 <?php
-
 namespace frontend\modules\api\controllers;
 
 use common\models\system\LoginForm;
@@ -326,9 +325,17 @@ class RestcustomerController extends \yii\rest\Controller
 
     public function actionGetbookings(){
         $my_var = Booking::find()->where(['customer_id'=>$this->getuserid()])->orderby('scheduled_date DESC')->all();
+        if($my_var){
         return $this->asJson(
             $my_var
-        );
+        );    
+        }
+        else{
+            return $this->asJson([
+                'success' => false,
+                'message' => 'No data Found',
+            ]);
+        }
     }
 
     public function actionGetbookingdetails(){
@@ -346,9 +353,17 @@ class RestcustomerController extends \yii\rest\Controller
 
          // var_dump($my_var); exit;
 
+        if($my_var){
         return $this->asJson(
             $my_var
-        );
+        );    
+        }
+        else{
+            return $this->asJson([
+                'success' => false,
+                'message' => 'No data Found',
+            ]);
+        }
     }
 
     public function actionMailcode($email){
