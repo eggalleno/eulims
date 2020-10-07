@@ -78,7 +78,7 @@ class Requestextension extends Request
                 AND r.payment_type_id != 2
                 AND s.active = 1
                 AND a.cancelled = 0
-                AND a.references <> '-'
+                -- AND a.references <> '-'
                 AND year(r.request_datetime)= $year
                 AND month(r.request_datetime)= $month")->queryScalar();
 
@@ -97,7 +97,7 @@ class Requestextension extends Request
                 AND r.payment_type_id = 2
                 AND s.active = 1
                 AND a.cancelled = 0
-                AND a.references <> '-'
+                -- AND a.references <> '-'
                 AND year(r.request_datetime)= $year
                 AND month(r.request_datetime)= $month")->queryScalar();
 

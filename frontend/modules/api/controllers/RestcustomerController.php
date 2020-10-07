@@ -1,5 +1,4 @@
 <?php
-
 namespace frontend\modules\api\controllers;
 
 use common\models\system\LoginForm;
@@ -214,16 +213,23 @@ class RestcustomerController extends \yii\rest\Controller
 
     public function actionGetcustomerwallet(){
         $transactions = Customerwallet::find()->where(['customer_id'=>$this->getuserid()])->one();
-        return $this->asJson(
-            $transactions
-        );
+        if($transactions){
+            return $this->asJson(
+                $transactions
+            ); 
+        }else{
+            return $this->asJson([
+                'success' => false,
+                'message' => '0.00',
+            ]); 
+        }
     }
 
      public function actionGetwallettransaction($id){
         $transactions = Customertransaction::find()->where(['customerwallet_id'=>$id])->orderby('date DESC')->all();
         return $this->asJson(
-            $transactions
-        );
+                $transactions
+            ); 
     }
     //************************************************
 
@@ -256,7 +262,7 @@ class RestcustomerController extends \yii\rest\Controller
         if($bookling->save(false)){
             return $this->asJson([
                 'success' => true,
-                'message' => 'Booked Successfully',
+                'message' => 'You have booked successfully',
             ]); 
         }
         else{
@@ -312,9 +318,17 @@ class RestcustomerController extends \yii\rest\Controller
 
     public function actionGetbookings(){
         $my_var = Booking::find()->where(['customer_id'=>$this->getuserid()])->orderby('scheduled_date DESC')->all();
+        if($my_var){
         return $this->asJson(
             $my_var
-        );
+        );    
+        }
+        else{
+            return $this->asJson([
+                'success' => false,
+                'message' => 'No data Found',
+            ]);
+        }
     }
 
     public function actionGetbookingdetails(){
@@ -332,9 +346,17 @@ class RestcustomerController extends \yii\rest\Controller
 
          // var_dump($my_var); exit;
 
+        if($my_var){
         return $this->asJson(
             $my_var
-        );
+        );    
+        }
+        else{
+            return $this->asJson([
+                'success' => false,
+                'message' => 'No data Found',
+            ]);
+        }
     }
 
     public function actionMailcode($email){
