@@ -617,11 +617,10 @@ fieldset>legend {
 }
 /* Full-width textarea */
 .form-container textarea {
-    width: 300px;
+    width: 350px;
     height: 50px;
-    margin-left: 20px;
     background: #f1f1f1;
-    padding: 15px;
+    padding: 5px;
     border: none;
     resize: none;
     position: fixed;

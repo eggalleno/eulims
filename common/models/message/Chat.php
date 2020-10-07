@@ -3,7 +3,7 @@
 namespace common\models\message;
 
 use Yii;
-
+use common\models\system\Profile;
 /**
  * This is the model class for table "tbl_chat".
  *
@@ -85,5 +85,10 @@ class Chat extends \yii\db\ActiveRecord
     public function getGroup()
     {
         return $this->hasOne(ChatGroup::className(), ['chat_group_id' => 'group_id']);
+    }
+	
+	 public function getProfile()
+    {
+        return $this->hasOne(Profile::className(), ['user_id' => 'sender_userid']);
     }
 }
