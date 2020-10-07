@@ -4,7 +4,6 @@ namespace common\models\lab;
 
 use Yii;
 use common\models\system\Rstl;
-use common\models\finance\Paymentitem;
 use common\components\Functions;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
@@ -332,10 +331,4 @@ class Request extends \yii\db\ActiveRecord
     {
         return $this->hasOne(RequestType::className(), ['request_type_id' => 'request_type_id']);
     }
-
-    public function getPayment()
-    {
-        return $this->hasOne(Paymentitem::className(), ['request_id' => 'request_id']);
-    }
 }
-
