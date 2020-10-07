@@ -258,6 +258,7 @@ class RestcustomerController extends \yii\rest\Controller
         $bookling->booking_status = 0;
         $bookling->purpose = $my_var['Purpose'];
         $bookling->modeofrelease_ids = $my_var['Modeofrelease'];
+        $bookling->customerstat = 1;
 
         if($bookling->save(false)){
             return $this->asJson([
@@ -386,7 +387,7 @@ class RestcustomerController extends \yii\rest\Controller
             }
             //contruct the html content to be mailed to the customer
             $content ="
-            <h1>Hello $customer->customer_name</h1>
+            <h1>Good day! $customer->customer_name</h1>
 
             <h3>Account code : $code</h3>
             <p>Thank you for choosing the Onelab, to be able to provide a quality service to our beloved customer, we are giving this account code above which you may use to activate your account if ever you want to use the mobile app version, below are the following features that you may found useful. Available for Android and Apple smart devices. </p>
@@ -396,6 +397,7 @@ class RestcustomerController extends \yii\rest\Controller
                 <li>Request Transaction History</li>
                 <li>Wallet Transations and History</li>
                 <li>Bookings</li>
+                <li>User Profile</li>
             </ul>
             <br>
             <p>Truly yours,</p>
