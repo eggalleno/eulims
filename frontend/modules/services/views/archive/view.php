@@ -68,7 +68,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             <td><?= $analysis['references'] ?></td>
                             <td><?= $analysis['method'] ?></td>
                             <td><?= $analysis['fee'] ?></td>
-                            <?= $sub = $sub +  $analysis['fee'] ?>
+                            <?php $sub = $sub +  $analysis['fee'] ?>
                         </tr>
                         <?php } ?>
                     </tbody>
