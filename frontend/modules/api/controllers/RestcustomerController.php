@@ -319,17 +319,9 @@ class RestcustomerController extends \yii\rest\Controller
 
     public function actionGetbookings(){
         $my_var = Booking::find()->where(['customer_id'=>$this->getuserid()])->orderby('scheduled_date DESC')->all();
-        if($my_var){
         return $this->asJson(
             $my_var
         );    
-        }
-        else{
-            return $this->asJson([
-                'success' => false,
-                'message' => 'No data Found',
-            ]);
-        }
     }
 
     public function actionGetbookingdetails(){
