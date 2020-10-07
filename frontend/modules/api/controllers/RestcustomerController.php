@@ -338,8 +338,10 @@ class RestcustomerController extends \yii\rest\Controller
          ->all();
 
          // var_dump($my_var); exit;
-
-        if($my_var){
+         return $this->asJson(
+            $my_var
+        );  
+       /* if($my_var){
         return $this->asJson(
             $my_var
         );    
@@ -349,7 +351,7 @@ class RestcustomerController extends \yii\rest\Controller
                 'success' => false,
                 'message' => 'No data Found',
             ]);
-        }
+        }*/
     }
 
     public function actionMailcode($email){
