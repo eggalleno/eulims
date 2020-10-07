@@ -24,14 +24,17 @@ $this->registerJsFile("/js/chat.js", [
 	
 	<!-- MODAL HERE!! -->
 	<button class="open-button" onclick="openForm()"><i class="fa fa-commenting-o"></i></button>
-	<div class="chat-popup" id="myForm">
+	<div class="chat-popup" id="myForm" name="myForm">
 		<form class="form-container" enctype="multipart/form-data">
 			<div class="chat-popup-header">
 				<!--<span>OneLab Chat</span>-->
 				<i class="fa fa-gear"></i>
 				<label id="profilenamepop"> &nbsp;</label>
-				<label id="chattype" hidden> &nbsp;</label> <!-- personal(1) or group(2) -->
+				<label id="chattype" hidden> &nbsp;</label> <!-- message(1) or file(2) -->
+				<label id="ctype" hidden> &nbsp;</label> <!-- personnal(1) or group(2) -->
 				<label id="dataid" hidden> &nbsp;</label> <!-- contact_id or group_id -->
+				<!--label id="recipientid" hidden> &nbsp;</label -->
+				<input type="text" id="recipientid" name="recipientid" hidden>
 				<i class="fa fa-close" onclick="closeForm()"></i>
 
 			</div>
@@ -39,15 +42,13 @@ $this->registerJsFile("/js/chat.js", [
 				<button type="button" class="btntab" id="btnuser"><i class="fa fa-user"></i></button>
 			
 				<button type="button" class="btntab" id="btngroup"><i class="fa fa-group"></i></button>
-				
-				
+				 
 			</div>
 			<div class="scroll-style1" id="popchatbody">
 			
 			</div>
-			<input type="file" name="filetoupload">
+			<input type="file" name="filetoupload" id="UploadFile">
 			<div class="chat-popup-footer">
-				<button type="button" class="btn" id="subm"><i class="fa fa-paperclip"></i></button>
 				<textarea id="chatareapop" placeholder="Type message.." name="msg" required></textarea>
 				<button type="button" class="btn" id="sendmes"><i class="fa fa-send-o"></i></button>
 			</div>
@@ -59,9 +60,10 @@ $this->registerJsFile("/js/chat.js", [
 <script type="text/javascript">
 
 var x;
-
+var profname ="";
 function mes(id,type) {
-	$("#recipientid").text(id);
+	$("#recipientid").val(id);
+	//$("#dataid").text(id);
 	var user_id= <?= Yii::$app->user->identity->profile->user_id?>;
 	const token =<?php echo json_encode($_SESSION['usertoken'])?>;
 	
@@ -87,17 +89,33 @@ function mes(id,type) {
 				var dt=new Date(response.chat[y].timestamp);
 				dt=formatAMPM(dt);
 				x = x+'<div>';
+				var messagetype= response.chat[y].message_type;
+				var chatdatatype= response.chat[y].chat_data_type;
 				if (response.chat[y].sender_userid != user_id){
 					
 					x = x+"<div class='message-blue'>";
-					x = x+"<p class='message-content'>"+response.chat[y].chat_data+"</p>";
+					if(chatdatatype == 2){
+						//profname= getprofile(response.chat[y].sender_userid);
+						x = x+"<div class='message-prof'>"+dt+"</div>"; //Profile header	
+					}
+					
+					if(messagetype == 1){
+						x = x+"<p class='message-content'>"+response.chat[y].chat_data+"</p>";	
+					}else{
+						x= x+ "<a href='http://www.eulims.local/uploads/message/"+response.chat[y].chat_data+"' download>"+response.chat[y].chat_data+"</a>";
+					}
+					
 					x = x+"<div class='message-timestamp-left'>"+dt+"</div>";
 					x = x+"</div>";
 					x = x+'<br>';
 				
 				}else{
 					x = x+"<div class='message-orange'>";
-					x = x+"<p class='message-content'>"+response.chat[y].chat_data+"</p>";
+					if(messagetype == 1){
+						x = x+"<p class='message-content'>"+response.chat[y].chat_data+"</p>";	
+					}else{
+						x= x+ "<a href='http://www.eulims.local/uploads/message/"+response.chat[y].chat_data+"' download>"+response.chat[y].chat_data+"</a>";
+					}
 					x = x+"<div class='message-timestamp-right'>"+dt+"</div>";
 					x = x+"</div>";
 					x = x+'<br>';
@@ -106,10 +124,12 @@ function mes(id,type) {
 				x = x+'</div>';
 					
 			}
-			$('#dataid').html(response.id);
-			$('#chattype').html(type);
 			
+			
+			$('#chattype').html(type);
+			$('#dataid').html(response.id);
 			if(type == 1){
+				$("#ctype").text("1");//personal message
 				$('#chathere').html(x); 
 				$('#profilename').html(response.profile.fullname);
 				
@@ -119,10 +139,12 @@ function mes(id,type) {
 			}
 			if(type == 2){
 				//console.log(response.profile);
+				
+				$("#ctype").text("2");//group message
 				$('#profilenamepop').html(response.profile.group_name);
 				$('#popchatbody').html(x); 
 			}
-		    //$('#chatbody').scrollTop($('#chatbody')[0].scrollHeight);
+		    $('#popchatbody').scrollTop($('#popchatbody')[0].scrollHeight);
 		},
 		error: function(xhr, status, error) {
 			alert(error);
@@ -132,47 +154,57 @@ function mes(id,type) {
 
 
 function sendmessage() {
- // $("#myForm").modal({"backdrop": "static"});
- // $("#myForm").preventDefault();
-   var txt=$('#chatareapop').val();
-   var token=<?php echo json_encode($_SESSION['usertoken'])?>;
-   var id=$('#dataid').text();
-   //alert(id);
-   var type = $('#chattype').text();
- //  var type=1;//personalmessage
-   var sender_userid= <?= Yii::$app->user->identity->profile->user_id?>;
-	$.ajax({
-		url: "http://www.eulims.local/api/message/setmessage", //API LINK FROM THE CENTRAL
-		type: 'POST',
-		dataType: "JSON",
-		beforeSend: function (xhr) {
-			xhr.setRequestHeader('Authorization', 'Bearer '+ token);
-		}, 
-		data: {
-			sender_userid: sender_userid,
-			message: txt,
-			type: type,
-			id:id
-		},
-		success: function(response) {
-			var dt=new Date();
-			dt=formatAMPM(dt);
-			x = x+'<br>';
-			x = x+"<div class='message-orange'>";
-			x = x+"<p class='message-content'>"+txt+"</p>";
-			
-			x = x+"<div class='message-timestamp-right'>"+dt+"</div>";
-			x = x+"</div>";
-			x = x+'<br>';
-			$('#chatareapop').val(" ");
-			$('#popchatbody').html(x); 
-			//openForm();
-		},
-		error: function(xhr, status, error) {
-			alert(error);
-		}
-	}); 
+   var textchat=$('#chatareapop').val();
+   if(textchat === ""){
+	   //alert("Hello");
+   }
+   else{
+	   $('#chattype').text("1");//Message type
+	   sendchat(textchat);
+   }
+   
+   if (document.getElementById("UploadFile").files.length === 0 ){ //For file attachment
+		//alert("Please select a file to upload");
+   }
+   else{
+	    $('#chattype').text("2");//Filetype
+		var token=<?php echo json_encode($_SESSION['usertoken'])?>;
+		var formData = new FormData($('form')[0]);
+		
+		$.ajax({
+			url: "http://www.eulims.local/api/message/savefile", //API LINK FROM THE CENTRAL
+			type: 'POST',
+			dataType: "JSON",
+			beforeSend: function (xhr) {
+				xhr.setRequestHeader('Authorization', 'Bearer '+ token);
+			}, 
+			data: formData,
+			success: function(response) {
+				$('#UploadFile').val("");
+				var txt=response.filename; //Filename
+				if(response.message == "success"){
+					//alert("Oks na lodi proceed next step!");	
+					sendchat(txt);
+				}
+				else{
+					alert("Error ka lodi!");
+				}
+				
+				
+			},
+			error: function(xhr, status, error) {
+				alert(error);
+			},
+			cache: false,
+			contentType: false,
+			processData: false
+		}); 	
+   }
+ 
+  
 } 
+
+
 
 function formatAMPM(date) {
  const ye = new Intl.DateTimeFormat('en', { year: 'numeric' }).format(date);
@@ -189,20 +221,22 @@ function formatAMPM(date) {
   return strTime;
 }
 
-$("#file").click(function(){
-	$("#filedialog").trigger("click");
- });
+window.setInterval(function(){
  
- function sendfile() {
-	 var file = document.getElementById('fileid').file;
-	 alert("Hello");
- }
-
-//window.setInterval(function(){
-  /// call your function here
-  //var id= $("#recipientid").text();
-   // mes(id);
-//}, 3000);
+  // var id= $("#recipientid").value();
+   var id=$("#recipientid").val();
+   var type =$("#ctype").text();
+   if(id == "")
+   {
+	  //alert("wala");   
+   }
+   else{
+	  mes(id,type); 
+   } 
+  
+   
+  
+}, 5000);
 
 function openForm() {
 	document.getElementById("myForm").style.display = "block";
@@ -213,10 +247,12 @@ function closeForm() {
 }
 
 $("#btnuser").click(function(){
+	$("#recipientid").val("");
 	$('#profilenamepop').html("");
 	contacts();
 });
 $("#btngroup").click(function(){
+	$("#recipientid").val("");
 	$('#profilenamepop').html("");
 	groupcontacts();
 });
@@ -256,43 +292,73 @@ function groupcontacts(){ //Group Messages
 	
 	$('#popchatbody').html(y); 
 }
-$("#sendmes").click(function(){
-	sendmessage();
-});
 
-$('#subm').click(function(e){
-	var token=<?php echo json_encode($_SESSION['usertoken'])?>;
-    var formData = new FormData($('form')[0]);
-	//var formData = new FormData();
-	//formData.append('image', $('input[type=file]')[0].files[0]);
-	//formData.append('key1', 'value1');
-	//formData.append('key2', 'value2');
-	/*for (var pair of formData.entries()) {
-    console.log(pair[0]+ ', ' + pair[1]); 
-	} */
-    //console.log(formData);
-	
+function sendchat(txt) {
+ //  var txt=$('#chatareapop').val();
+   var token=<?php echo json_encode($_SESSION['usertoken'])?>;
+   var id=$('#dataid').text();
+   var type = $('#ctype').text();
+   var dataxtype = $('#chattype').text();
+   var sender_userid= <?= Yii::$app->user->identity->profile->user_id?>;
 	$.ajax({
-        url: "http://www.eulims.local/api/message/savefile", //API LINK FROM THE CENTRAL
+		url: "http://www.eulims.local/api/message/setmessage", //API LINK FROM THE CENTRAL
 		type: 'POST',
 		dataType: "JSON",
 		beforeSend: function (xhr) {
 			xhr.setRequestHeader('Authorization', 'Bearer '+ token);
 		}, 
-		data: formData,
+		data: {
+			sender_userid: sender_userid,
+			message: txt,
+			type: type,
+			id:id,
+			dataxtype: dataxtype
+		},
 		success: function(response) {
-			alert(response.message);
+			var dt=new Date();
+			dt=formatAMPM(dt);
+			x = x+'<br>';
+			x = x+"<div class='message-orange'>";
+			if(type == 1){
+				x = x+"<p class='message-content'>"+txt+"</p>";
+			}else{
+				x= x+ "<a href='http://www.eulims.local/uploads/message/"+txt+"' download>"+txt+"</a>";
+			}
 			
 			
+			x = x+"<div class='message-timestamp-right'>"+dt+"</div>";
+			x = x+"</div>";
+			x = x+'<br>';
+			$('#chatareapop').val(" ");
+			$('#popchatbody').html(x); 
 		},
 		error: function(xhr, status, error) {
 			alert(error);
-		},
-        cache: false,
-        contentType: false,
-        processData: false
-    });  
-	
+		}
+	}); 	
+}
+$("#sendmes").click(function(){
+	sendmessage();
 });
 
+function getprofile(id) {
+	var token=<?php echo json_encode($_SESSION['usertoken'])?>;
+	$.ajax({
+		url: "http://www.eulims.local/api/message/profile", //API LINK FROM THE CENTRAL
+		type: 'POST',
+		dataType: "JSON",
+		beforeSend: function (xhr) {
+			xhr.setRequestHeader('Authorization', 'Bearer '+ token);
+		}, 
+		data: {
+			id:id
+		},
+		success: function(response) {
+			return response.fullname;
+		},
+		error: function(xhr, status, error) {
+			alert(error);
+		}
+	}); 	
+}
  </script>

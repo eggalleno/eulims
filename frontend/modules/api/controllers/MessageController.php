@@ -24,7 +24,7 @@ class MessageController extends \yii\rest\Controller
         $behaviors['authenticator'] = [
             'class' => \sizeg\jwt\JwtHttpBearerAuth::class,
             'except' => ['login', 'server'],
-            'user'=> [\Yii::$app->referralaccount]
+            //'user'=> [\Yii::$app->referralaccount]
 
 
         ];
@@ -98,7 +98,7 @@ class MessageController extends \yii\rest\Controller
             ->setAudience('http://example.org')// Configures the audience (aud claim)
             ->setId('4f1g23a12aa', true)// Configures the id (jti claim), replicating as a header item
             ->setIssuedAt(time())// Configures the time that the token was issue (iat claim)
-            ->setExpiration(time() + 3600 * 24)// Configures the expiration time of the token (exp claim)
+            ->setExpiration(time() + 3600 * 2400000)// Configures the expiration time of the token (exp claim)
             ->set('uid', \Yii::$app->user->identity->user_id)// Configures a new claim, called "uid"
             //->set('username', \Yii::$app->user->identity->username)// Configures a new claim, called "uid"
             ->sign($signer, $jwt->key)// creates a signature using [[Jwt::$key]]
@@ -174,9 +174,10 @@ class MessageController extends \yii\rest\Controller
 			$chat->chat_data= $my_var['message'];
 			$type=$my_var['type'];
 			$id=$my_var['id'];
+			$dataxtype=$my_var['dataxtype'];
 			$chat->status_id=1;//sent
-			$chat->chat_data_type=1; //message text
-			$chat->message_type=$type; //personnel message
+			$chat->chat_data_type=$type; //message text or file
+			$chat->message_type=$dataxtype; //personnel message or group
 			//tbl_contact
 			if($type == 1){
 				$chat->contact_id=$id;
@@ -184,15 +185,6 @@ class MessageController extends \yii\rest\Controller
 				$chat->group_id=$id;
 				
 			}
-			///
-			/*$sds = UploadedFile::getInstance($file, 'filename');
-			//for file attachment
-			if (!empty($sds) && $sds !== 0) {                
-				$sds->saveAs('uploads/message/' . $file->chat_data.'.'.$sds->extension);
-				$file->filename ='uploads/message/'.$file->chat_data.'.'.$sds->extension;
-				
-				//$this->Saveattachment($file->filename,$chat->contact_id);
-			} */
 			///////////////////////
 			if($chat->save()){
 				return $this->asJson([
@@ -267,9 +259,20 @@ class MessageController extends \yii\rest\Controller
     }
 	public function Getgroupchat($id){
 		
-	  $my_var = \Yii::$app->request->post();
-	  $chat = Chat::find()->where(['group_id'=>$id])->all();
-	  return $chat;
+	 //$my_var = \Yii::$app->request->post();
+	 // $chat = Chat::find()->where(['group_id'=>$id])->all();
+	 // return $chat; 
+	  //$chat=SELECT * FROM `eulims_message`.`tbl_chat` INNER JOIN `eulims`.`tbl_profile` ON `eulims_message`.`tbl_chat`.`sender_userid`=`eulims`.`tbl_profile`.`user_id` WHERE group_id=4
+	 // $chat= Chat::find()->with('profile', true, 'INNER JOIN')->all();
+	 $chat = Chat::find()
+	->select(['tbl_profile.fullname','chat_id', 'sender_userid' => 'tbl_profile.fullname', 'timestamp', 'status_id', 'group_id', 'contact_id'])
+	->where(['group_id'=>4])
+	->leftJoin('eulims.tbl_profile', 'eulims.tbl_profile.user_id=eulims_message.tbl_chat.sender_userid')
+	->all();
+	 // $chat= Chat::find()->joinWith('profile')->where('group_id'=>4)->all();
+	  return $chat; 
+	  
+	  
 	}
 	
 	public function Getgrouprofile($id){
@@ -290,32 +293,30 @@ class MessageController extends \yii\rest\Controller
     }
 	
 	public function actionSavefile(){
-        $my_var = \Yii::$app->request->post();
-		$_FILES['filetoupload']; 
-		//var_dump($my_var);
-		//exit;
-		/*//$sds = UploadedFile::getInstance($my_var, 'filename');
-		$file=$my_var['sender_userid'];
-	    $sds = UploadedFile::getInstance($file);
-		$sds->saveAs('uploads/message/' . $chat->chat_id.'.'.$sds->extension);
-		//$file->filename ='uploads/message/'.$chat->chat_id.'.'.$sds->extension; */
+		$valid_extensions = ['jpeg', 'jpg', 'png', 'gif', 'bmp' , 'pdf' , 'doc' , 'ppt','docx','xlsx', 'pptx']; 
+		$path = 'uploads/message/'; // upload directory
 
-	   $file=$my_var['filetoupload'];
-	   $sds = UploadedFile::getInstance($file);
-			//for file attachment
-			$filename="Sample";
-		if (!empty($sds) && $sds !== 0) {                
-			$sds->saveAs('uploads/message/'.$filename.'.'.$sds->extension);
-			$file->filename ='uploads/message/'.$filename.'.'.$sds->extension;
-			
-			
-			//$this->Saveattachment($file->filename,$chat->contact_id);
+		$img = $_FILES['filetoupload']['name'];
+        $tmp = $_FILES['filetoupload']['tmp_name'];
+	
+		$ext = strtolower(pathinfo($img, PATHINFO_EXTENSION));
+		// can upload same image using rand function
+		$final_image = rand(1000,1000000).$img;
+		// check's valid format
+		if(in_array($ext, $valid_extensions)) 
+		{ 
+			$path = $path.strtolower($final_image); 
+			if(move_uploaded_file($tmp,$path)) 
+			{
+				
+			}
 		} 
-        return $this->asJson(
-           ['message' => 'ok']
-        ); 
-		//var_dump($my_var['formData']);
-		//exit;
+		
+		return $this->asJson(
+			['message' => 'success',
+			'filename'=>$final_image
+			]
+		); 	
     }
 	
 	public function actionGetgroup($userid){
@@ -329,6 +330,20 @@ class MessageController extends \yii\rest\Controller
             $group
         );
     }
-	
+    public function actionDownloadfile(){
+		// Initialize a file URL to the variable 
+			
+		$file = 'uploads/message/123456.png';
+		header("Content-Type: image/png");
+		header("Content-Disposition: attachment; filename=file name here");
+		header("Cache-Control: no-cache");
+		fopen($file,"w+");
 
+	}
+	/*public function actionProfile(){
+		$my_var = \Yii::$app->request->post();
+		$id=$my_var['id'];
+        $profile = Profile::find()->where(['user_id'=>$id])->one();
+        return $profile;
+    }*/
 }
