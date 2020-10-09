@@ -182,7 +182,7 @@ class RestcustomerController extends \yii\rest\Controller
     }
 
     public function actionGetcustonreq(){
-        $model = Request::find()->select(['request_id','request_ref_num','request_datetime'])->where(['customer_id'=>$this->getuserid(), 'status_id'=>1])->orderBy('request_id DESC')->all();
+        $model = Request::find()->select(['request_id','request_ref_num','request_datetime', 'status_id'])->where(['customer_id'=>$this->getuserid()])->orderBy('request_id DESC')->all();
 
         if($model){
             return $this->asJson(
