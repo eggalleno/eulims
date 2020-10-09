@@ -358,7 +358,7 @@ class MessageController extends \yii\rest\Controller
             // if(isset($post)){
             //     //$myvar = Json::decode($post['data']);
             //     //use this email to track if the user record already exist in ulimsportal or in any other cloud storage
-            //     //lets check the record if it exist
+         
 
                 $toreturn = false;
                 return $model = Customer::find()->where(['email'=>Yii::$app->request->post('email')])->one();
