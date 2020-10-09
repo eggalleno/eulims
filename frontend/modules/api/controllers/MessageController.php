@@ -386,7 +386,7 @@ class MessageController extends \yii\rest\Controller
                     $newmodel->is_sync_up = Yii::$app->request->post('is_sync_up');
                     $newmodel->is_updated = Yii::$app->request->post('is_updated');
                     $newmodel->is_deleted = Yii::$app->request->post('is_deleted');
-                    if($newmodel->save(false)){
+                    if($newmodel->save()){
                         $newmodel->customer_code = $newmodel->rstl_id."-".$newmodel->customer_id;
                         $newmodel->save(false);
                         $toreturn = $newmodel->customer_code;
