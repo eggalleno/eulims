@@ -352,47 +352,50 @@ class MessageController extends \yii\rest\Controller
 
     public function actionSynccustomer(){ 
      
-            $post = Yii::$app->request->post();
-            $toreturn = false;
-            if(isset($post)){
-                $myvar = Json::decode($post['data']);
-                //use this email to track if the user record already exist in ulimsportal or in any other cloud storage
-                //lets check the record if it exist
+        
+            // $post = Yii::$app->request->post();
+            
+            // if(isset($post)){
+            //     //$myvar = Json::decode($post['data']);
+            //     //use this email to track if the user record already exist in ulimsportal or in any other cloud storage
+            //     //lets check the record if it exist
+
+                $toreturn = false;
                 $model = Customer::find()->where(['email'=>$myvar['email']])->one();
+
                 if($model){
-                    //the customer already exist
                     // email already exist proceed to confirmation
                     $toreturn=2; //this mean that the record's email already exist and that the client accessing the API will know what to do -> compare the records for confirmation
                 }else{
-                    // save the customer info
+                   
                     $newmodel = new Customer;
-                    $newmodel->rstl_id = $myvar['rstl_id'];
-                    $newmodel->customer_name = $myvar['customer_name'];
-                    $newmodel->classification_id = $myvar['classification_id'];
-                    $newmodel->latitude = $myvar['latitude'];
-                    $newmodel->longitude = $myvar['longitude'];
-                    $newmodel->head = $myvar['head'];
-                    $newmodel->barangay_id = $myvar['barangay_id'];
-                    $newmodel->address = $myvar['address'];
-                    $newmodel->tel = $myvar['tel'];
-                    $newmodel->fax = $myvar['fax'];
-                    $newmodel->email = $myvar['email'];
-                    $newmodel->customer_type_id = $myvar['customer_type_id'];
-                    $newmodel->business_nature_id = $myvar['business_nature_id'];
-                    $newmodel->industrytype_id = $myvar['industrytype_id'];
-                    $newmodel->is_sync_up = $myvar['is_sync_up'];
-                    $newmodel->is_updated = $myvar['is_updated'];
-                    $newmodel->is_deleted = $myvar['is_deleted'];
-                    if($newmodel->save()){
+                    $newmodel->rstl_id = Yii::$app->request->post('rstl_id');
+                    $newmodel->customer_name = Yii::$app->request->post('customer_name');
+                    $newmodel->classification_id = Yii::$app->request->post('classification_id');
+                    $newmodel->latitude = Yii::$app->request->post('latitude');
+                    $newmodel->longitude = Yii::$app->request->post('longitude');
+                    $newmodel->head = Yii::$app->request->post('head');
+                    $newmodel->barangay_id = Yii::$app->request->post('barangay_id');
+                    $newmodel->address = Yii::$app->request->post('address');
+                    $newmodel->tel = Yii::$app->request->post('tel');
+                    $newmodel->fax = Yii::$app->request->post('fax');
+                    $newmodel->email = Yii::$app->request->post('email');
+                    $newmodel->customer_type_id = Yii::$app->request->post('customer_type_id');
+                    $newmodel->business_nature_id = Yii::$app->request->post('business_nature_id');
+                    $newmodel->industrytype_id = Yii::$app->request->post('industrytype_id');
+                    $newmodel->is_sync_up = Yii::$app->request->post('is_sync_up');
+                    $newmodel->is_updated = Yii::$app->request->post('is_updated');
+                    $newmodel->is_deleted = Yii::$app->request->post('is_deleted');
+                    if($newmodel->save(false)){
                         $newmodel->customer_code = $newmodel->rstl_id."-".$newmodel->customer_id;
                         $newmodel->save(false);
                         $toreturn = $newmodel->customer_code;
                     }
                 }
-            }
-            return $this->asJson(
-                        $toreturn
-                    );
+                
+                return $this->asJson(
+                    $toreturn
+                );
         
     }
 }
