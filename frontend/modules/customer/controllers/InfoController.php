@@ -79,31 +79,32 @@ class InfoController extends Controller
 
     public function actionSyncrecord($id){
 
-        $model = Customer::find()->where(['customer_code'=>null,'customer_id'=>$id])->one();
-         //enclose the to timeout in 20 seconds
+        $data = Customer::find()->where(['customer_code'=>null,'customer_id'=>$id])->one();
+        $params = (array) $data;
+
         try {
-            //$authorization = "Authorization: Bearer ".$token; 
-            $apiUrl=$GLOBALS['api_url']."message/server";
+            // $authorization = "Authorization: Bearer ".$token; 
+            $apiUrl=$GLOBALS['api_url']."message/synccustomer";
             $curl = new curl\Curl();
+            $curl->setRequestBody(json_encode($params));
             $curl->setOption(CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
             $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
             $curl->setOption(CURLOPT_TIMEOUT, 180);
-            $response = $curl->get($apiUrl);
-
-             if($response==2){
+            $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
+            $response = $curl->post($apiUrl);
+            
+            if($response==2){
                 //update the record's 
-                $model->sync_status = 2;
-                $model->save();
-
+                $data->sync_status = 2;
+                $data->save();
                 //notify user that the record may exist on the cloud server
-
                 echo "User's email already exist proceed to confirmation";
              } elseif ($response) {
                 //update the model with the customer code
-                $model->sync_status = 1;
+                $data->sync_status = 1;
                 $response = json_decode($response);
-                $model->customer_code=$response;
-                $model->save();
+                $data->customer_code=$response;
+                $data->save();
                 //user record sync
                 echo "Customer Code Sync with ID: ".$response;
              }
@@ -114,8 +115,6 @@ class InfoController extends Controller
         } catch (Exception $e) {
             echo "Syncing Failed...";
         }
-        
-       
        
     }
 
@@ -123,13 +122,13 @@ class InfoController extends Controller
 
 
         $model = Customer::find()->where(['customer_code'=>null,'customer_id'=>$id])->one();
-        $curl = new Curl();
+        $curl = new curl\Curl();
 
         try {
            $response = $curl->setGetParams([
                 'email' => $model->email,
              ])
-             ->get($GLOBALS['api_url']."confirm");
+             ->get($GLOBALS['api_url']."message/confirm");
 
             if ($curl->errorCode === null) {
                
