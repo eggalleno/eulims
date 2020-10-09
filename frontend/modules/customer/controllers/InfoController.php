@@ -92,7 +92,7 @@ class InfoController extends Controller
             $curl->setOption(CURLOPT_TIMEOUT, 180);
             $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
             $response = $curl->post($apiUrl);
-            
+            echo $response; exit;
             if($response==2){
                 //update the record's 
                 $data->sync_status = 2;

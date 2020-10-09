@@ -671,12 +671,21 @@ class RequestController extends Controller
         $Func->CheckRSTLProfile();
         $connection= Yii::$app->labdb;
         $connection->createCommand('SET FOREIGN_KEY_CHECKS=0')->execute();
-        //$GLOBALS['rstl_id']=Yii::$app->user->identity->profile->rstl_id;
+        $GLOBALS['rstl_id']=Yii::$app->user->identity->profile->rstl_id;
+
+
+        //gets the listoflabs //btc
         $labreferral = ArrayHelper::map(json_decode($refcomponent->listLabreferral()), 'lab_id', 'labname');
+    
+        //gets the list of discounts //btc
         $discountreferral = ArrayHelper::map(json_decode($refcomponent->listDiscountreferral()), 'discount_id', 'type');
+ 
+        //gets all the list of purposes //btc
         $purposereferral = ArrayHelper::map(json_decode($refcomponent->listPurposereferral()), 'purpose_id', 'name');
+
+        //gets all the list of modeofrelease //btc 
         $modereleasereferral = ArrayHelper::map(json_decode($refcomponent->listModereleasereferral()), 'modeofrelease_id', 'mode');
-        
+                
         if ($model->load(Yii::$app->request->post())) {
             $transaction = $connection->beginTransaction();
             $modelReferralrequest = new Referralrequest();
@@ -734,6 +743,7 @@ class RequestController extends Controller
                     'discountreferral' => $discountreferral,
                     'purposereferral' => $purposereferral,
                     'modereleasereferral' => $modereleasereferral,
+                    'api_url'=>$refcomponent->getSource()
                 ]);
             }else{
                 return $this->render('createReferral', [
@@ -742,6 +752,7 @@ class RequestController extends Controller
                     'discountreferral' => $discountreferral,
                     'purposereferral' => $purposereferral,
                     'modereleasereferral' => $modereleasereferral,
+                    'api_url'=>$refcomponent->getSource()
                 ]);
             }
         }
@@ -866,18 +877,19 @@ class RequestController extends Controller
     //get referral customer list
     public function actionReferralcustomerlist($query = null, $id = null)
     {
-        if (!is_null($query)) {
-            $apiUrl='http://localhost/eulimsapi.onelab.ph/api/web/referral/customers/searchname?keyword='.$query;
-            //$apiUrl='https://eulimsapi.onelab.ph/api/web/referral/customers/searchname?keyword='.$query;
+        // if (!is_null($query)) {
+            //btc :  gets the url from referralcomponent
+            $refcomponent = new ReferralComponent();
+            $apiUrl=$refcomponent->getSource().'/searchname?keyword='.$query;
             $curl = new curl\Curl();
             $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
             $curl->setOption(CURLOPT_TIMEOUT, 180);
             $show = $curl->get($apiUrl);
-        } else {
-            $show = ['results' => ['id' => '', 'text' => '']];
-        }
+        // } else {
+        //     $show = ['results' => ['id' => '', 'text' => '']];
+        // }
 
-        return $show;
+        return $apiUrl;
     }
     //check if received sample as a tesing lab
     protected function checkTesting($requestId,$rstlId)

@@ -11,7 +11,7 @@ namespace common\components;
 use Yii;
 use yii\base\Component;
 use yii\web\JsExpression;
-//use yii\helpers\ArrayHelper;
+use yii\helpers\ArrayHelper;
 //use common\models\lab\Request;
 //use kartik\grid\GridView;
 use yii\web\NotFoundHttpException;
@@ -33,9 +33,17 @@ use common\models\lab\Samplecode;//used to point to old referral
 class ReferralComponent extends Component {
 
     // public $source = 'https://eulimsapi.onelab.ph';
-    public $source = 'https://referral.onelab.ph/';
-    //public $source = 'http://localhost/eulimsapi.onelab.ph';
+    // public $source = 'https://referral.onelab.ph/';
+    // public $source = 'http://localhost/eulimsapi.onelab.ph';
+    public $source = 'http://www.eulims.local/api/restreferral';
     // public $source = 'http://192.168.1.213/referral.onelab.ph/';
+    /**
+     * Get Source
+     * @return string
+     */
+    function getSource(){
+        return $this->source;
+    }
     /**
      * FindOne testname
      * @param integer $testnameId
@@ -150,53 +158,41 @@ class ReferralComponent extends Component {
     //get referral laboratory list
     function listLabreferral()
     {
-        $apiUrl=$this->source.'/api/web/referral/listdatas/lab';
+        $apiUrl=$this->source.'/labs';
         $curl = new curl\Curl();
         $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
         $curl->setOption(CURLOPT_TIMEOUT, 180);
         $list = $curl->get($apiUrl);
-
-        //$data = ArrayHelper::map(json_decode($list), 'lab_id', 'labname');
-        
         return $list;
     }
     //get referral discount list
     function listDiscountreferral()
     {
-        $apiUrl=$this->source.'/api/web/referral/listdatas/discount';
+        $apiUrl=$this->source.'/discounts';
         $curl = new curl\Curl();
         $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
         $curl->setOption(CURLOPT_TIMEOUT, 180);
         $list = $curl->get($apiUrl);
-
-        //$data = ArrayHelper::map(json_decode($list), 'discount_id', 'type');
-        
         return $list;
     }
     //get referral purpose list
     function listPurposereferral()
     {
-        $apiUrl=$this->source.'/api/web/referral/listdatas/purpose';
+        $apiUrl=$this->source.'/purposes';
         $curl = new curl\Curl();
         $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
         $curl->setOption(CURLOPT_TIMEOUT, 180);
-        $list = $curl->get($apiUrl);
-
-        //$data = ArrayHelper::map(json_decode($list), 'purpose_id', 'name');
-        
+        $list = $curl->get($apiUrl);        
         return $list;
     }
     //get referral mode of release list
     function listModereleasereferral()
     {
-        $apiUrl=$this->source.'/api/web/referral/listdatas/moderelease';
+        $apiUrl=$this->source.'/modesrelease';
         $curl = new curl\Curl();
         $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
         $curl->setOption(CURLOPT_TIMEOUT, 180);
         $list = $curl->get($apiUrl);
-
-        //$data = ArrayHelper::map(json_decode($list), 'modeofrelease_id', 'mode');
-        
         return $list;
     }
     //get matching services

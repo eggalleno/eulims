@@ -201,7 +201,10 @@ return [
             'lab/booking/create',
             'lab/booking/viewcustomer',
             'lab/booking/viewbyreference',
-            'lab/csf/index'
+            'lab/csf/index',
+            'api/restreferral/*',
+            'api/message/*',
+            'api/restcustomer/*'
         ]
     ],
 
