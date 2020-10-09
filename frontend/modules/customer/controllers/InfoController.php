@@ -111,8 +111,8 @@ class InfoController extends Controller
             $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
             $curl->setOption(CURLOPT_TIMEOUT, 180);
             $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
-            $response = $curl->post('http://eulims.test/api/message/synccustomer');
-            
+            $response = $curl->post($apiUrl);
+            // var_dump($response); exit;
             if($response==2){
                 //update the record's 
                 $data->sync_status = 2;
