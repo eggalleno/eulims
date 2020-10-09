@@ -71,6 +71,7 @@ if($TRequest>0){
 $model->modeofreleaseids=$model->modeofrelease_ids;
 $sameLab = !empty($model->lab_id) ? $model->lab_id : 0;
 ?>
+
 <div class="request-form">
     <?php $form = ActiveForm::begin(); ?>
     <?= $form->field($model, 'rstl_id')->hiddenInput()->label(false) ?>
@@ -271,7 +272,7 @@ $sameLab = !empty($model->lab_id) ? $model->lab_id : 0;
             <div class="input-group">
                 <?php
                 $func = new Functions();
-                echo $func->GetCustomerList($form, $model, $disabled,'Customer');
+                echo $func->GetReferralCustomerList($form, $model, $disabled,'Customer');
                 if($disabled){
                     $btnDisp=" disabled='disabled'";
                 }else{
@@ -314,7 +315,8 @@ $sameLab = !empty($model->lab_id) ? $model->lab_id : 0;
         'pluginEvents'=>[
             "change" => 'function() { 
                 var discountid=this.value;
-                $.get("'.$api_url."/getdiscount".'", {
+                console.log(discountid);
+                $.get("/ajax/getdiscountreferral", {
                         discountid: discountid
                     }, function(result){
                     if(result){
