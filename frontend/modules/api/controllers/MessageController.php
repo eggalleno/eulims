@@ -361,7 +361,7 @@ class MessageController extends \yii\rest\Controller
             //     //lets check the record if it exist
 
                 $toreturn = false;
-                $model = Customer::find()->where(['email'=>$myvar['email']])->one();
+                $model = Customer::find()->where(['email'=>Yii::$app->request->post('email')])->one();
 
                 if($model){
                     // email already exist proceed to confirmation
