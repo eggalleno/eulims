@@ -48,7 +48,7 @@ $this->params['breadcrumbs'][] = $this->title;
             ['class' => 'kartik\grid\ActionColumn',
             'contentOptions' => ['style' => 'width: 8.7%'],
           //  'template' => $button,
-          'template' => '{view}{update}{delete}',
+          'template' => '{view}{update}',
             'buttons'=>[
                 'view'=>function ($url, $model) {
                     return Html::button('<span class="glyphicon glyphicon-eye-open"></span>', ['value'=>Url::to(['/lab/testname/view','id'=>$model->testname_id]), 'onclick'=>'LoadModal(this.title, this.value);', 'class' => 'btn btn-primary','title' => Yii::t('app', "View Test Name")]);
@@ -59,7 +59,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 // 'delete'=>function ($url, $model) {
                 //     $urls = '/lab/testname/delete?id='.$model->testname_id;
                 //     return Html::a('<span class="glyphicon glyphicon-trash"></span>', $urls,['data-confirm'=>"Are you sure you want to delete this record?<b></b>", 'data-method'=>'post', 'class'=>'btn btn-danger','title'=>'Delete Test Name','data-pjax'=>'0']);
-                // },
+                },
                 ],
             ],
         ],
