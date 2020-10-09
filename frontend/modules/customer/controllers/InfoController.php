@@ -92,7 +92,7 @@ class InfoController extends Controller
                  [
                     'data' => json::encode($model),
                  ])
-             ->post($GLOBALS['api_url']."synccustomer");
+             ->post($GLOBALS['api_url']."message/synccustomer");
 
              if($response==2){
                 //update the record's 
