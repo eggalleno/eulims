@@ -17,7 +17,7 @@ use yii\filters\VerbFilter;
 use yii\helpers\Html;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Json;
-use linslin\yii2\curl\Curl;
+use linslin\yii2\curl;
 use yii\data\ActiveDataProvider;
 /**
  * InfoController implements the CRUD actions for Customer model.
@@ -80,19 +80,15 @@ class InfoController extends Controller
     public function actionSyncrecord($id){
 
         $model = Customer::find()->where(['customer_code'=>null,'customer_id'=>$id])->one();
-        
-
-        $curl = new Curl();
-
          //enclose the to timeout in 20 seconds
         try {
-            // $curl->setOption(CURLOPT_CONNECTTIMEOUT,5);
-            // $curl->setOption(CURLOPT_TIMEOUT, 5);
-            $response = $curl->setRawPostData(
-                 [
-                    'data' => json::encode($model),
-                 ])
-             ->post($GLOBALS['api_url']."message/synccustomer");
+            //$authorization = "Authorization: Bearer ".$token; 
+            $apiUrl=$GLOBALS['api_url']."message/server";
+            $curl = new curl\Curl();
+            $curl->setOption(CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+            $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
+            $curl->setOption(CURLOPT_TIMEOUT, 180);
+            $response = $curl->get($apiUrl);
 
              if($response==2){
                 //update the record's 
@@ -102,7 +98,7 @@ class InfoController extends Controller
                 //notify user that the record may exist on the cloud server
 
                 echo "User's email already exist proceed to confirmation";
-             }else{
+             } elseif ($response) {
                 //update the model with the customer code
                 $model->sync_status = 1;
                 $response = json_decode($response);
@@ -110,6 +106,9 @@ class InfoController extends Controller
                 $model->save();
                 //user record sync
                 echo "Customer Code Sync with ID: ".$response;
+             }
+             else{
+                echo "Error : No response from API";
              }
             
         } catch (Exception $e) {
