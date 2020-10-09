@@ -11,6 +11,7 @@ use common\models\auth\AuthAssignment;
 use common\models\system\Rstl;
 
 use common\models\lab\Customer;
+use yii\helpers\Json;
 
 use common\models\message\Chat;
 use common\models\message\Contacts;
