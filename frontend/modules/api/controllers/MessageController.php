@@ -10,6 +10,8 @@ use common\models\system\User;
 use common\models\auth\AuthAssignment;
 use common\models\system\Rstl;
 
+use common\models\lab\Customer;
+
 use common\models\message\Chat;
 use common\models\message\Contacts;
 use common\models\message\GroupMember;
@@ -23,7 +25,7 @@ class MessageController extends \yii\rest\Controller
         $behaviors = parent::behaviors();
         $behaviors['authenticator'] = [
             'class' => \sizeg\jwt\JwtHttpBearerAuth::class,
-            'except' => ['login', 'server'],
+            'except' => ['login', 'server','synccustomer'],
             //'user'=> [\Yii::$app->referralaccount]
 
 
@@ -346,4 +348,50 @@ class MessageController extends \yii\rest\Controller
         $profile = Profile::find()->where(['user_id'=>$id])->one();
         return $profile;
     }*/
+
+    public function actionSynccustomer(){ 
+     
+            $post = Yii::$app->request->post();
+            $toreturn = false;
+            if(isset($post)){
+                $myvar = Json::decode($post['data']);
+                //use this email to track if the user record already exist in ulimsportal or in any other cloud storage
+                //lets check the record if it exist
+                $model = Customer::find()->where(['email'=>$myvar['email']])->one();
+                if($model){
+                    //the customer already exist
+                    // email already exist proceed to confirmation
+                    $toreturn=2; //this mean that the record's email already exist and that the client accessing the API will know what to do -> compare the records for confirmation
+                }else{
+                    // save the customer info
+                    $newmodel = new Customer;
+                    $newmodel->rstl_id = $myvar['rstl_id'];
+                    $newmodel->customer_name = $myvar['customer_name'];
+                    $newmodel->classification_id = $myvar['classification_id'];
+                    $newmodel->latitude = $myvar['latitude'];
+                    $newmodel->longitude = $myvar['longitude'];
+                    $newmodel->head = $myvar['head'];
+                    $newmodel->barangay_id = $myvar['barangay_id'];
+                    $newmodel->address = $myvar['address'];
+                    $newmodel->tel = $myvar['tel'];
+                    $newmodel->fax = $myvar['fax'];
+                    $newmodel->email = $myvar['email'];
+                    $newmodel->customer_type_id = $myvar['customer_type_id'];
+                    $newmodel->business_nature_id = $myvar['business_nature_id'];
+                    $newmodel->industrytype_id = $myvar['industrytype_id'];
+                    $newmodel->is_sync_up = $myvar['is_sync_up'];
+                    $newmodel->is_updated = $myvar['is_updated'];
+                    $newmodel->is_deleted = $myvar['is_deleted'];
+                    if($newmodel->save()){
+                        $newmodel->customer_code = $newmodel->rstl_id."-".$newmodel->customer_id;
+                        $newmodel->save(false);
+                        $toreturn = $newmodel->customer_code;
+                    }
+                }
+            }
+            return $this->asJson(
+                        $toreturn
+                    );
+        
+    }
 }
