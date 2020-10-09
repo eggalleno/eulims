@@ -80,8 +80,28 @@ class InfoController extends Controller
     public function actionSyncrecord($id){
 
         $data = Customer::find()->where(['customer_code'=>null,'customer_id'=>$id])->one();
-        $params = (array) $data;
-
+        // $params = (array) $data;
+        $params = [
+            'email' => $data['email'],
+            'customer_id' => $data['customer_id'],
+            'rstl_id' => $data['rstl_id'],
+            'customer_name' =>$data['customer_name'],
+            'classification_id' =>$data['classification_id'],
+            'latitude' => $data['latitude'],
+            'longitude' => $data['longitude'],
+            'head' => $data['head'],
+            'barangay_id' => $data['barangay_id'],
+            'address' => $data['address'],
+            'tel' => $data['tel'],
+            'fax' => $data['fax'],
+            'email' => $data['email'],
+            'customer_type_id' => $data['customer_type_id'],
+            'business_nature_id' => $data['business_nature_id'],
+            'industrytype_id' => $data['industrytype_id'],
+            'is_sync_up' => $data['is_sync_up'],
+            'is_updated' => $data['is_updated'],
+            'is_deleted' => $data['is_deleted'],
+        ];
         try {
             // $authorization = "Authorization: Bearer ".$token; 
             $apiUrl=$GLOBALS['api_url']."message/synccustomer";
@@ -91,7 +111,7 @@ class InfoController extends Controller
             $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
             $curl->setOption(CURLOPT_TIMEOUT, 180);
             $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
-            $response = $curl->post($apiUrl);
+            $response = $curl->post('http://eulims.test/api/message/synccustomer');
             
             if($response==2){
                 //update the record's 
