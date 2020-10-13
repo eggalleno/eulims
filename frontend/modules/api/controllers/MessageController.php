@@ -398,4 +398,12 @@ class MessageController extends \yii\rest\Controller
                 );
         
     }
+
+    public function actionConfirm($email){
+        $model = Customer::find()->where(['email'=>$email])->one();
+
+        return $this->asJson(
+                        $model
+                    );
+    }
 }
