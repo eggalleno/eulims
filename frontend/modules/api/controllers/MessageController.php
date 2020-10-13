@@ -26,7 +26,7 @@ class MessageController extends \yii\rest\Controller
         $behaviors = parent::behaviors();
         $behaviors['authenticator'] = [
             'class' => \sizeg\jwt\JwtHttpBearerAuth::class,
-            'except' => ['login', 'server','synccustomer'],
+            'except' => ['login', 'server','synccustomer','confirm'],
             //'user'=> [\Yii::$app->referralaccount]
 
 

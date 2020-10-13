@@ -79,28 +79,25 @@ class InfoController extends Controller
 
     public function actionSyncrecord($id){
 
-        $data = Customer::find()->where(['customer_code'=>null,'customer_id'=>$id])->one();
+        $data = Customer::findOne($id);
         // $params = (array) $data;
         $params = [
-            'email' => $data['email'],
-            'customer_id' => $data['customer_id'],
-            'rstl_id' => $data['rstl_id'],
-            'customer_name' =>$data['customer_name'],
-            'classification_id' =>$data['classification_id'],
-            'latitude' => $data['latitude'],
-            'longitude' => $data['longitude'],
-            'head' => $data['head'],
-            'barangay_id' => $data['barangay_id'],
-            'address' => $data['address'],
-            'tel' => $data['tel'],
-            'fax' => $data['fax'],
-            'email' => $data['email'],
-            'customer_type_id' => $data['customer_type_id'],
-            'business_nature_id' => $data['business_nature_id'],
-            'industrytype_id' => $data['industrytype_id'],
-            'is_sync_up' => $data['is_sync_up'],
-            'is_updated' => $data['is_updated'],
-            'is_deleted' => $data['is_deleted'],
+            'email' => $data->email,
+            'customer_id' => $data->customer_id,
+            'rstl_id' => $data->rstl_id,
+            'customer_name' =>$data->customer_name,
+            'classification_id' =>$data->classification_id,
+            'latitude' => $data->latitude,
+            'longitude' => $data->longitude,
+            'head' => $data->head,
+            'barangay_id' => $data->barangay_id,
+            'address' => $data->address,
+            'tel' => $data->tel,
+            'fax' => $data->fax,
+            'email' => $data->email,
+            'customer_type_id' => $data->customer_type_id,
+            'business_nature_id' => $data->business_nature_id,
+            'industrytype_id' => $data->industrytype_id,
         ];
         try {
             // $authorization = "Authorization: Bearer ".$token; 
@@ -112,6 +109,8 @@ class InfoController extends Controller
             $curl->setOption(CURLOPT_TIMEOUT, 180);
             $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
             $response = $curl->post($apiUrl);
+
+
             // var_dump($response); exit;
             if($response==2){
                 //update the record's 
@@ -141,17 +140,20 @@ class InfoController extends Controller
     public function actionConfirmrecord($id){
 
 
-        $model = Customer::find()->where(['customer_code'=>null,'customer_id'=>$id])->one();
+        $model = Customer::findOne($id);
         $curl = new curl\Curl();
 
         try {
-           $response = $curl->setGetParams([
+            $curl->setOption(CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+            $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
+            $curl->setOption(CURLOPT_TIMEOUT, 180);
+            $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
+            $response = $curl->setGetParams([
                 'email' => $model->email,
              ])
              ->get($GLOBALS['api_url']."message/confirm");
 
             if ($curl->errorCode === null) {
-               
                return $this->renderAjax('_view', [
                     'model' => $response,
                     'local'=>$model
@@ -170,7 +172,7 @@ class InfoController extends Controller
             $session->set('deletepopup',"Something Went Wrong!");
             return $this->redirect(['index']);
         }
-        $model = Customer::find()->where(['customer_code'=>null,'email'=>$email])->one();
+        $model = Customer::find()->where(['email'=>$email])->one();
         $model->customer_code=$code;
         $model->sync_status=1;
         if($model->save()){
