@@ -10,6 +10,9 @@ use common\models\system\User;
 use common\models\auth\AuthAssignment;
 use common\models\system\Rstl;
 
+use common\models\lab\Customer;
+use yii\helpers\Json;
+
 use common\models\message\Chat;
 use common\models\message\Contacts;
 use common\models\message\GroupMember;
@@ -24,7 +27,7 @@ class MessageController extends \yii\rest\Controller
         $behaviors = parent::behaviors();
         $behaviors['authenticator'] = [
             'class' => \sizeg\jwt\JwtHttpBearerAuth::class,
-            'except' => ['login', 'server'],
+            'except' => ['login', 'server','synccustomer','confirm'],
             //'user'=> [\Yii::$app->referralaccount]
 
 
@@ -337,8 +340,6 @@ class MessageController extends \yii\rest\Controller
 	
 	public function actionSetgroup(){ //send message
        $my_var = \Yii::$app->request->post();
-
-
        if(!$my_var){
             return $this->asJson([
                 'success' => false,
@@ -373,4 +374,69 @@ class MessageController extends \yii\rest\Controller
 		); 	
 	   }
 	}   
+
+	//}
+	/*public function actionProfile(){
+		$my_var = \Yii::$app->request->post();
+		$id=$my_var['id'];
+        $profile = Profile::find()->where(['user_id'=>$id])->one();
+        return $profile;
+    }*/
+
+    public function actionSynccustomer(){ 
+     
+        
+            // $post = Yii::$app->request->post();
+            
+            // if(isset($post)){
+            //     //$myvar = Json::decode($post['data']);
+            //     //use this email to track if the user record already exist in ulimsportal or in any other cloud storage
+         
+
+                $toreturn = false;
+                return $model = Customer::find()->where(['email'=>Yii::$app->request->post('email')])->one();
+
+                if(count($model) > 0){
+                    // email already exist proceed to confirmation
+                    $toreturn=2; //this mean that the record's email already exist and that the client accessing the API will know what to do -> compare the records for confirmation
+                }else{
+                   
+                    $newmodel = new Customer;
+                    $newmodel->rstl_id = Yii::$app->request->post('rstl_id');
+                    $newmodel->customer_name = Yii::$app->request->post('customer_name');
+                    $newmodel->classification_id = Yii::$app->request->post('classification_id');
+                    $newmodel->latitude = Yii::$app->request->post('latitude');
+                    $newmodel->longitude = Yii::$app->request->post('longitude');
+                    $newmodel->head = Yii::$app->request->post('head');
+                    $newmodel->barangay_id = Yii::$app->request->post('barangay_id');
+                    $newmodel->address = Yii::$app->request->post('address');
+                    $newmodel->tel = Yii::$app->request->post('tel');
+                    $newmodel->fax = Yii::$app->request->post('fax');
+                    $newmodel->email = Yii::$app->request->post('email');
+                    $newmodel->customer_type_id = Yii::$app->request->post('customer_type_id');
+                    $newmodel->business_nature_id = Yii::$app->request->post('business_nature_id');
+                    $newmodel->industrytype_id = Yii::$app->request->post('industrytype_id');
+                    $newmodel->is_sync_up = Yii::$app->request->post('is_sync_up');
+                    $newmodel->is_updated = Yii::$app->request->post('is_updated');
+                    $newmodel->is_deleted = Yii::$app->request->post('is_deleted');
+                    if($newmodel->save()){
+                        $newmodel->customer_code = $newmodel->rstl_id."-".$newmodel->customer_id;
+                        $newmodel->save(false);
+                        $toreturn = $newmodel->customer_code;
+                    }
+                }
+                
+                return $this->asJson(
+                    $toreturn
+                );
+        
+    }
+
+    public function actionConfirm($email){
+        $model = Customer::find()->where(['email'=>$email])->one();
+
+        return $this->asJson(
+                        $model
+                    );
+    }
 }

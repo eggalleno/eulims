@@ -182,7 +182,7 @@ class RestcustomerController extends \yii\rest\Controller
     }
 
     public function actionGetcustonreq(){
-        $model = Request::find()->select(['request_id','request_ref_num','request_datetime'])->where(['customer_id'=>$this->getuserid(), 'status_id'=>1])->orderBy('request_id DESC')->all();
+        $model = Request::find()->select(['request_id','request_ref_num','request_datetime', 'status_id'])->where(['customer_id'=>$this->getuserid()])->orderBy('request_id DESC')->all();
 
         if($model){
             return $this->asJson(
@@ -258,6 +258,7 @@ class RestcustomerController extends \yii\rest\Controller
         $bookling->booking_status = 0;
         $bookling->purpose = $my_var['Purpose'];
         $bookling->modeofrelease_ids = $my_var['Modeofrelease'];
+        $bookling->customerstat = 1;
 
         if($bookling->save(false)){
             return $this->asJson([
@@ -318,17 +319,9 @@ class RestcustomerController extends \yii\rest\Controller
 
     public function actionGetbookings(){
         $my_var = Booking::find()->where(['customer_id'=>$this->getuserid()])->orderby('scheduled_date DESC')->all();
-        if($my_var){
         return $this->asJson(
             $my_var
         );    
-        }
-        else{
-            return $this->asJson([
-                'success' => false,
-                'message' => 'No data Found',
-            ]);
-        }
     }
 
     public function actionGetbookingdetails(){
@@ -345,8 +338,10 @@ class RestcustomerController extends \yii\rest\Controller
          ->all();
 
          // var_dump($my_var); exit;
-
-        if($my_var){
+         return $this->asJson(
+            $my_var
+        );  
+       /* if($my_var){
         return $this->asJson(
             $my_var
         );    
@@ -356,7 +351,7 @@ class RestcustomerController extends \yii\rest\Controller
                 'success' => false,
                 'message' => 'No data Found',
             ]);
-        }
+        }*/
     }
 
     public function actionMailcode($email){
@@ -386,7 +381,7 @@ class RestcustomerController extends \yii\rest\Controller
             }
             //contruct the html content to be mailed to the customer
             $content ="
-            <h1>Hello $customer->customer_name</h1>
+            <h1>Good day! $customer->customer_name</h1>
 
             <h3>Account code : $code</h3>
             <p>Thank you for choosing the Onelab, to be able to provide a quality service to our beloved customer, we are giving this account code above which you may use to activate your account if ever you want to use the mobile app version, below are the following features that you may found useful. Available for Android and Apple smart devices. </p>
@@ -396,6 +391,7 @@ class RestcustomerController extends \yii\rest\Controller
                 <li>Request Transaction History</li>
                 <li>Wallet Transations and History</li>
                 <li>Bookings</li>
+                <li>User Profile</li>
             </ul>
             <br>
             <p>Truly yours,</p>
