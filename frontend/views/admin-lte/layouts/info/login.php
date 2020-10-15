@@ -11,6 +11,7 @@ $this->title = 'Login';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="site-login">
+    <h1><?= Html::encode($this->title) ?></h1>
 
     <p>Please fill out the following fields to login:</p>
 
@@ -45,9 +46,8 @@ $this->params['breadcrumbs'][] = $this->title;
 		},
 		success: function(response) {
 			var token=response.token;
-			var userid=response.userid;
 			$.post({
-            url: '/chat/info/settoken?token='+token+'&userid='+userid, // your controller action
+            url: '/chat/info/settoken?token='+token, // your controller action
       
 				success: function(data) {
 					//alert("data");

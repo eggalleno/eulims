@@ -4,6 +4,7 @@ namespace frontend\modules\chat\controllers;
 
 use Yii;
 use common\models\message\Chat;
+use common\models\message\ChatGroup;
 use common\models\message\ChatSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
@@ -11,8 +12,10 @@ use yii\filters\VerbFilter;
 use common\models\system\LoginForm;
 use linslin\yii2\curl;
 use yii\helpers\Json;
+use yii\data\ActiveDataProvider;
 
 use common\components\Notification;
+
 /**
  * InfoController implements the CRUD actions for Chat model.
  */
@@ -64,6 +67,8 @@ class InfoController extends Controller
 			$curl->setOption(CURLOPT_TIMEOUT, 180);
 			$list = $curl->get($apiUrl);
 			$decode=Json::decode($list);
+		
+		
 		
 			//GROUPLIST
 			$groupUrl=$this->source.'/api/message/getgroup?userid='.$userid;
@@ -177,11 +182,12 @@ class InfoController extends Controller
         }
     }
 	
-	public function actionSettoken($token)
+	public function actionSettoken($token,$userid)
     {
 		$session = Yii::$app->session;
 		
 		$session->set('usertoken', $token);
+		$session->set('userid', $userid);
 		return;
 	}	
     public function beforeAction($action) 
@@ -190,5 +196,59 @@ class InfoController extends Controller
 		return parent::beforeAction($action); 
 	}	
 	
+	 public function actionGroup()
+    {
+	    $model = new ChatGroup();
+		
+		if(isset($_SESSION['usertoken'])){
+			$token=$_SESSION['usertoken'];
+			$userid= Yii::$app->user->identity->profile->user_id;
+			//get profile
+			$authorization = "Authorization: Bearer ".$token; 
+			$apiUrl=$this->source.'/api/message/possiblerecipients?userid='.$userid;
+			$curl = new curl\Curl();
+			$curl->setOption(CURLOPT_HTTPHEADER, ['Content-Type: application/json' , $authorization]);
+			$curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
+			$curl->setOption(CURLOPT_TIMEOUT, 180);
+			$list = $curl->get($apiUrl);
+			$decode=Json::decode($list);
+			
+		    //var_dump($list);
+			//exit;
+			
+			
+		//	$dataProvider = New ActiveDataProvider(['query'=>$list]);
+		
+			if ($model->load(Yii::$app->request->post())) {
+				
+			}
+			else{
+				return $this->renderAjax('group', [
+				'model' => $model,
+				'possible_recipients' => $decode,
+				]);
+			}
+		
+		}	
+		else{
+			$model = new LoginForm();
+			if ($model->load(Yii::$app->request->post())){
+			}else{
+				return $this->render('login', [
+				'model' => $model
+				]);
+			}	
+		}
+        
+    }
 	
+	public function actionLogin(){
+		$model = new LoginForm();
+		if ($model->load(Yii::$app->request->post())){
+		}else{
+			return $this->render('login', [
+			'model' => $model
+			]);
+		}	
+	}
 }

@@ -17,6 +17,7 @@ use Yii;
  */
 class ChatGroup extends \yii\db\ActiveRecord
 {
+	public $userids;
     /**
      * {@inheritdoc}
      */
