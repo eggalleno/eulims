@@ -41,7 +41,7 @@ class MessageController extends \yii\rest\Controller
             'class' => \yii\filters\Cors::className(),
             'cors'  => [
                 // restrict access to domains:
-                'Origin'                           => '*',
+                'Origin'                           => ['*'],
                 'Access-Control-Request-Method'    => ['POST'],
                 'Access-Control-Allow-Credentials' => true,
                 'Access-Control-Max-Age'           => 3600,                 // Cache (seconds)
