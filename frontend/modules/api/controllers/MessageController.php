@@ -384,17 +384,9 @@ class MessageController extends \yii\rest\Controller
     }*/
 
     public function actionSynccustomer(){ 
-     
-        
-            // $post = Yii::$app->request->post();
-            
-            // if(isset($post)){
-            //     //$myvar = Json::decode($post['data']);
-            //     //use this email to track if the user record already exist in ulimsportal or in any other cloud storage
-         
 
                 $toreturn = false;
-                return $model = Customer::find()->where(['email'=>Yii::$app->request->post('email')])->one();
+                $model = Customer::find()->where(['email'=>Yii::$app->request->post('email')])->one();
 
                 if(count($model) > 0){
                     // email already exist proceed to confirmation
