@@ -345,6 +345,7 @@ class MessageController extends \yii\rest\Controller
                 'success' => false,
                 'message' => 'POST empty',
             ]); 
+			
        }
 	   else{
 		    $userids=$my_var['userids'];

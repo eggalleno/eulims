@@ -21,7 +21,7 @@ use common\components\Notification;
  */
 class InfoController extends Controller
 {
-	public $source = 'http://www.eulims.local/';
+	public $source = 'https://eulims.onelab.dost.gov.ph/api/message/';
     /**
      * @inheritdoc
      */
@@ -60,9 +60,10 @@ class InfoController extends Controller
 			$userid= Yii::$app->user->identity->profile->user_id;
 			//get profile
 			$authorization = "Authorization: Bearer ".$token; 
-			$apiUrl=$this->source.'/api/message/getuser';
+			$apiUrl=$this->source.'/getuser';
 			$curl = new curl\Curl();
 			$curl->setOption(CURLOPT_HTTPHEADER, ['Content-Type: application/json' , $authorization]);
+			$curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
 			$curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
 			$curl->setOption(CURLOPT_TIMEOUT, 180);
 			$list = $curl->get($apiUrl);
@@ -71,9 +72,10 @@ class InfoController extends Controller
 		
 		
 			//GROUPLIST
-			$groupUrl=$this->source.'/api/message/getgroup?userid='.$userid;
+			$groupUrl=$this->source.'/getgroup?userid='.$userid;
 			$curlgroup = new curl\Curl();
 			$curlgroup->setOption(CURLOPT_HTTPHEADER, ['Content-Type: application/json' , $authorization]);
+			$curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
 			$curlgroup->setOption(CURLOPT_CONNECTTIMEOUT, 180);
 			$curlgroup->setOption(CURLOPT_TIMEOUT, 180);
 			$grouplist = $curlgroup->get($groupUrl);
@@ -205,9 +207,10 @@ class InfoController extends Controller
 			$userid= Yii::$app->user->identity->profile->user_id;
 			//get profile
 			$authorization = "Authorization: Bearer ".$token; 
-			$apiUrl=$this->source.'/api/message/possiblerecipients?userid='.$userid;
+			$apiUrl=$this->source.'/possiblerecipients?userid='.$userid;
 			$curl = new curl\Curl();
 			$curl->setOption(CURLOPT_HTTPHEADER, ['Content-Type: application/json' , $authorization]);
+			$curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
 			$curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
 			$curl->setOption(CURLOPT_TIMEOUT, 180);
 			$list = $curl->get($apiUrl);

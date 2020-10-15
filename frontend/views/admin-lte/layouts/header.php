@@ -81,7 +81,7 @@ $this->registerJsFile("/js/intro.js", [
 ], 'js-intro');
 
 $session = Yii::$app->session;
-$source = 'http://www.eulims.local/'; //API LINK
+$source = 'https://eulims.onelab.dost.gov.ph/api/message/'; //API LINK
 $sourcetoken="";
 $flag="";
 $contacts="";
@@ -95,6 +95,7 @@ if(isset($_SESSION['usertoken'])){
 	$apiUrl=$source.'/api/message/getuser';
 	$curl = new curl\Curl();
 	$curl->setOption(CURLOPT_HTTPHEADER, ['Content-Type: application/json' , $authorization]);
+	$curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
 	$curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
 	$curl->setOption(CURLOPT_TIMEOUT, 180);
 	$list = $curl->get($apiUrl);
@@ -104,6 +105,7 @@ if(isset($_SESSION['usertoken'])){
 	$groupUrl=$source.'/api/message/getgroup?userid='.$userid;
 	$curlgroup = new curl\Curl();
 	$curlgroup->setOption(CURLOPT_HTTPHEADER, ['Content-Type: application/json' , $authorization]);
+	$curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
 	$curlgroup->setOption(CURLOPT_CONNECTTIMEOUT, 180);
 	$curlgroup->setOption(CURLOPT_TIMEOUT, 180);
 	$grouplist = $curlgroup->get($groupUrl);
@@ -319,7 +321,7 @@ function mes(id,type) {
 		//alert(token);
 	   // exit;
 			$.ajax({
-			url: "http://www.eulims.local/api/message/getcontact", //API LINK FROM THE CENTRAL
+			url: "https://eulims.onelab.dost.gov.ph/api/message/getcontact", //API LINK FROM THE CENTRAL
 			type: 'POST',
 			dataType: "JSON",
 			beforeSend: function (xhr) {
@@ -352,7 +354,7 @@ function mes(id,type) {
 						if(messagetype == 1){
 							x = x+"<p class='message-content'>"+response.chat[y].chat_data+"</p>";	
 						}else{
-							x= x+ "<a href='http://www.eulims.local/uploads/message/"+response.chat[y].chat_data+"' download>"+response.chat[y].chat_data+"</a>";
+							x= x+ "<a href='https://eulims.onelab.dost.gov.ph/uploads/message/"+response.chat[y].chat_data+"' download>"+response.chat[y].chat_data+"</a>";
 						}
 						
 						x = x+"<div class='message-timestamp-left'>"+dt+"</div>";
@@ -365,7 +367,7 @@ function mes(id,type) {
 						if(messagetype == 1){
 							x = x+"<p class='message-content'>"+response.chat[y].chat_data+"</p>";	
 						}else{
-							x= x+ "<a href='http://www.eulims.local/uploads/message/"+response.chat[y].chat_data+"' download>"+response.chat[y].chat_data+"</a>";
+							x= x+ "<a href='https://eulims.onelab.dost.gov.ph/uploads/message/"+response.chat[y].chat_data+"' download>"+response.chat[y].chat_data+"</a>";
 						}
 						x = x+"<div class='message-timestamp-right'>"+dt+"</div>";
 						x = x+"</div>";
@@ -431,7 +433,7 @@ function sendmessage() {
 		var formData = new FormData($('form')[0]);
 		
 		$.ajax({
-			url: "http://www.eulims.local/api/message/savefile", //API LINK FROM THE CENTRAL
+			url: "https://eulims.onelab.dost.gov.ph/api/message/savefile", //API LINK FROM THE CENTRAL
 			type: 'POST',
 			dataType: "JSON",
 			beforeSend: function (xhr) {
@@ -579,7 +581,7 @@ function sendchat(txt) {
 		}
 	?>;
 	$.ajax({
-		url: "http://www.eulims.local/api/message/setmessage", //API LINK FROM THE CENTRAL
+		url: "https://eulims.onelab.dost.gov.ph/api/message/setmessage", //API LINK FROM THE CENTRAL
 		type: 'POST',
 		dataType: "JSON",
 		beforeSend: function (xhr) {
@@ -600,7 +602,7 @@ function sendchat(txt) {
 			if(type == 1){
 				x = x+"<p class='message-content'>"+txt+"</p>";
 			}else{
-				x= x+ "<a href='http://www.eulims.local/uploads/message/"+txt+"' download>"+txt+"</a>";
+				x= x+ "<a href='https://eulims.onelab.dost.gov.ph/uploads/message/"+txt+"' download>"+txt+"</a>";
 			}
 			
 			
@@ -626,7 +628,7 @@ function getprofile(id) {
 	}
 	?>;
 	$.ajax({
-		url: "http://www.eulims.local/api/message/profile", //API LINK FROM THE CENTRAL
+		url: "https://eulims.onelab.dost.gov.ph/api/message/profile", //API LINK FROM THE CENTRAL
 		type: 'POST',
 		dataType: "JSON",
 		beforeSend: function (xhr) {
