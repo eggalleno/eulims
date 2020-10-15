@@ -22,6 +22,12 @@ use yii\web\UploadedFile;
 use yii\data\ActiveDataProvider;
 class MessageController extends \yii\rest\Controller
 {
+	public static function allowedDomains() {
+        return [
+            '*',                     
+        ];
+    }
+
 	public function behaviors()
     {
         $behaviors = parent::behaviors();
@@ -29,8 +35,17 @@ class MessageController extends \yii\rest\Controller
             'class' => \sizeg\jwt\JwtHttpBearerAuth::class,
             'except' => ['login', 'server','synccustomer','confirm'],
             //'user'=> [\Yii::$app->referralaccount]
+        ];
 
-
+        $behaviors['corsFilter']  = [
+            'class' => \yii\filters\Cors::className(),
+            'cors'  => [
+                // restrict access to domains:
+                'Origin'                           => static::allowedDomains(),
+                'Access-Control-Request-Method'    => ['POST'],
+                'Access-Control-Allow-Credentials' => true,
+                'Access-Control-Max-Age'           => 3600,                 // Cache (seconds)
+            ],
         ];
 
         return $behaviors;
@@ -433,32 +448,5 @@ class MessageController extends \yii\rest\Controller
                     );
     }
 	
-	public static function allowedDomains() {
-        return [
-            '*',                     
-        ];
-    }
-
-	public function behaviors()
-    {
-        $behaviors = parent::behaviors();
-        $behaviors['authenticator'] = [
-            'class' => \sizeg\jwt\JwtHttpBearerAuth::class,
-            'except' => ['login', 'server','synccustomer','confirm'],
-            //'user'=> [\Yii::$app->referralaccount]
-        ];
-
-        $behaviors['corsFilter']  = [
-            'class' => \yii\filters\Cors::className(),
-            'cors'  => [
-                // restrict access to domains:
-                'Origin'                           => static::allowedDomains(),
-                'Access-Control-Request-Method'    => ['POST'],
-                'Access-Control-Allow-Credentials' => true,
-                'Access-Control-Max-Age'           => 3600,                 // Cache (seconds)
-            ],
-        ];
-
-        return $behaviors;
-    }
+	
 }
