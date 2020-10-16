@@ -76,7 +76,8 @@ class MessageController extends \yii\rest\Controller
                                     'middleInitial' => $profile->middleinitial,
                                     'lastname' => $profile->lastname,
                                     'type' => $role->item_name,]),
-						'userid'=> $profile->user_id,			
+						'userid'=> $profile->user_id,	
+						'success' => true
                     ]);
                 } else {
                     return $this->asJson([
