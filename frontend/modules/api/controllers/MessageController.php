@@ -22,6 +22,12 @@ use yii\web\UploadedFile;
 use yii\data\ActiveDataProvider;
 class MessageController extends \yii\rest\Controller
 {
+	public static function allowedDomains() {
+        return [
+            '*',                     
+        ];
+    }
+
 	public function behaviors()
     {
         $behaviors = parent::behaviors();
@@ -30,9 +36,18 @@ class MessageController extends \yii\rest\Controller
             'except' => ['login', 'server','synccustomer','confirm'],
             //'user'=> [\Yii::$app->referralaccount]
         ];
-        return $behaviors;
-    }
 
+        $behaviors['corsFilter']  = [
+            'class' => \yii\filters\Cors::className(),
+            'cors'  => [
+                // restrict access to domains:
+                'Origin'                           => static::allowedDomains(),
+                'Access-Control-Request-Method'    => ['POST'],
+                'Access-Control-Allow-Credentials' => true,
+                'Access-Control-Max-Age'           => 3600,                 // Cache (seconds)
+            ],
+        ];
+	}
     protected function verbs(){
         return [
             'login' => ['POST'],

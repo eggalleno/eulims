@@ -105,7 +105,7 @@ if(isset($_SESSION['usertoken'])){
 	$groupUrl=$source.'/api/message/getgroup?userid='.$userid;
 	$curlgroup = new curl\Curl();
 	$curlgroup->setOption(CURLOPT_HTTPHEADER, ['Content-Type: application/json' , $authorization]);
-	$curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
+	$curlgroup->setOption(CURLOPT_SSL_VERIFYPEER, false);
 	$curlgroup->setOption(CURLOPT_CONNECTTIMEOUT, 180);
 	$curlgroup->setOption(CURLOPT_TIMEOUT, 180);
 	$grouplist = $curlgroup->get($groupUrl);

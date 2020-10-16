@@ -130,6 +130,7 @@ return [
             'identityClass' => 'common\models\system\User',
             'enableAutoLogin' => true,
             'identityCookie' => ['name' => '_identity-referral', 'httpOnly' => true],
+			'enableSession' =>false
         ],
 
         'view' => [

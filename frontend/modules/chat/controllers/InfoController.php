@@ -15,6 +15,7 @@ use yii\helpers\Json;
 use yii\data\ActiveDataProvider;
 
 use common\components\Notification;
+use  yii\web\Session;
 
 /**
  * InfoController implements the CRUD actions for Chat model.
@@ -262,20 +263,17 @@ class InfoController extends Controller
             $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
             $response = $curl->post($apiUrl);
 			$decoderes=Json::decode($response);
-			
-			if($decoderes['success'] <> 0){ //false
-				$token=$decoderes['token'];
-				$userid=$decoderes['userid'];
 
-				$session = \Yii::$app->session;
-		
-				//$session->set('usertoken', $token);
-				//$session->set('userid', $userid);
-				
+			if($decoderes['success'] <> 0){ //false
+
+				$session = Yii::$app->session;
+				$session->set('token', $decoderes['token']);
+				$session->set('userid', $decoderes['userid']);
 			}
 			else{
-				
+				echo "wala";
 			}
+			exit;
 		}else{
 			return $this->render('login', [
 			'model' => $model
