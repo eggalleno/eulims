@@ -69,10 +69,18 @@ class RestapiController extends \yii\rest\Controller
      */
     public function actionLogin()
     {
+        $my_var = \Yii::$app->request->post();
+
+        $email = $my_var['email'];
+        $password = $my_var['password'];
+
+        $users = User::find()->where(['LIKE', 'email', $email])->one();
+
+        if($users){
             $model = new LoginForm();
             $my_var = \Yii::$app->request->post();
-            $model->email = $my_var['email'];
-            $model->password = $my_var['password'];
+            $model->email = $users->email;
+            $model->password = $password;
            
             if ($model->login()) {      
                 $signer = new \Lcobucci\JWT\Signer\Hmac\Sha256();
@@ -89,24 +97,30 @@ class RestapiController extends \yii\rest\Controller
                     ->sign($signer, $jwt->key)// creates a signature using [[Jwt::$key]]
                     ->getToken(); // Retrieves the generated token
     
-                    $users = User::find()->where(['LIKE', 'email', $my_var['email']])->one();
                     $profile = Profile::find()->where(['user_id'=>$users->user_id])->one();
                     $role = AuthAssignment::find()->where(['user_id'=>$users->user_id])->one();
         
                     return $this->asJson([
                         'token' => (string)$token,
-                        'user'=> (['email'=>$users->email,
-                                    'firstName'=>$profile->firstname,
-                                    'middleInitial' => $profile->middleinitial,
-                                    'lastname' => $profile->lastname,
-                                    'type' => $role->item_name,]),
+                        'email'=>$users->email,
+                        'firstName'=>$profile->firstname,
+                        'middleInitial' => $profile->middleinitial,
+                        'lastname' => $profile->lastname,
+                        'type' => $role->item_name,
                     ]);
-                } else {
+            } else {
                     return $this->asJson([
                         'success' => false,
-                        'message' => 'Email and Password didn\'t match',
+                        'message' => 'Password didn\'t match',
                     ]);
                 }
+        }else {
+            return $this->asJson([
+                        'success' => false,
+                        'message' => 'Email didn\'t match',
+                    ]);
+        }
+            
     }
 
     public function actionUser()
@@ -391,6 +405,14 @@ class RestapiController extends \yii\rest\Controller
         $products = Products::find()->where(['LIKE', 'product_name', $keyword])->all();
 
         //product type 1 = consumables and 2 = non consumable
+        return $this->asJson(
+            $products
+        );
+    }
+
+    //**********************************************
+    public function actionGetproductsinventory(){
+        $products = Products::find()->all();
         return $this->asJson(
             $products
         );
