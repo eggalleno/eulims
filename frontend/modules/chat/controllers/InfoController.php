@@ -184,19 +184,19 @@ class InfoController extends Controller
         }
     }
 	
-	public function actionSettoken($token,$userid)
+	public function Settoken($token,$userid)
     {
 		$session = Yii::$app->session;
 		
 		$session->set('usertoken', $token);
 		$session->set('userid', $userid);
-		return;
+		//return;
 	}	
-    public function beforeAction($action) 
+    /*public function beforeAction($action) 
 	{ 
 		$this->enableCsrfValidation = false; 
 		return parent::beforeAction($action); 
-	}	
+	}	*/
 	
 	 public function actionGroup()
     {
@@ -264,13 +264,18 @@ class InfoController extends Controller
 			$decoderes=Json::decode($response);
 			
 			if($decoderes['success'] <> 0){ //false
-				echo $decoderes['userid'];
-			}
-			else{
-				echo"wala";
+				$token=$decoderes['token'];
+				$userid=$decoderes['userid'];
+
+				$session = \Yii::$app->session;
+		
+				//$session->set('usertoken', $token);
+				//$session->set('userid', $userid);
 				
 			}
-			exit;
+			else{
+				
+			}
 		}else{
 			return $this->render('login', [
 			'model' => $model
