@@ -22,35 +22,34 @@ use yii\web\UploadedFile;
 use yii\data\ActiveDataProvider;
 class MessageController extends \yii\rest\Controller
 {
-	public function behaviors()
-    {
-		
+	public static function allowedDomains()
+	{
 		return [
-			'corsFilter' => [
-				'class' => \yii\filters\Cors::className(),
-				'cors' => [
-					// restrict access to
-					'Origin' => ['http://www.myserver.com', 'https://www.myserver.com'],
-					// Allow only POST and PUT methods
-					'Access-Control-Request-Method' => ['POST', 'PUT'],
-					// Allow only headers 'X-Wsse'
-					'Access-Control-Request-Headers' => ['X-Wsse'],
-					// Allow credentials (cookies, authorization headers, etc.) to be exposed to the browser
-					'Access-Control-Allow-Credentials' => true,
-					// Allow OPTIONS caching
-					'Access-Control-Max-Age' => 3600,
-					// Allow the X-Pagination-Current-Page header to be exposed to the browser.
-					'Access-Control-Expose-Headers' => ['X-Pagination-Current-Page'],
-				],
-				
-
-			],
-			'authenticator' => [
-            'class' => \sizeg\jwt\JwtHttpBearerAuth::class,
-            'except' => ['login', 'server','synccustomer','confirm'],
-			]
+			'*',  
 		];
-    }
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	public function behaviors()
+	{
+		return array_merge(parent::behaviors(), [
+
+			// For cross-domain AJAX request
+			'corsFilter'  => [
+				'class' => \yii\filters\Cors::className(),
+				'cors'  => [
+					// restrict access to domains:
+					'Origin'                           => static::allowedDomains(),
+					'Access-Control-Request-Method'    => ['POST'],
+					'Access-Control-Allow-Credentials' => true,
+					'Access-Control-Max-Age'           => 3600,                 // Cache (seconds)
+				],
+			],
+
+		]);
+	}
 	
 	public function beforeAction($action) 
 	{ 
