@@ -22,6 +22,7 @@ use yii\web\UploadedFile;
 use yii\data\ActiveDataProvider;
 class MessageController extends \yii\rest\Controller
 {
+	$enableCsrfValidation = false;
 	public function behaviors()
     {
         $behaviors = parent::behaviors();
@@ -30,10 +31,30 @@ class MessageController extends \yii\rest\Controller
             'except' => ['login', 'server','synccustomer','confirm'],
             //'user'=> [\Yii::$app->referralaccount]
         ];
+        
+		$auth = $behaviors['authenticator'];
+        unset($behaviors['authenticator']);
+
+        $behaviors['corsFilter'] = [
+            'class' => \yii\filters\Cors::className(),
+            'cors' => [
+                'Origin'                           => ['*'],
+                'Access-Control-Request-Method'    => ['POST', 'GET'],
+                'Access-Control-Allow-Credentials' => true,
+                'Access-Control-Max-Age'           => 3600,
+            ],
+        ];
+
+        $behaviors['authenticator'] = $auth;
+        $behaviors['authenticator']['except'] = ['options'];
 
         return $behaviors;
     }
-
+	 public function beforeAction($action) 
+	{ 
+		$this->enableCsrfValidation = false; 
+		return parent::beforeAction($action); 
+	}	
     protected function verbs(){
         return [
             'login' => ['POST'],
