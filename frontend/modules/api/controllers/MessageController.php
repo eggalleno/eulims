@@ -46,7 +46,7 @@ class MessageController extends \yii\rest\Controller
         ];
 
         $behaviors['authenticator'] = $auth;
-        $behaviors['authenticator']['except'] = ['options'];
+        $behaviors['authenticator']['except'] = ['login'];
 
         return $behaviors;
     }
