@@ -22,7 +22,7 @@ use yii\web\UploadedFile;
 use yii\data\ActiveDataProvider;
 class MessageController extends \yii\rest\Controller
 {
-	
+	public $enableCsrfValidation = false;
 	public function behaviors()
     {
         $behaviors = parent::behaviors();
@@ -46,7 +46,7 @@ class MessageController extends \yii\rest\Controller
         ];
 
         $behaviors['authenticator'] = $auth;
-        $behaviors['authenticator']['except'] = ['login'];
+       // $behaviors['authenticator']['except'] = ['login'];
 
         return $behaviors;
     }
