@@ -11,7 +11,6 @@ $this->title = 'Login';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="site-login">
-    <h1><?= Html::encode($this->title) ?></h1>
 
     <p>Please fill out the following fields to login:</p>
 
@@ -23,44 +22,14 @@ $this->params['breadcrumbs'][] = $this->title;
 
                 <?= $form->field($model, 'password')->passwordInput() ?>
 
-                <div class="form-group">
-                     <button id="submit"> Send </button>
-                </div>
+                <div class="form-group pull-right">
+					<?= Html::submitButton('Login', ['class' =>'btn btn-primary','id'=>'btnlogin']) ?>
+					<?php if(Yii::$app->request->isAjax){ ?>
+						<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+					<?php } ?>
+				</div>
 
             <?php ActiveForm::end(); ?>
         </div>
     </div>
 </div>
-<script type="text/javascript">
-  $("#submit").click(function(){   
-  //alert("Hello");
-	var email = $("#loginform-email").val(); 
-	var password = $("#loginform-password").val(); 
-	$.ajax({
-		url: "http://www.eulims.local/api/message/login", //API LINK FROM THE CENTRAL
-		type: 'POST',
-		dataType: "JSON",
-		data: {
-			email: email,
-			password: password
-		},
-		success: function(response) {
-			var token=response.token;
-			$.post({
-            url: '/chat/info/settoken?token='+token, // your controller action
-      
-				success: function(data) {
-					//alert("data");
-				   //location.href = "/message/chat";
-				   location.reload();
-				}
-            });
-		},
-		error: function(xhr, status, error) {
-			alert(error);
-		}
-	}); 
-	
-   
-});
-</script>

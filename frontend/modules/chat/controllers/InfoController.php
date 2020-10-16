@@ -4,6 +4,7 @@ namespace frontend\modules\chat\controllers;
 
 use Yii;
 use common\models\message\Chat;
+use common\models\message\ChatGroup;
 use common\models\message\ChatSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
@@ -11,14 +12,16 @@ use yii\filters\VerbFilter;
 use common\models\system\LoginForm;
 use linslin\yii2\curl;
 use yii\helpers\Json;
+use yii\data\ActiveDataProvider;
 
 use common\components\Notification;
+
 /**
  * InfoController implements the CRUD actions for Chat model.
  */
 class InfoController extends Controller
 {
-	public $source = 'http://www.eulims.local/';
+	public $source = 'https://eulims.onelab.dost.gov.ph/api/message/';
     /**
      * @inheritdoc
      */
@@ -57,18 +60,22 @@ class InfoController extends Controller
 			$userid= Yii::$app->user->identity->profile->user_id;
 			//get profile
 			$authorization = "Authorization: Bearer ".$token; 
-			$apiUrl=$this->source.'/api/message/getuser';
+			$apiUrl=$this->source.'/getuser';
 			$curl = new curl\Curl();
 			$curl->setOption(CURLOPT_HTTPHEADER, ['Content-Type: application/json' , $authorization]);
+			$curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
 			$curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
 			$curl->setOption(CURLOPT_TIMEOUT, 180);
 			$list = $curl->get($apiUrl);
 			$decode=Json::decode($list);
 		
+		
+		
 			//GROUPLIST
-			$groupUrl=$this->source.'/api/message/getgroup?userid='.$userid;
+			$groupUrl=$this->source.'/getgroup?userid='.$userid;
 			$curlgroup = new curl\Curl();
 			$curlgroup->setOption(CURLOPT_HTTPHEADER, ['Content-Type: application/json' , $authorization]);
+			$curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
 			$curlgroup->setOption(CURLOPT_CONNECTTIMEOUT, 180);
 			$curlgroup->setOption(CURLOPT_TIMEOUT, 180);
 			$grouplist = $curlgroup->get($groupUrl);
@@ -177,11 +184,12 @@ class InfoController extends Controller
         }
     }
 	
-	public function actionSettoken($token)
+	public function actionSettoken($token,$userid)
     {
 		$session = Yii::$app->session;
 		
 		$session->set('usertoken', $token);
+		$session->set('userid', $userid);
 		return;
 	}	
     public function beforeAction($action) 
@@ -190,5 +198,83 @@ class InfoController extends Controller
 		return parent::beforeAction($action); 
 	}	
 	
+	 public function actionGroup()
+    {
+	    $model = new ChatGroup();
+		
+		if(isset($_SESSION['usertoken'])){
+			$token=$_SESSION['usertoken'];
+			$userid= Yii::$app->user->identity->profile->user_id;
+			//get profile
+			$authorization = "Authorization: Bearer ".$token; 
+			$apiUrl=$this->source.'/possiblerecipients?userid='.$userid;
+			$curl = new curl\Curl();
+			$curl->setOption(CURLOPT_HTTPHEADER, ['Content-Type: application/json' , $authorization]);
+			$curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
+			$curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
+			$curl->setOption(CURLOPT_TIMEOUT, 180);
+			$list = $curl->get($apiUrl);
+			$decode=Json::decode($list);
+			
+		    //var_dump($list);
+			//exit;
+			
+			
+		//	$dataProvider = New ActiveDataProvider(['query'=>$list]);
+		
+			if ($model->load(Yii::$app->request->post())) {
+				
+			}
+			else{
+				return $this->renderAjax('group', [
+				'model' => $model,
+				'possible_recipients' => $decode,
+				]);
+			}
+		
+		}	
+		else{
+			$model = new LoginForm();
+			if ($model->load(Yii::$app->request->post())){
+			}else{
+				return $this->render('login', [
+				'model' => $model
+				]);
+			}	
+		}
+        
+    }
 	
+	public function actionLogin(){
+		$model = new LoginForm();
+		if ($model->load(Yii::$app->request->post())){
+			$params = [ 
+			'email' => $model->email,
+            'password' => $model->password
+			];
+
+			$apiUrl=$GLOBALS['api_url'].'message/login';
+            $curl = new curl\Curl();
+			$curl->setRequestBody(json_encode($params));
+            $curl->setOption(CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+            $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
+            $curl->setOption(CURLOPT_TIMEOUT, 180);
+            $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
+            $response = $curl->post($apiUrl);
+			$decoderes=Json::decode($response);
+			
+			if($decoderes['success'] <> 0){ //false
+				echo $decoderes['userid'];
+			}
+			else{
+				echo"wala";
+				
+			}
+			exit;
+		}else{
+			return $this->render('login', [
+			'model' => $model
+			]);
+		}	
+	}
 }

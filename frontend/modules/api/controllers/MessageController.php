@@ -19,6 +19,7 @@ use common\models\message\GroupMember;
 use common\models\message\ChatGroup;
 use yii\web\UploadedFile;
 
+use yii\data\ActiveDataProvider;
 class MessageController extends \yii\rest\Controller
 {
 	public function behaviors()
@@ -28,10 +29,7 @@ class MessageController extends \yii\rest\Controller
             'class' => \sizeg\jwt\JwtHttpBearerAuth::class,
             'except' => ['login', 'server','synccustomer','confirm'],
             //'user'=> [\Yii::$app->referralaccount]
-
-
         ];
-
         return $behaviors;
     }
 
@@ -78,6 +76,8 @@ class MessageController extends \yii\rest\Controller
                                     'middleInitial' => $profile->middleinitial,
                                     'lastname' => $profile->lastname,
                                     'type' => $role->item_name,]),
+						'userid'=> $profile->user_id,	
+						'success' => true
                     ]);
                 } else {
                     return $this->asJson([
@@ -212,6 +212,11 @@ class MessageController extends \yii\rest\Controller
         );
     }
 	
+	public function actionPossiblerecipients($userid){
+        $my_var = Profile::find()->where(['!=', 'user_id', $userid])->all();
+		return $my_var;
+    }
+	
 	public function actionGetcontact(){
        $my_var = \Yii::$app->request->post();
 	   if(!$my_var){
@@ -262,17 +267,13 @@ class MessageController extends \yii\rest\Controller
     }
 	public function Getgroupchat($id){
 		
-	 //$my_var = \Yii::$app->request->post();
-	 // $chat = Chat::find()->where(['group_id'=>$id])->all();
-	 // return $chat; 
-	  //$chat=SELECT * FROM `eulims_message`.`tbl_chat` INNER JOIN `eulims`.`tbl_profile` ON `eulims_message`.`tbl_chat`.`sender_userid`=`eulims`.`tbl_profile`.`user_id` WHERE group_id=4
-	 // $chat= Chat::find()->with('profile', true, 'INNER JOIN')->all();
-	 $chat = Chat::find()
-	->select(['tbl_profile.fullname','chat_id', 'sender_userid' => 'tbl_profile.fullname', 'timestamp', 'status_id', 'group_id', 'contact_id'])
-	->where(['group_id'=>4])
-	->leftJoin('eulims.tbl_profile', 'eulims.tbl_profile.user_id=eulims_message.tbl_chat.sender_userid')
+	$chat = Chat::find()
+	->select(['chat_data','chat_id', 'sender_userid', 'timestamp', 'status_id', 'group_id', 'contact_id' => 'eulims.tbl_profile.fullname','chat_data_type','message_type'])
+	->where(['group_id'=>$id])
+	->innerJoin('eulims.tbl_profile', 'eulims.tbl_profile.user_id=eulims_message.tbl_chat.sender_userid')
+	->orderBy(['timestamp' => SORT_ASC ])
 	->all();
-	 // $chat= Chat::find()->joinWith('profile')->where('group_id'=>4)->all();
+
 	  return $chat; 
 	  
 	  
@@ -323,7 +324,7 @@ class MessageController extends \yii\rest\Controller
     }
 	
 	public function actionGetgroup($userid){
-        $group = GroupMember::find()
+         $group = GroupMember::find()
 		//->select('tbl_chat_group.group_name')
 		->joinWith('chatGroup')
 		->where('tbl_chat_group.chat_group_id =tbl_group_member.chat_group_id')
@@ -331,18 +332,49 @@ class MessageController extends \yii\rest\Controller
 		->asArray()->all();
         return $this->asJson(
             $group
-        );
+        ); 
     }
-    public function actionDownloadfile(){
-		// Initialize a file URL to the variable 
+   
+	
+	public function actionSetgroup(){ //send message
+       $my_var = \Yii::$app->request->post();
+       if(!$my_var){
+            return $this->asJson([
+                'success' => false,
+                'message' => 'POST empty',
+            ]); 
 			
-		$file = 'uploads/message/123456.png';
-		header("Content-Type: image/png");
-		header("Content-Disposition: attachment; filename=file name here");
-		header("Cache-Control: no-cache");
-		fopen($file,"w+");
+       }
+	   else{
+		    $userids=$my_var['userids'];
+			$str_user = explode(',', $userids);
+			$arr_length = count($str_user);
+			$model = new ChatGroup();
+			$model->createdby_userid=$my_var['sender_userid'];
+			$model->group_name= $my_var['groupname'];
+			$model->save();
+			
+			for($i=0;$i<$arr_length;$i++){
+				$member= new GroupMember();
+				$member->chat_group_id = $model->chat_group_id;
+				$member->user_id=$str_user[$i];
+				$member->save();
+			}
+			//Adding the user who created the group
+			$member= new GroupMember();
+			$member->chat_group_id = $model->chat_group_id;
+			$member->user_id=$my_var['sender_userid'];
+			$member->save(); 
+			////////////
+			
+			return $this->asJson(
+			['message' => 'success'
+			]
+		); 	
+	   }
+	}   
 
-	}
+	//}
 	/*public function actionProfile(){
 		$my_var = \Yii::$app->request->post();
 		$id=$my_var['id'];
@@ -351,17 +383,9 @@ class MessageController extends \yii\rest\Controller
     }*/
 
     public function actionSynccustomer(){ 
-     
-        
-            // $post = Yii::$app->request->post();
-            
-            // if(isset($post)){
-            //     //$myvar = Json::decode($post['data']);
-            //     //use this email to track if the user record already exist in ulimsportal or in any other cloud storage
-         
 
                 $toreturn = false;
-                return $model = Customer::find()->where(['email'=>Yii::$app->request->post('email')])->one();
+                $model = Customer::find()->where(['email'=>Yii::$app->request->post('email')])->one();
 
                 if(count($model) > 0){
                     // email already exist proceed to confirmation
@@ -406,4 +430,6 @@ class MessageController extends \yii\rest\Controller
                         $model
                     );
     }
+	
+	
 }

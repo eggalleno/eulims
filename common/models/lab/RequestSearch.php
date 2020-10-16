@@ -45,7 +45,7 @@ class RequestSearch extends exRequest
      */
     public function search($params)
     {
-        $query = Request::find();
+        $query = Request::find()->where(['is_migrated'=>0]);
         // add conditions that should always apply here
 
         $dataProvider = new ActiveDataProvider([
