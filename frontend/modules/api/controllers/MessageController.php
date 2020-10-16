@@ -35,7 +35,10 @@ class MessageController extends \yii\rest\Controller
 	public function behaviors()
 	{
 		return array_merge(parent::behaviors(), [
-
+			'authenticator' => [
+				'class' => \sizeg\jwt\JwtHttpBearerAuth::class,
+				'except' => ['login', 'server','synccustomer','confirm'],
+            ],
 			// For cross-domain AJAX request
 			'corsFilter'  => [
 				'class' => \yii\filters\Cors::className(),
