@@ -22,6 +22,7 @@ use yii\web\UploadedFile;
 use yii\data\ActiveDataProvider;
 class MessageController extends \yii\rest\Controller
 {
+	public $enableCsrfValidation = false;
 	public static function allowedDomains() {
         return [
             '*',                     
@@ -37,16 +38,23 @@ class MessageController extends \yii\rest\Controller
             //'user'=> [\Yii::$app->referralaccount]
         ];
 
-        $behaviors['corsFilter']  = [
+        $auth = $behaviors['authenticator'];
+        unset($behaviors['authenticator']);
+
+        $behaviors['corsFilter'] = [
             'class' => \yii\filters\Cors::className(),
-            'cors'  => [
-                // restrict access to domains:
-                'Origin'                           => static::allowedDomains(),
-                'Access-Control-Request-Method'    => ['POST'],
+            'cors' => [
+                'Origin'                           => ['*'],
+                'Access-Control-Request-Method'    => ['POST', 'GET'],
                 'Access-Control-Allow-Credentials' => true,
-                'Access-Control-Max-Age'           => 3600,                 // Cache (seconds)
+                'Access-Control-Max-Age'           => 3600,
             ],
         ];
+
+        $behaviors['authenticator'] = $auth;
+        $behaviors['authenticator']['except'] = ['options'];
+
+        return $behaviors;
 	}
     protected function verbs(){
         return [
