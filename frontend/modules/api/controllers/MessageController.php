@@ -22,7 +22,7 @@ use yii\web\UploadedFile;
 use yii\data\ActiveDataProvider;
 class MessageController extends \yii\rest\Controller
 {
-	$enableCsrfValidation = false;
+	
 	public function behaviors()
     {
         $behaviors = parent::behaviors();
@@ -50,11 +50,6 @@ class MessageController extends \yii\rest\Controller
 
         return $behaviors;
     }
-	 public function beforeAction($action) 
-	{ 
-		$this->enableCsrfValidation = false; 
-		return parent::beforeAction($action); 
-	}	
     protected function verbs(){
         return [
             'login' => ['POST'],
