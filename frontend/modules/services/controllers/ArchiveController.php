@@ -148,7 +148,7 @@ class ArchiveController extends Controller
                 $new->content = json_encode($content);
                 $new->status = 'New';
                 $new->created_at = date("Y-m-d H:i:s");
-                $new->updated_at = date("Y-m-d H:i:s");
+                // $new->updated_at = date("Y-m-d H:i:s");
                 $new->save();
             
             }else{

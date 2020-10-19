@@ -38,9 +38,9 @@ class Archive extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['customer', 'request_no', 'content', 'created_at', 'updated_at'], 'required'],
+            [['customer', 'request_no', 'content', 'created_at'], 'required'],
             [['content'], 'string'],
-            [['created_at', 'updated_at'], 'safe'],
+            [['created_at'], 'safe'],
             [['customer', 'request_no'], 'string', 'max' => 200],
         ];
     }
