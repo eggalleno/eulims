@@ -219,6 +219,7 @@ $this->registerJs($js,\yii\web\View::POS_READY);
                                 'customer',
                                 'request_no',
                                 'status',
+                                'type',
                                 'created_at',
                                 [
                                     'class' => kartik\grid\ActionColumn::className(),

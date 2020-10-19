@@ -38,7 +38,7 @@ class Archive extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['customer', 'request_no', 'content', 'created_at'], 'required'],
+            [['customer', 'request_no', 'content', 'status', 'type', 'created_at'], 'required'],
             [['content'], 'string'],
             [['created_at'], 'safe'],
             [['customer', 'request_no'], 'string', 'max' => 200],
@@ -55,8 +55,9 @@ class Archive extends \yii\db\ActiveRecord
             'customer' => 'Customer',
             'request_no' => 'Request No',
             'content' => 'Content',
+            'status' => 'Status',
+            'type' => 'Type',
             'created_at' => 'Created At',
-            'updated_at' => 'Updated At',
         ];
     }
 }
