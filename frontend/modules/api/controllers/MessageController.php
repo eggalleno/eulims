@@ -52,7 +52,7 @@ class MessageController extends \yii\rest\Controller
 				'Access-Control-Request-Method'    => ['POST', 'GET', 'OPTIONS'],
 				'Access-Control-Allow-Credentials' => true,
 				'Access-Control-Max-Age'           => 3600,                 // Cache (seconds)
-				'Access-Control-Allow-Headers' => ['authorization','X-Requested-With','content-type', 'Access-Control-Request-Headers','Access-Control-Request-Method','Accept','Access-Control-Allow-Headers']
+				'Access-Control-Allow-Headers' => ['Origin','X-Requested-With','content-type', 'Access-Control-Request-Headers','Access-Control-Request-Method','Accept','Access-Control-Allow-Headers']
 			],
 		];
 		
