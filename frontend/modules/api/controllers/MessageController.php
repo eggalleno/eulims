@@ -29,55 +29,38 @@ class MessageController extends \yii\rest\Controller
 	/**
 	 * @inheritdoc
 	 */
-	/*public function behaviors()
-	{
-		return array_merge(parent::behaviors(), [
-			'authenticator' => [
-				'class' => \sizeg\jwt\JwtHttpBearerAuth::class,
-				'except' => ['login', 'server','synccustomer','confirm'],
-            ],
-			// For cross-domain AJAX request
-			'corsFilter'  => [
-				'class' => \yii\filters\Cors::className(),
-				'cors'  => [
-					// restrict access to
-					'Origin' => ['*'],
-					// Allow only POST and PUT methods
-					'Access-Control-Request-Method' => ['POST', 'GET'],
-					// Allow only headers 'X-Wsse'
-					'Access-Control-Request-Headers' => ['X-Wsse'],
-					// Allow credentials (cookies, authorization headers, etc.) to be exposed to the browser
-					'Access-Control-Allow-Credentials' => true,
-					// Allow OPTIONS caching
-					'Access-Control-Max-Age' => 3600,
-					// Allow the X-Pagination-Current-Page header to be exposed to the browser.
-					'Access-Control-Expose-Headers' => ['X-Pagination-Current-Page'],
-				],
-			],
+	public static function allowedDomains() {
+		return ['*'];
+	}
 
-		]);
-	} */
-	
-	public function behaviors()
+	function behaviors()
 	{
-		return ArrayHelper::merge([
-			[
-				'authenticator' => [
-					'class' => \sizeg\jwt\JwtHttpBearerAuth::class,
-					'except' => ['login', 'server','synccustomer','confirm'],
-				],
-				'class' => Cors::className(),
-				'cors' => [
-					'Origin' => ['http://www.myserver.net'],
-					'Access-Control-Request-Method' => ['GET', 'HEAD', 'OPTIONS'],
-				],
-				'actions' => [
-					'login' => [
-						'Access-Control-Allow-Credentials' => true,
-					]
-				]
+		$behaviors = parent::behaviors();
+		$behaviors['contentNegotiator'] = [
+			'class' => ContentNegotiator::className(),
+			'formats' => [
+				'application/json' => Response::FORMAT_JSON,
 			],
-		], parent::behaviors());
+		];
+		$behaviors['authenticator'] = [
+            'class' => \sizeg\jwt\JwtHttpBearerAuth::class,
+            'except' => ['login', 'server'],
+            'except' => ['login', 'server','synccustomer','confirm'],
+		];
+		return array_merge($behaviors, [
+			'corsFilter'  => [
+				'class' => \common\filters\Cors::className(),
+				'cors'  => [
+					// restrict access to domains:
+					'Origin'                           => static::allowedDomains(),
+					'Access-Control-Request-Method'    => ['POST', 'GET', 'OPTIONS'],
+					'Access-Control-Allow-Credentials' => true,
+					'Access-Control-Max-Age'           => 3600,                 // Cache (seconds)
+					'Access-Control-Allow-Headers' => ['authorization','X-Requested-With','content-type', 'some_custom_header']
+				],
+			],
+		]);
+		return $behaviors;
 	}
 	
 	public function beforeAction($action) 
