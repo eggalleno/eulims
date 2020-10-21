@@ -41,7 +41,6 @@ class MessageController extends \yii\rest\Controller
 		
 		$behaviors['authenticator'] = [
 			'class' => \sizeg\jwt\JwtHttpBearerAuth::class,
-			'except' => ['login', 'server','synccustomer','confirm'],
 		];
 		// remove authentication filter
 		$auth = $behaviors['authenticator'];
@@ -64,7 +63,7 @@ class MessageController extends \yii\rest\Controller
 		// re-add authentication filter
 		$behaviors['authenticator'] = $auth;
 		// avoid authentication on CORS-pre-flight requests (HTTP OPTIONS method)
-		$behaviors['authenticator']['except'] = ['options'];
+		$behaviors['authenticator']['except'] = ['options','login', 'server','synccustomer','confirm'];
 
 		return $behaviors;
 	}
