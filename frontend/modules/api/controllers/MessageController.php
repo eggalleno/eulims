@@ -30,11 +30,7 @@ class MessageController extends \yii\rest\Controller
 	/**
 	 * @inheritdoc
 	 */
-	public static function allowedDomains() {
-		return ['*'];
-	}
 
-	
 	public function behaviors()
 	{
 		$behaviors = parent::behaviors();
@@ -52,11 +48,11 @@ class MessageController extends \yii\rest\Controller
 			'class' => \yii\filters\Cors::className(),
 			'cors'  => [
 				// restrict access to domains:
-				'Origin'                           => static::allowedDomains(),
+				'Origin'                           => ['*'],
 				'Access-Control-Request-Method'    => ['POST', 'GET', 'OPTIONS'],
 				'Access-Control-Allow-Credentials' => true,
 				'Access-Control-Max-Age'           => 3600,                 // Cache (seconds)
-				'Access-Control-Allow-Headers' => ['authorization','X-Requested-With','content-type', 'some_custom_header']
+				'Access-Control-Allow-Headers' => ['authorization','X-Requested-With','content-type', 'Access-Control-Request-Headers','Access-Control-Request-Method','Accept','Access-Control-Allow-Headers']
 			],
 		];
 		
