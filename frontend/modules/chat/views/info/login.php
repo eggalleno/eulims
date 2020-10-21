@@ -35,6 +35,7 @@ $this->params['breadcrumbs'][] = $this->title;
   //alert("Hello");
 	var email = $("#loginform-email").val(); 
 	var password = $("#loginform-password").val(); 
+	//alert(email);
 	$.ajax({
 		url: "https://eulims.onelab.dost.gov.ph/api/message/login", //API LINK FROM THE CENTRAL
 		type: 'POST',
@@ -50,11 +51,9 @@ $this->params['breadcrumbs'][] = $this->title;
             url: '/chat/info/settoken?token='+token+'&userid='+userid, // your controller action
       
 				success: function(data) {
-					//alert("data");
-				   //location.href = "/message/chat";
 				   location.reload();
 				}
-            });
+            }); 
 		},
 		error: function(xhr, status, error) {
 			alert(error);

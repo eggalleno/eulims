@@ -20,19 +20,16 @@ use common\models\message\ChatGroup;
 use yii\web\UploadedFile;
 
 use yii\data\ActiveDataProvider;
+
+use yii\filters\Cors;
+use yii\helpers\ArrayHelper;
+
 class MessageController extends \yii\rest\Controller
 {
-	public static function allowedDomains()
-	{
-		return [
-			'*',  
-		];
-	}
-
 	/**
 	 * @inheritdoc
 	 */
-	public function behaviors()
+	/*public function behaviors()
 	{
 		return array_merge(parent::behaviors(), [
 			'authenticator' => [
@@ -43,15 +40,44 @@ class MessageController extends \yii\rest\Controller
 			'corsFilter'  => [
 				'class' => \yii\filters\Cors::className(),
 				'cors'  => [
-					// restrict access to domains:
-					'Origin'                           => static::allowedDomains(),
-					'Access-Control-Request-Method'    => ['POST'],
+					// restrict access to
+					'Origin' => ['*'],
+					// Allow only POST and PUT methods
+					'Access-Control-Request-Method' => ['POST', 'GET'],
+					// Allow only headers 'X-Wsse'
+					'Access-Control-Request-Headers' => ['X-Wsse'],
+					// Allow credentials (cookies, authorization headers, etc.) to be exposed to the browser
 					'Access-Control-Allow-Credentials' => true,
-					'Access-Control-Max-Age'           => 3600,                 // Cache (seconds)
+					// Allow OPTIONS caching
+					'Access-Control-Max-Age' => 3600,
+					// Allow the X-Pagination-Current-Page header to be exposed to the browser.
+					'Access-Control-Expose-Headers' => ['X-Pagination-Current-Page'],
 				],
 			],
 
 		]);
+	} */
+	
+	public function behaviors()
+	{
+		return ArrayHelper::merge([
+			[
+				'authenticator' => [
+					'class' => \sizeg\jwt\JwtHttpBearerAuth::class,
+					'except' => ['login', 'server','synccustomer','confirm'],
+				],
+				'class' => Cors::className(),
+				'cors' => [
+					'Origin' => ['http://www.myserver.net'],
+					'Access-Control-Request-Method' => ['GET', 'HEAD', 'OPTIONS'],
+				],
+				'actions' => [
+					'login' => [
+						'Access-Control-Allow-Credentials' => true,
+					]
+				]
+			],
+		], parent::behaviors());
 	}
 	
 	public function beforeAction($action) 

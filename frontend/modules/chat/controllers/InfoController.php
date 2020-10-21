@@ -185,13 +185,13 @@ class InfoController extends Controller
         }
     }
 	
-	public function Settoken($token,$userid)
+	public function actionSettoken($token,$userid)
     {
 		$session = Yii::$app->session;
 		
 		$session->set('usertoken', $token);
 		$session->set('userid', $userid);
-		//return;
+		return;
 	}	
     /*public function beforeAction($action) 
 	{ 
@@ -249,31 +249,8 @@ class InfoController extends Controller
 	public function actionLogin(){
 		$model = new LoginForm();
 		if ($model->load(Yii::$app->request->post())){
-			$params = [ 
-			'email' => $model->email,
-            'password' => $model->password
-			];
-
-			$apiUrl=$GLOBALS['api_url'].'message/login';
-            $curl = new curl\Curl();
-			$curl->setRequestBody(json_encode($params));
-            $curl->setOption(CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
-            $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
-            $curl->setOption(CURLOPT_TIMEOUT, 180);
-            $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
-            $response = $curl->post($apiUrl);
-			$decoderes=Json::decode($response);
-
-			if($decoderes['success'] <> 0){ //false
-
-				$session = Yii::$app->session;
-				$session->set('token', $decoderes['token']);
-				$session->set('userid', $decoderes['userid']);
-			}
-			else{
-				echo "wala";
-			}
-			exit;
+			
+			
 		}else{
 			return $this->render('login', [
 			'model' => $model

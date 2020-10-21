@@ -92,7 +92,7 @@ if(isset($_SESSION['usertoken'])){
 	$userid= Yii::$app->user->identity->profile->user_id;
 	//get profile
 	$authorization = "Authorization: Bearer ".$sourcetoken; 
-	$apiUrl=$source.'/api/message/getuser';
+	$apiUrl=$source.'getuser';
 	$curl = new curl\Curl();
 	$curl->setOption(CURLOPT_HTTPHEADER, ['Content-Type: application/json' , $authorization]);
 	$curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
@@ -102,7 +102,7 @@ if(isset($_SESSION['usertoken'])){
 	$decode=Json::decode($list);
 
 	//GROUPLIST
-	$groupUrl=$source.'/api/message/getgroup?userid='.$userid;
+	$groupUrl=$source.'getgroup?userid='.$userid;
 	$curlgroup = new curl\Curl();
 	$curlgroup->setOption(CURLOPT_HTTPHEADER, ['Content-Type: application/json' , $authorization]);
 	$curlgroup->setOption(CURLOPT_SSL_VERIFYPEER, false);
@@ -318,8 +318,7 @@ function mes(id,type) {
 			echo json_encode($_SESSION['usertoken']);
 		}
 		?>;
-		//alert(token);
-	   // exit;
+		
 			$.ajax({
 			url: "https://eulims.onelab.dost.gov.ph/api/message/getcontact", //API LINK FROM THE CENTRAL
 			type: 'POST',
@@ -334,6 +333,7 @@ function mes(id,type) {
 			},
 			success: function(response) {
 				var y;
+				
 				x="";
 				x = x+'<br>';
 				for(y=0;y<response.chat.length;y++){
@@ -492,7 +492,7 @@ window.setInterval(function(){
 	  //alert("wala");   
    }
    else{
-	  mes(id,type); 
+	  //mes(id,type); 
    } 
   
    
@@ -534,12 +534,13 @@ function contacts(){ //Personnal Messages
 			<?php } ?>
 			//GROUPS
 			y= y + "<br> <div> <h4>Groups Contacts </h4></div>";
-			<?php foreach ($group as $data)
-			 { ?>
-			y=y + "<a class='thismessage1' onclick='mes(<?=$data['chat_group_id']?>,2)'>";
-			y= y + "<div class='first'><img src='/uploads/user/photo/group.png' alt='/uploads/user/photo/user.png' width='42' height='42'>&nbsp;<b>"+ '<?= $data['chatGroup']['group_name']?>' +"</div>";
-			y= y + "</a>";
-			<?php } 
+			<?php 
+			if($group){
+				foreach ($group as $data)
+				 { ?>
+				
+				<?php } 
+			}
 		}	
 		?>
 		
@@ -555,9 +556,7 @@ function groupcontacts(){ //Group Messages
 		if($group){
 		foreach ($group as $data)
 		 { ?>
-		y=y + "<a class='thismessage' onclick='mes(<?=$data['chat_group_id']?>,2)'>";
-		y= y + "<div class='first'><b>"+ '<?= $data['chatGroup']['group_name']?>' +"</div>";
-		y= y + "</a>";
+		
 		<?php } 
 		}
 	?>
