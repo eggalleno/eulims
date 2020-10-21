@@ -19,7 +19,7 @@ class ArchiveSearch extends Archive
     {
         return [
             [['id'], 'integer'],
-            [['customer', 'request_no', 'content', 'status', 'created_at', 'updated_at'], 'safe'],
+            [['customer', 'request_no', 'content', 'status', 'type', 'created_at'], 'safe'],
         ];
     }
 
@@ -61,13 +61,13 @@ class ArchiveSearch extends Archive
         $query->andFilterWhere([
             'id' => $this->id,
             'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at,
         ]);
 
         $query->andFilterWhere(['like', 'customer', $this->customer])
             ->andFilterWhere(['like', 'request_no', $this->request_no])
             ->andFilterWhere(['like', 'content', $this->content])
-            ->andFilterWhere(['like', 'status', $this->status]);
+            ->andFilterWhere(['like', 'status', $this->status])
+            ->andFilterWhere(['like', 'type', $this->type]);
 
         return $dataProvider;
     }

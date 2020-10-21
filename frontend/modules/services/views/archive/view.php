@@ -44,7 +44,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
         <div class="row"><br>
             <div class="col-xs-12 table-responsive">
-            
+            <p class="lead" style="font-size: 14px; font-weight: bold;">Samples & Analysis :</p>
             <?php $sub = 0; ?>
                 <?php foreach($request[0]['samples'] as $sample) {?>
                 <p class="text-muted well well-sm no-shadow" style="margin-top: 10px;">
@@ -78,12 +78,69 @@ $this->params['breadcrumbs'][] = $this->title;
 
             </div>
         </div>
+        
+        <hr>
+
+        <?php  if(!empty($request[0]['payments']) && $request[0]['payments'] != 'Not Available'){ ?>
+        <div class="row">
+            <div class="col-xs-12">
+                <p class="lead" style="font-size: 14px; font-weight: bold;">Payment History & Details :</p>
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Payor</th>
+                            <th>Transaction No.</th>
+                            <th>Receipt ID</th>
+                            <th>Purpose</th>
+                            <th>Mode</th>
+                            <th>Date</th>
+                            <th>Amount</th>
+
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach($request[0]['payments'] as $pay) {?>
+                        <tr>
+                            <td><?= $pay['payor'] ?></td>
+                            <td><?= $pay['transactionNum'] ?></td>
+                            <td><?= $pay['receiptId'] ?></td>
+                            <td><?= $pay['purpose'] ?></td>
+                            <td><?= $pay['payment_mode'] ?></td>
+                            <td><?= $pay['receipt_date'] ?></td>
+                            <td><?= $pay['amount'] ?></td>
+                        </tr>
+                        <?php if($pay['payment_mode'] == 'Check'){ ?>
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Bank</th>
+                                        <th>Cheque No.</th>
+                                        <th>Cheque Date</th>
+
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php foreach($request[0]['payments'] as $pay) {?>
+                                    <tr>
+                                        <td><?= $pay['bank'] ?></td>
+                                        <td><?= $pay['check'] ?></td>
+                                        <td><?= $pay['check_date'] ?></td>
+                                    </tr>
+                                    <?php }?>
+                                </tbody>
+                            </table>
+                        <?php } ?>
+                        <?php }?>
+                    </tbody>
+                </table>
+               
+            </div>
+        </div>
+        <?php } ?>
 
         <div class="row">
             <div class="col-xs-6"></div>
             <div class="col-xs-6">
-                <p class="lead">Payment Details:</p>
-
                 <div class="table-responsive">
                     <table class="table">
                         <tbody>
