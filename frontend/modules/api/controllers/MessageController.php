@@ -22,6 +22,7 @@ use yii\web\UploadedFile;
 use yii\data\ActiveDataProvider;
 
 use yii\filters\Cors;
+use yii\filters\auth\HttpBasicAuth;
 use yii\helpers\ArrayHelper;
 
 class MessageController extends \yii\rest\Controller
@@ -33,33 +34,38 @@ class MessageController extends \yii\rest\Controller
 		return ['*'];
 	}
 
-	function behaviors()
+	
+	public function behaviors()
 	{
 		$behaviors = parent::behaviors();
-		$behaviors['contentNegotiator'] = [
-			'class' => ContentNegotiator::className(),
-			'formats' => [
-				'application/json' => Response::FORMAT_JSON,
-			],
-		];
+		
 		$behaviors['authenticator'] = [
-            'class' => \sizeg\jwt\JwtHttpBearerAuth::class,
-            'except' => ['login', 'server'],
-            'except' => ['login', 'server','synccustomer','confirm'],
+			'class' => \sizeg\jwt\JwtHttpBearerAuth::class,
+			'except' => ['login', 'server','synccustomer','confirm'],
 		];
-		return array_merge($behaviors, [
-			'corsFilter'  => [
-				'class' => \common\filters\Cors::className(),
-				'cors'  => [
-					// restrict access to domains:
-					'Origin'                           => static::allowedDomains(),
-					'Access-Control-Request-Method'    => ['POST', 'GET', 'OPTIONS'],
-					'Access-Control-Allow-Credentials' => true,
-					'Access-Control-Max-Age'           => 3600,                 // Cache (seconds)
-					'Access-Control-Allow-Headers' => ['authorization','X-Requested-With','content-type', 'some_custom_header']
-				],
+		// remove authentication filter
+		$auth = $behaviors['authenticator'];
+		unset($behaviors['authenticator']);
+		
+		// add CORS filter
+
+		$behaviors['corsFilter'] = [
+			'class' => \yii\filters\Cors::className(),
+			'cors'  => [
+				// restrict access to domains:
+				'Origin'                           => static::allowedDomains(),
+				'Access-Control-Request-Method'    => ['POST', 'GET', 'OPTIONS'],
+				'Access-Control-Allow-Credentials' => true,
+				'Access-Control-Max-Age'           => 3600,                 // Cache (seconds)
+				'Access-Control-Allow-Headers' => ['authorization','X-Requested-With','content-type', 'some_custom_header']
 			],
-		]);
+		];
+		
+		// re-add authentication filter
+		$behaviors['authenticator'] = $auth;
+		// avoid authentication on CORS-pre-flight requests (HTTP OPTIONS method)
+		$behaviors['authenticator']['except'] = ['options'];
+
 		return $behaviors;
 	}
 	
