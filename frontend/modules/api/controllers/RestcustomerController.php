@@ -17,6 +17,8 @@ use common\models\lab\Sample;
 use common\models\lab\Sampletype;
 use common\models\lab\Purpose;
 use common\models\lab\Modeofrelease;
+use common\models\lab\TestnameMethod;
+
 
 class RestcustomerController extends \yii\rest\Controller
 {
@@ -490,6 +492,20 @@ class RestcustomerController extends \yii\rest\Controller
 
     public function actionGetsamples($id){
         $model = Sample::find()->select(['sample_code','samplename','completed'])->where(['request_id'=>$id])->all();
+        if($model){
+            return $this->asJson(
+                $model
+            ); 
+        }
+    }
+    public function actionGetquotation(){
+        $model = TestnameMethod::find()
+        ->select(['testname_method_id','testname_id'=> 'tbl_testname.testName', 'method_id'=> 'tbl_methodreference.fee', 'workflow'=> 'tbl_methodreference.method', 'lab_id'=> 'tbl_lab.labname'])
+        ->joinWith(['testname'])
+        ->joinWith(['method'])
+        ->joinWith(['lab'])
+        ->orderby(['lab_id'=> SORT_ASC,'testname_id'=> SORT_ASC])
+        ->all();
         if($model){
             return $this->asJson(
                 $model
