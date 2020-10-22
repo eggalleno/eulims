@@ -17,7 +17,7 @@ use common\models\lab\Sample;
 use common\models\lab\Sampletype;
 use common\models\lab\Purpose;
 use common\models\lab\Modeofrelease;
-use common\models\lab\TestnameMethod;
+use common\models\lab\Testnamemethod;
 
 
 class RestcustomerController extends \yii\rest\Controller
@@ -499,7 +499,7 @@ class RestcustomerController extends \yii\rest\Controller
         }
     }
     public function actionGetquotation(){
-        $model = TestnameMethod::find()
+        $model = Testnamemethod::find()
         ->select(['testname_method_id','testname_id'=> 'tbl_testname.testName', 'method_id'=> 'tbl_methodreference.fee', 'workflow'=> 'tbl_methodreference.method', 'lab_id'=> 'tbl_lab.labname'])
         ->joinWith(['testname'])
         ->joinWith(['method'])
