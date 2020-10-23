@@ -17,6 +17,8 @@ use common\models\lab\Sample;
 use common\models\lab\Sampletype;
 use common\models\lab\Purpose;
 use common\models\lab\Modeofrelease;
+use common\models\lab\Testnamemethod;
+
 
 class RestcustomerController extends \yii\rest\Controller
 {
@@ -27,6 +29,19 @@ class RestcustomerController extends \yii\rest\Controller
             'class' => \sizeg\jwt\JwtHttpBearerAuth::class,
             'except' => ['login','server','codevalid','mailcode','register'], //all the other
             'user'=> \Yii::$app->customeraccount
+        ];
+
+        $behaviors['corsFilter'] = [
+            'class' => \common\filters\Cors::className(),
+            'cors'  => [
+                // restrict access to domains:
+                'Origin'                           => ['*'],
+                'Access-Control-Request-Method'    => ['POST', 'GET', 'OPTIONS'],
+                'Access-Control-Allow-Credentials' => true,
+                'Access-Control-Max-Age'           => 3600,                 // Cache (seconds)
+                'Access-Control-Allow-Headers' => ['authorization','X-Requested-With','content-type', 'some_custom_header']
+                // 'Access-Control-Allow-Headers' => ['Origin','X-Requested-With','content-type', 'Access-Control-Request-Headers','Access-Control-Request-Method','Accept','Access-Control-Allow-Headers']
+            ],
         ];
 
         return $behaviors;
@@ -490,6 +505,20 @@ class RestcustomerController extends \yii\rest\Controller
 
     public function actionGetsamples($id){
         $model = Sample::find()->select(['sample_code','samplename','completed'])->where(['request_id'=>$id])->all();
+        if($model){
+            return $this->asJson(
+                $model
+            ); 
+        }
+    }
+    public function actionGetquotation(){
+        $model = Testnamemethod::find()
+        ->select(['testname_method_id','testname_id'=> 'tbl_testname.testName', 'method_id'=> 'tbl_methodreference.fee', 'workflow'=> 'tbl_methodreference.method', 'lab_id'=> 'tbl_lab.labname'])
+        ->joinWith(['testname'])
+        ->joinWith(['method'])
+        ->joinWith(['lab'])
+        ->orderby(['lab_id'=> SORT_ASC,'testname_id'=> SORT_ASC])
+        ->all();
         if($model){
             return $this->asJson(
                 $model
