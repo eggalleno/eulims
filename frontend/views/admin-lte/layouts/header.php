@@ -538,7 +538,9 @@ function contacts(){ //Personnal Messages
 			if($group){
 				foreach ($group as $data)
 				 { ?>
-				
+					y=y + "<a class='thismessage1' onclick='mes(<?=$data['chat_group_id']?>,2)'>";
+					y= y + "<div class='first'><img src='/uploads/user/photo/group.png' alt='/uploads/user/photo/user.png' width='42' height='42'>&nbsp;<b>"+ '<?= $data['chatGroup']['group_name']?>' +"</div>";
+					y= y + "</a>";
 				<?php } 
 			}
 		}	
@@ -556,7 +558,9 @@ function groupcontacts(){ //Group Messages
 		if($group){
 		foreach ($group as $data)
 		 { ?>
-		
+				y=y + "<a class='thismessage1' onclick='mes(<?=$data['chat_group_id']?>,2)'>";
+				y= y + "<div class='first'><img src='/uploads/user/photo/group.png' alt='/uploads/user/photo/user.png' width='42' height='42'>&nbsp;<b>"+ '<?= $data['chatGroup']['group_name']?>' +"</div>";
+				y= y + "</a>";
 		<?php } 
 		}
 	?>

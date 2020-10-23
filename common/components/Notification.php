@@ -26,6 +26,8 @@ class Notification extends Component {
             'action' => $action
          ])
          ->post($url);
+		 
+		 return $response;
     }
     
     public function sendEmail($hash, $sender, $recipient, $title, $message, $via, $module, $action)
