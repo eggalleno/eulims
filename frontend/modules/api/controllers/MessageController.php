@@ -31,6 +31,9 @@ class MessageController extends \yii\rest\Controller
 	 * @inheritdoc
 	 */
 
+    public static function allowedDomains() {
+		return 'http://www.eulims.local';
+	}
 	public function behaviors()
 	{
 		$behaviors = parent::behaviors();
@@ -48,7 +51,7 @@ class MessageController extends \yii\rest\Controller
 			'class' => \common\filters\Cors::className(),
 			'cors'  => [
 				// restrict access to domains:
-				'Origin'                           => ['*'],
+				'Origin'                           => static::allowedDomains(),
 				'Access-Control-Request-Method'    => ['POST', 'GET', 'OPTIONS'],
 				'Access-Control-Allow-Credentials' => true,
 				'Access-Control-Max-Age'           => 3600,                 // Cache (seconds)
