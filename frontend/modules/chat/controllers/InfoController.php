@@ -205,10 +205,10 @@ class InfoController extends Controller
 		
 		if(isset($_SESSION['usertoken'])){
 			$token=$_SESSION['usertoken'];
-			$userid= Yii::$app->user->identity->profile->user_id;
+			$userid= $_SESSION['userid'];
 			//get profile
 			$authorization = "Authorization: Bearer ".$token; 
-			$apiUrl=$this->source.'/possiblerecipients?userid='.$userid;
+			$apiUrl=$this->source.'possiblerecipients?userid='.$userid;
 			$curl = new curl\Curl();
 			$curl->setOption(CURLOPT_HTTPHEADER, ['Content-Type: application/json' , $authorization]);
 			$curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
@@ -220,8 +220,6 @@ class InfoController extends Controller
 		    //var_dump($list);
 			//exit;
 			
-			
-		//	$dataProvider = New ActiveDataProvider(['query'=>$list]);
 		
 			if ($model->load(Yii::$app->request->post())) {
 				
@@ -235,11 +233,11 @@ class InfoController extends Controller
 		
 		}	
 		else{
-			$model = new LoginForm();
-			if ($model->load(Yii::$app->request->post())){
+			$login = new LoginForm();
+			if ($login->load(Yii::$app->request->post())){
 			}else{
 				return $this->render('login', [
-				'model' => $model
+				'model' => $login
 				]);
 			}	
 		}
