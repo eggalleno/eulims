@@ -13,6 +13,10 @@ use common\models\finance\Customertransaction;
 use common\components\Functions;
 use common\models\finance\Customerwallet;
 
+use common\models\finance\Paymentitem;
+use common\models\lab\Request;
+use common\models\finance\Op;
+
 /**
  * CancelledorController implements the CRUD actions for CancelledOr model.
  */
@@ -78,6 +82,24 @@ class CancelledorController extends Controller
             $receipt= Receipt::find()->where(['receipt_id'=>$receipt_id])->one();
             $receipt->cancelled=1; //Means to be cancelled
             $receipt->save(false);
+			//10/28/2020 CancelledOr
+			$opid= $receipt->orderofpayment_id;
+			if($opid <> 0){
+				$op= Op::find()->where(['orderofpayment_id'=>$opid])->one();
+				$op->receipt_id=null; 
+				$op->payment_status_id=1;
+				$op->save(false);
+				//paymentitem
+				$paymentitem= Paymentitem::find()->where(['orderofpayment_id'=>$opid])->one();
+				$paymentitem->status=0;
+				$paymentitem->save(false);
+				$requestid=$paymentitem->request_id;
+				//request
+				$request= Request::find()->where(['request_id'=>$requestid])->one();
+				$request->payment_status_id=1; 
+				$request->save(false);
+			}
+			//////////////
             $custrans=Customertransaction::find()->where(['source' => $receipt_id])->one();
             if ($custrans){
                 $wallet = Customerwallet::find()->where(['customerwallet_id' => $custrans->customerwallet_id])->one();

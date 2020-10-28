@@ -584,12 +584,9 @@ function sendchat(txt) {
 		}
 	?>;
 	$.ajax({
-		url: "https://eulims.onelab.dost.gov.ph/api/message/setmessage", //API LINK FROM THE CENTRAL
+		url: "/chat/info/setmessage", //API LINK FROM THE CENTRAL
 		type: 'POST',
-		dataType: "JSON",
-		beforeSend: function (xhr) {
-			xhr.setRequestHeader('Authorization', 'Bearer '+ token);
-		}, 
+		dataType: "JSON", 
 		data: {
 			sender_userid: sender_userid,
 			message: txt,
@@ -631,12 +628,9 @@ function getprofile(id) {
 	}
 	?>;
 	$.ajax({
-		url: "https://eulims.onelab.dost.gov.ph/api/message/profile", //API LINK FROM THE CENTRAL
+		url: "/chat/info/profile", //API LINK FROM THE CENTRAL
 		type: 'POST',
 		dataType: "JSON",
-		beforeSend: function (xhr) {
-			xhr.setRequestHeader('Authorization', 'Bearer '+ token);
-		}, 
 		data: {
 			id:id
 		},

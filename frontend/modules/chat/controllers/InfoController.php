@@ -255,4 +255,70 @@ class InfoController extends Controller
 			]);
 		}	
 	}
+	
+	public function actionSetmessage(){
+		if(isset($_SESSION['usertoken'])){
+			$token=$_SESSION['usertoken'];
+			$userid= $_SESSION['userid'];
+			
+			$my_var = \Yii::$app->request->post();
+		
+			//get profile
+			$authorization = "Authorization: Bearer ".$token; 
+			$apiUrl=$this->source.'setmessage';
+			$params = [
+				'sender_userid' => $my_var['sender_userid'],
+				'message' => $my_var['message'],
+				'type' => $my_var['type'],
+				'id' => $my_var['id'],
+				'dataxtype'=> $my_var['dataxtype'],
+			];
+			$curl = new curl\Curl();
+			$curl->setRequestBody(json_encode($params));
+			$curl->setOption(CURLOPT_HTTPHEADER, ['Content-Type: application/json' , $authorization]);
+			$curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
+			$curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
+			$curl->setOption(CURLOPT_TIMEOUT, 180);
+			$list = $curl->get($apiUrl);
+			return $list;
+			//$decode=Json::decode($list); 
+		}else{
+			$model = new LoginForm();
+			return $this->render('login', [
+			'model' => $model
+			]);
+		}
+		
+	}
+	public function actionProfile(){
+		if(isset($_SESSION['usertoken'])){
+			
+			$token=$_SESSION['usertoken'];
+			$userid= $_SESSION['userid'];
+			
+			$my_var = \Yii::$app->request->post();
+		
+			//get profile
+			$authorization = "Authorization: Bearer ".$token; 
+			$apiUrl=$this->source.'profile';
+			$params = [
+				'id' => $my_var['id']
+			];
+			$curl = new curl\Curl();
+			$curl->setRequestBody(json_encode($params));
+			$curl->setOption(CURLOPT_HTTPHEADER, ['Content-Type: application/json' , $authorization]);
+			$curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
+			$curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
+			$curl->setOption(CURLOPT_TIMEOUT, 180);
+			$list = $curl->get($apiUrl);
+			//$decode=Json::decode($list); 
+			return $list;
+		}else{
+			$model = new LoginForm();
+			return $this->render('login', [
+			'model' => $model
+			]);
+		}
+		
+	}
 }
