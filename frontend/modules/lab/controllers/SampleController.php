@@ -612,7 +612,9 @@ class SampleController extends Controller
     {
         $refcomponent = new ReferralComponent();
         $list = $refcomponent->getSampletype($labId);
-        $data = ArrayHelper::map(json_decode($list), 'sampletype_id', 'type');
+        $data = [];
+        if($list)
+            $data = ArrayHelper::map(json_decode($list), 'sampletype_id', 'type');
         return $data;
     }
 }
