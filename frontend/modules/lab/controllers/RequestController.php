@@ -122,7 +122,6 @@ class RequestController extends Controller
             $ids = ['-1'];
         }
 
-      //  $analysisQuery = Analysis::find()->where(['sample_id' =>$samples->sample_id]);
         if($request_type == 2) {
             $refcomponent = new ReferralComponent();
             $modelref_request = Referralrequest::find()->where(['request_id'=>$id])->one();
@@ -133,31 +132,37 @@ class RequestController extends Controller
 
             $analysisdataprovider = new ActiveDataProvider([
                 'query' => $analysisQuery,
-                /*'pagination' => [
-                    'pageSize' => 10,
-                ]*/
                 'pagination' => false,
             ]);
-
+            //gets the customer on the API //updated to new api //btc
             $customer = json_decode($refcomponent->getCustomerOne($reqModel->customer_id),true);
+            //gets all the matching agency ??? hard to maintain, needs inovative idea here //btc 
             $agency = json_decode($refcomponent->listMatchAgency($id),true);
+
+            //gets the attachement details ??? //btc
 			//set third parameter to 1 for attachment type deposit slip
+            //updated to new api with false return temporarily //btc
             $deposit = json_decode($refcomponent->getAttachment($reqModel->referral_id,Yii::$app->user->identity->profile->rstl_id,1),true);
             //set third parameter to 2 for attachment type or
+            //updated to new api with false return temporarily //btc
             $or = json_decode($refcomponent->getAttachment($reqModel->referral_id,Yii::$app->user->identity->profile->rstl_id,2),true);
-            $referred_agency = json_decode($refcomponent->getReferredAgency($reqModel->referral_id,Yii::$app->user->identity->profile->rstl_id),true);
 
+            //get the referred Agency details //btc
+            //updated to new api with false return temporarily //btc
+            $referred_agency = json_decode($refcomponent->getReferredAgency($reqModel->referral_id,Yii::$app->user->identity->profile->rstl_id),true);
+   
             $as_receiving = !empty($referred_agency['receiving_agency']) && $referred_agency > 0 ? $referred_agency['receiving_agency']['name'] : null;
             $as_testing = !empty($referred_agency['testing_agency']) && $referred_agency > 0 ? $referred_agency['testing_agency']['name'] : null;
-
+            //updated to new api with false return temporarily //btc
             $bid = json_decode($refcomponent->getBidderAgency($id,Yii::$app->user->identity->profile->rstl_id),true);
+            //updated to new api with false return temporarily //btc
             $countBidnotice = json_decode($refcomponent->countBidnotice($id,Yii::$app->user->identity->profile->rstl_id),true);
-
+            
             $noSampleCode = Sample::find()->where("request_id =:requestId AND ISNULL(sample_code)",[':requestId'=>$id])->count();
 
             if($bid == 0){
                 $countBid = 0;
-                $bidder = [];
+                $bidders = [];
             } else {
                 $countBid = $bid['count_bid'];
                 if($countBid > 0){
@@ -539,7 +544,7 @@ class RequestController extends Controller
         $Func=new Functions();
         $Func->CheckRSTLProfile();
         $GLOBALS['rstl_id']=Yii::$app->user->identity->profile->rstl_id;
-       
+
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
            // Yii::$app->session->setFlash('success', 'Request Successfully Created!');
             return $this->redirect(['view', 'id' => $model->request_id]); ///lab/request/view?id=1
@@ -653,7 +658,7 @@ class RequestController extends Controller
         if ($model!== null) {
             return $model;
         } else {
-            throw new NotFoundHttpException('The requested Request its either does not exist or you have no permission to view it.');
+            throw new NotFoundHttpException('The Request is either not existing or you have no permission to view it.');
         }
     }
     //bergel cutara
@@ -692,10 +697,16 @@ class RequestController extends Controller
         $Func->CheckRSTLProfile();
         $connection= Yii::$app->labdb;
         $connection->createCommand('SET FOREIGN_KEY_CHECKS=0')->execute();
-        //$GLOBALS['rstl_id']=Yii::$app->user->identity->profile->rstl_id;
+        $GLOBALS['rstl_id']=Yii::$app->user->identity->profile->rstl_id;
+        
+        //gets the listoflabs //btc
         $labreferral = ArrayHelper::map(json_decode($refcomponent->listLabreferral()), 'lab_id', 'labname');
+        
+        //gets the list of discounts //btc
         $discountreferral = ArrayHelper::map(json_decode($refcomponent->listDiscountreferral()), 'discount_id', 'type');
+        //gets all the list of purposes //btc
         $purposereferral = ArrayHelper::map(json_decode($refcomponent->listPurposereferral()), 'purpose_id', 'name');
+        //gets all the list of modeofrelease //btc 
         $modereleasereferral = ArrayHelper::map(json_decode($refcomponent->listModereleasereferral()), 'modeofrelease_id', 'mode');
         
         if ($model->load(Yii::$app->request->post())) {
@@ -755,6 +766,7 @@ class RequestController extends Controller
                     'discountreferral' => $discountreferral,
                     'purposereferral' => $purposereferral,
                     'modereleasereferral' => $modereleasereferral,
+                    'api_url'=>$refcomponent->getSource()
                 ]);
             }else{
                 return $this->render('createReferral', [
@@ -763,6 +775,7 @@ class RequestController extends Controller
                     'discountreferral' => $discountreferral,
                     'purposereferral' => $purposereferral,
                     'modereleasereferral' => $modereleasereferral,
+                    'api_url'=>$refcomponent->getSource()
                 ]);
             }
         }
@@ -871,6 +884,7 @@ class RequestController extends Controller
                     'purposereferral' => $purposereferral,
                     'modereleasereferral' => $modereleasereferral,
                     'notified'=>$notified,
+                    'api_url'=>$refcomponent->getSource()
                 ]);
             }else{
                 return $this->renderAjax('updateReferral', [
@@ -880,26 +894,24 @@ class RequestController extends Controller
                     'purposereferral' => $purposereferral,
                     'modereleasereferral' => $modereleasereferral,
                     'notified'=>$notified,
+                    'api_url'=>$refcomponent->getSource()
                 ]);
             }
         }
     }
+
     //get referral customer list
     public function actionReferralcustomerlist($query = null, $id = null)
     {
-        if (!is_null($query)) {
-            $apiUrl='http://localhost/eulimsapi.onelab.ph/api/web/referral/customers/searchname?keyword='.$query;
-            //$apiUrl='https://eulimsapi.onelab.ph/api/web/referral/customers/searchname?keyword='.$query;
+            $refcomponent = new ReferralComponent();
+            $apiUrl=$refcomponent->getSource().'/searchname?keyword='.$query;
             $curl = new curl\Curl();
             $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
             $curl->setOption(CURLOPT_TIMEOUT, 180);
             $show = $curl->get($apiUrl);
-        } else {
-            $show = ['results' => ['id' => '', 'text' => '']];
-        }
-
-        return $show;
+            return $apiUrl;
     }
+
     //check if received sample as a tesing lab
     protected function checkTesting($requestId,$rstlId)
     {

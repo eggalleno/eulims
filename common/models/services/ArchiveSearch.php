@@ -19,7 +19,7 @@ class ArchiveSearch extends Archive
     {
         return [
             [['id'], 'integer'],
-            [['customer', 'request_no', 'content', 'status', 'type', 'created_at'], 'safe'],
+            [['customer', 'request_no', 'content', 'status', 'type', 'requested_at'], 'safe'],
         ];
     }
 
@@ -60,7 +60,7 @@ class ArchiveSearch extends Archive
         // grid filtering conditions
         $query->andFilterWhere([
             'id' => $this->id,
-            'created_at' => $this->created_at,
+            'requested_at' => $this->requested_at,
         ]);
 
         $query->andFilterWhere(['like', 'customer', $this->customer])

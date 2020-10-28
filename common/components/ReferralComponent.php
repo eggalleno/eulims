@@ -11,7 +11,7 @@ namespace common\components;
 use Yii;
 use yii\base\Component;
 use yii\web\JsExpression;
-//use yii\helpers\ArrayHelper;
+use yii\helpers\ArrayHelper;
 //use common\models\lab\Request;
 //use kartik\grid\GridView;
 use yii\web\NotFoundHttpException;
@@ -22,7 +22,7 @@ use linslin\yii2\curl;
 use common\models\lab\exRequestreferral;
 use common\models\lab\Analysis;
 use common\models\lab\Sample;
-use common\models\lab\Lab;//used to point to old referral
+use common\models\lab\Lab;//used to point to old referralhttps://eulims.onelab.dost.gov.ph/api/restcustomer/index
 use common\models\lab\Samplecode;//used to point to old referral
 
 /**
@@ -32,10 +32,16 @@ use common\models\lab\Samplecode;//used to point to old referral
  */
 class ReferralComponent extends Component {
 
-    // public $source = 'https://eulimsapi.onelab.ph';
-    public $source = 'https://referral.onelab.ph/';
-    //public $source = 'http://localhost/eulimsapi.onelab.ph';
-    // public $source = 'http://192.168.1.213/referral.onelab.ph/';
+    public $source = 'http://www.eulims.local/api/restreferral';
+
+    /**
+     * Get Source
+     * @return string
+     */
+    function getSource(){
+        return $this->source;
+    }
+
     /**
      * FindOne testname
      * @param integer $testnameId
@@ -43,7 +49,7 @@ class ReferralComponent extends Component {
      */
     function getTestnameOne($testnameId){
         if($testnameId > 0){
-            $apiUrl=$this->source.'/api/web/referral/listdatas/testnameone?testname_id='.$testnameId;
+            $apiUrl=$this->source.'/testnameone?testname_id='.$testnameId;
             $curl = new curl\Curl();
             $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
             $curl->setOption(CURLOPT_TIMEOUT, 180);
@@ -60,7 +66,7 @@ class ReferralComponent extends Component {
      */
     function getMethodrefOne($methodrefId){
         if($methodrefId > 0){
-            $apiUrl=$this->source.'/api/web/referral/listdatas/methodreferenceone?methodref_id='.$methodrefId;
+            $apiUrl=$this->source.'/methodreferenceone?methodref_id='.$methodrefId;
             $curl = new curl\Curl();
             $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
             $curl->setOption(CURLOPT_TIMEOUT, 180);
@@ -76,9 +82,8 @@ class ReferralComponent extends Component {
      * @return array
      */
     function getDiscountOne($discountId){
-        //if($discountId > 0){
         if($discountId >= 0){
-            $apiUrl=$this->source.'/api/web/referral/listdatas/discountbyid?discount_id='.$discountId;
+            $apiUrl=$this->source.'/discountbyid?discount_id='.$discountId;
             $curl = new curl\Curl();
             $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
             $curl->setOption(CURLOPT_TIMEOUT, 180);
@@ -95,7 +100,7 @@ class ReferralComponent extends Component {
      */
     function getCustomerOne($customerId){
         if($customerId > 0){
-            $apiUrl=$this->source.'/api/web/referral/customers/customerone?customer_id='.$customerId;
+            $apiUrl=$this->source.'/getcustomer?customer_id='.$customerId;
             $curl = new curl\Curl();
             $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
             $curl->setOption(CURLOPT_TIMEOUT, 180);
@@ -109,7 +114,7 @@ class ReferralComponent extends Component {
     function getSampletype($labId)
     {
         if($labId > 0){
-            $apiUrl=$this->source.'/api/web/referral/listdatas/sampletypebylab?lab_id='.$labId;
+            $apiUrl=$this->source.'/sampletypebylab?lab_id='.$labId;
             $curl = new curl\Curl();
             $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
             $curl->setOption(CURLOPT_TIMEOUT, 180);
@@ -132,6 +137,21 @@ class ReferralComponent extends Component {
             return "Not valid lab or sampletype";
         }
     }
+
+    //btc use in the referral view button add analysis
+    function getTestnamesbysampletypeidsonly($sampletypeId){
+        if($sampletypeId > 0){
+            $apiUrl=$this->source.'/testnamebysampletypeids?sampletype_ids='.$sampletypeId;
+            $curl = new curl\Curl();
+            $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
+            $curl->setOption(CURLOPT_TIMEOUT, 180);
+            $list = $curl->get($apiUrl);
+            return $list;
+        } else {
+            return "Not valid lab or sampletype";
+        }
+    }
+
     //get referral methodref by testname
     function getMethodrefs($labId,$sampletypeId,$testnameId){
         if($labId > 0 && $sampletypeId > 0 && $testnameId > 0){
@@ -147,56 +167,55 @@ class ReferralComponent extends Component {
         }
     }
 
+    //btc this function here is same with the top but with only testname_id only as argument
+    function getMethodrefbytestnameidonly($testnameId){
+
+        $apiUrl=$this->source.'/testnamemethodref?testname_id='.$testnameId;
+        $curl = new curl\Curl();
+        $curl->setOption(CURLOPT_CONNECTTIMEOUT, 120);
+        $curl->setOption(CURLOPT_TIMEOUT, 120);
+        $data = $curl->get($apiUrl);
+        return $data;
+    }
+
     //get referral laboratory list
     function listLabreferral()
     {
-        $apiUrl=$this->source.'/api/web/referral/listdatas/lab';
+        $apiUrl=$this->source.'/labs';
         $curl = new curl\Curl();
         $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
         $curl->setOption(CURLOPT_TIMEOUT, 180);
         $list = $curl->get($apiUrl);
-
-        //$data = ArrayHelper::map(json_decode($list), 'lab_id', 'labname');
-        
         return $list;
     }
     //get referral discount list
     function listDiscountreferral()
     {
-        $apiUrl=$this->source.'/api/web/referral/listdatas/discount';
+        $apiUrl=$this->source.'/discounts';
         $curl = new curl\Curl();
         $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
         $curl->setOption(CURLOPT_TIMEOUT, 180);
         $list = $curl->get($apiUrl);
-
-        //$data = ArrayHelper::map(json_decode($list), 'discount_id', 'type');
-        
         return $list;
     }
     //get referral purpose list
     function listPurposereferral()
     {
-        $apiUrl=$this->source.'/api/web/referral/listdatas/purpose';
+        $apiUrl=$this->source.'/purposes';
         $curl = new curl\Curl();
         $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
         $curl->setOption(CURLOPT_TIMEOUT, 180);
         $list = $curl->get($apiUrl);
-
-        //$data = ArrayHelper::map(json_decode($list), 'purpose_id', 'name');
-        
         return $list;
     }
     //get referral mode of release list
     function listModereleasereferral()
     {
-        $apiUrl=$this->source.'/api/web/referral/listdatas/moderelease';
+        $apiUrl=$this->source.'/modesrelease';
         $curl = new curl\Curl();
         $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
         $curl->setOption(CURLOPT_TIMEOUT, 180);
         $list = $curl->get($apiUrl);
-
-        //$data = ArrayHelper::map(json_decode($list), 'modeofrelease_id', 'mode');
-        
         return $list;
     }
     //get matching services
@@ -210,17 +229,19 @@ class ReferralComponent extends Component {
             ->groupBy('sampletype_id')
             ->asArray()->all();
 
+
         $analysis = Analysis::find()
             ->joinWith('sample')
-            ->where('tbl_sample.request_id =:requestId AND is_package_name =:packageName',[':requestId'=>$requestId,':packageName'=>0])
-            ->groupBy(['testname_id','methodref_id'])
+            ->where('tbl_sample.request_id =:requestId AND is_package =:packageName',[':requestId'=>$requestId,':packageName'=>0])
+            ->groupBy(['test_id','methodref_id'])
             ->asArray()->all();
 
         $package = Analysis::find()
             ->joinWith('sample')
-            ->where('tbl_sample.request_id =:requestId AND is_package_name =:packageName AND type_fee_id =:typeFee',[':requestId'=>$requestId,':packageName'=>1,':typeFee'=>2])
+            ->where('tbl_sample.request_id =:requestId AND is_package =:packageName AND type_fee_id =:typeFee',[':requestId'=>$requestId,':packageName'=>1,':typeFee'=>2])
             ->groupBy(['package_id'])
             ->asArray()->all();
+
 
         $sampletypeId = implode(',', array_map(function ($data) {
             return $data['sampletype_id'];
@@ -238,20 +259,19 @@ class ReferralComponent extends Component {
             return $data['package_id'];
         }, $package));
 
-        $apiUrl=$this->source.'/api/web/referral/services/listmatchagency?rstl_id='.$request->rstl_id.'&lab_id='.$request->lab_id.'&sampletype_id='.$sampletypeId.'&testname_id='.$testnameId.'&methodref_id='.$methodrefId.'&package_id='.$packageId;
-
+        $apiUrl=$this->source.'/listmatchagency?rstl_id='.$request->rstl_id.'&lab_id='.$request->lab_id.'&sampletype_id='.$sampletypeId.'&testname_id='.$testnameId.'&methodref_id='.$methodrefId.'&package_id='.$packageId;
         $curl = new curl\Curl();
         $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
         $curl->setOption(CURLOPT_TIMEOUT, 180);
-        $list = $curl->get($apiUrl);
+        $data = $curl->get($apiUrl);
 
-        if($list == 'false'){
+        $list = false;
+        if($data == 'false'){
             return null;
         } else {
             $agencyId = implode(',', array_map(function ($data) {
                 return $data['agency_id'];
-            }, json_decode($list,true)));
-            
+            }, json_decode($data,true)));
             $list_agency = $this->listAgency($agencyId);
             return $list_agency;
         }
@@ -261,8 +281,7 @@ class ReferralComponent extends Component {
     {   
         if(!empty($agencyId)){
             $agencies = rtrim($agencyId);
-
-            $apiUrl=$this->source.'/api/web/referral/listdatas/listagency?agency_id='.$agencies;
+            $apiUrl=$this->source.'/listagency?agency_id='.$agencies;
             $curl = new curl\Curl();
             $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
             $curl->setOption(CURLOPT_TIMEOUT, 180);
@@ -407,8 +426,9 @@ class ReferralComponent extends Component {
     //get bidder agency
     function getBidderAgency($requestId,$rstlId)
     {
+        return false;
         if($requestId > 0 && $rstlId > 0){
-            $apiUrl=$this->source.'/api/web/referral/bidnotifications/bidderagency?request_id='.$requestId.'&rstl_id='.$rstlId;
+            $apiUrl=$this->source.'/bidderagency?request_id='.$requestId.'&rstl_id='.$rstlId;
             $curl = new curl\Curl();
             $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
             $curl->setOption(CURLOPT_TIMEOUT, 180);
@@ -433,8 +453,9 @@ class ReferralComponent extends Component {
     }
     //count bid notices
     function countBidnotice($requestId,$rstlId){
+        return false;
         if($requestId > 0 && $rstlId > 0){
-            $apiUrl=$this->source.'/api/web/referral/bidnotifications/bidnotice?request_id='.$requestId.'&rstl_id='.$rstlId;
+            $apiUrl=$this->source.'/bidnotice?request_id='.$requestId.'&rstl_id='.$rstlId;
             $curl = new curl\Curl();
             $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
             $curl->setOption(CURLOPT_TIMEOUT, 180);
@@ -588,8 +609,9 @@ class ReferralComponent extends Component {
     }
     //get attachment
     function getAttachment($referralId,$rstlId,$type){
+        return false;
         if($referralId > 0 && $rstlId > 0 && $type > 0) {
-            $apiUrl=$this->source.'/api/web/referral/attachments/show_upload?referral_id='.$referralId.'&rstl_id='.$rstlId.'&type='.$type;
+            $apiUrl=$this->source.'/show_upload?referral_id='.$referralId.'&rstl_id='.$rstlId.'&type='.$type;
             $curl = new curl\Curl();
             $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
             $curl->setOption(CURLOPT_TIMEOUT, 180);
@@ -616,8 +638,9 @@ class ReferralComponent extends Component {
         }
     }
     function getReferredAgency($referralId,$rstlId){
+        return false;
         if($referralId > 0 && $rstlId > 0) {
-            $apiUrl=$this->source.'/api/web/referral/referrals/referred_agency?referral_id='.$referralId.'&rstl_id='.$rstlId;
+            $apiUrl=$this->source.'/referred_agency?referral_id='.$referralId.'&rstl_id='.$rstlId;
             $curl = new curl\Curl();
             $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
             $curl->setOption(CURLOPT_TIMEOUT, 180);
@@ -724,7 +747,7 @@ class ReferralComponent extends Component {
     function getPackageOne($packageId)
     {
         if($packageId > 0){
-            $apiUrl=$this->source.'/api/web/referral/packages/package_detail?package_id='.$packageId;
+            $apiUrl=$this->source.'/package_detail?package_id='.$packageId;
             $curl = new curl\Curl();
             $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
             $curl->setOption(CURLOPT_TIMEOUT, 180);
@@ -738,7 +761,7 @@ class ReferralComponent extends Component {
     function getPackages($labId,$sampletypeId)
     {
         if($labId > 0 && $sampletypeId > 0){
-            $apiUrl=$this->source.'/api/web/referral/packages/listpackage?lab_id='.$labId.'&sampletype_id='.$sampletypeId;
+            $apiUrl=$this->source.'/listpackage?lab_id='.$labId.'&sampletype_id='.$sampletypeId;
             $curl = new curl\Curl();
             $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
             $curl->setOption(CURLOPT_TIMEOUT, 180);

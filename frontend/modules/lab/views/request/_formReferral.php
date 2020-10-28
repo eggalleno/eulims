@@ -272,7 +272,7 @@ $sameLab = !empty($model->lab_id) ? $model->lab_id : 0;
             <div class="input-group">
                 <?php
                 $func = new Functions();
-                echo $func->GetReferralCustomerList($form, $model, $disabled,'Customer');
+                echo $func->GetCustomerList($form, $model, $disabled,'Customer');
                 if($disabled){
                     $btnDisp=" disabled='disabled'";
                 }else{
@@ -315,8 +315,7 @@ $sameLab = !empty($model->lab_id) ? $model->lab_id : 0;
         'pluginEvents'=>[
             "change" => 'function() { 
                 var discountid=this.value;
-                console.log(discountid);
-                $.get("/ajax/getdiscountreferral", {
+                $.get("'.$api_url."/getdiscount".'", {
                         discountid: discountid
                     }, function(result){
                     if(result){
