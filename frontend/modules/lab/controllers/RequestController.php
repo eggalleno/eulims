@@ -40,6 +40,8 @@ use yii\helpers\ArrayHelper;
 use yii\data\ArrayDataProvider;
 use common\models\lab\Lab;
 
+use common\components\Notification;
+
 //use yii\helpers\Url;
 /**
  * RequestController implements the CRUD actions for Request model.
@@ -910,5 +912,51 @@ class RequestController extends Controller
         } else {
             return 0;
         }
+    }
+	
+	 public function actionNotifysms($id,$reqid,$refnum)
+    {
+       $id = $_GET['id'];
+	   $reqid = $_GET['reqid'];
+	   $refnum = $_GET['refnum'];
+       
+       $customer = Customer::find()->where(['customer_id' => $id])->one();
+       $contactnum = $customer->tel;
+	   
+	    $notif= new Notification();
+		$title="Test Report";
+		$mes= "Good Day dear customer! Your test report for reference#: ".$refnum." is ready and available for pick-up.";
+		$res=$notif->sendSMS("", "", $contactnum, $title, $mes, "eULIMS", $this->module->id,$this->action->id);
+		$decode=Json::decode($res);
+		//var_dump($decode["data"]);
+		Yii::$app->session->setFlash('success',$decode["data"] );
+		return $this->redirect(['index']); 
+    }
+	
+	 public function actionNotifyreportdue()
+    {
+	  // $todaydate=date("Y-m-d");
+	   $tomorrow = date("Y-m-d", strtotime("+1 day"));
+	  // echo $tomorrow;
+       $request = Request::find()->where(['report_due' => $tomorrow])->all();
+	   
+		foreach ($request as $res){
+			$refnum= $res->request_ref_num;
+			$users = Profile::find()->where(['designation' => 'Lab Analyst'])->all();
+			$title="Request Report Due";
+			foreach ($users as $analyst){
+				 $contactnum = $analyst->contact_numbers;	
+				 if($contactnum){
+					 $notif= new Notification();
+					 $mes= "Hello dear analyst! There is a request due tomorrow with reference#: ".$refnum;
+					 $res=$notif->sendSMS("", "", $contactnum, $title, $mes, "eULIMS", $this->module->id,$this->action->id);
+					 $decode=Json::decode($res); 
+				 }
+			}
+           
+		}
+		
+		Yii::$app->session->setFlash('success',$decode["data"] );
+		return $this->redirect(['index']); 
     }
 }

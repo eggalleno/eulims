@@ -1,6 +1,6 @@
 <?php
 namespace frontend\modules\api\controllers;
-
+use Yii;
 use common\models\system\LoginForm;
 use common\models\system\Profile;
 use common\models\system\User;
@@ -18,6 +18,7 @@ use common\models\lab\Sampletype;
 use common\models\lab\Purpose;
 use common\models\lab\Modeofrelease;
 use common\models\lab\Testnamemethod;
+use common\models\lab\Testname;
 
 
 class RestcustomerController extends \yii\rest\Controller
@@ -511,7 +512,7 @@ class RestcustomerController extends \yii\rest\Controller
             ); 
         }
     }
-    public function actionGetquotation(){
+    public function actionGetquotation($keyword){
         $model = Testnamemethod::find()
         ->select(['testname_method_id','testname_id'=> 'tbl_testname.testName', 'method_id'=> 'tbl_methodreference.fee', 'workflow'=> 'tbl_methodreference.method', 'lab_id'=> 'tbl_lab.labname'])
         ->joinWith(['testname'])
@@ -524,5 +525,69 @@ class RestcustomerController extends \yii\rest\Controller
                 $model
             ); 
         }
+    }
+
+    public function actionGettestnames($keyword){
+        $model= Testname::find()
+        ->select([
+            'testname_id',
+            'testName'
+        ])
+        /*->where(['like', 'testName', $keyword. '%', false])
+        ->limit(10)*/
+        ->all();
+
+        if($model){
+            return $this->asJson(
+                $model
+            ); 
+        }
+    }
+
+    public function actionGettestnamemethod($testname_id){
+        $testnamemethods = Testnamemethod::find()
+        ->with('method')
+        ->where([
+            'tbl_testname_method.testname_id'=>$testname_id,
+        ])
+        ->all();
+        $methodfee = [];
+        foreach ($testnamemethods as $model) {
+            $methodfee [] = [
+                'tm_id' => $model->testname_method_id ,
+                'method' => $model->method->method,
+                'reference' => $model->method->reference,
+                'fee' => $model->method->fee,
+            ];
+        }
+
+
+        
+        return $this->asJson(
+            $methodfee
+        ); 
+    
+    }
+    public function actionGetcustomerquotation(){
+        $querySql = Yii::$app->labdb->createCommand("SELECT a.testname_method_id, b.testName, c.method, c.fee from tbl_testname_method AS a
+      INNER JOIN tbl_testname AS b ON a.testname_id = b.testname_id
+      INNER JOIN tbl_methodreference AS c ON a.method_id = c.method_reference_id")->queryAll();
+$arrayTestname =array();
+foreach ($querySql  as $eachRow)
+        {
+         $recData=array();
+        //  $recFeesData['type']='column';
+        //  $recData['name']=$eachRow['legend'];
+          $recData['testname_method_id']= $eachRow['testname_method_id'];
+          $recData['testName']=  $eachRow['testName'];
+          $recData['method']=  $eachRow['method'];
+          $recData['fee'] =  $eachRow['fee'];
+          array_push($arrayTestname,$recData);
+
+ 
+        }; 
+  //Yii::$app->labdb->createCommand("CALL spPerformanceDashboardRealtime('" . $kpirec . "'," . $currentmonth . ",'" . $currentmonthchar  . "',". $currentyear .",'Accomplishments','". $rstlId ."');")->execute();
+      return $this->asJson($arrayTestname);
+
     }
 }

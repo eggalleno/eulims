@@ -24,6 +24,7 @@ use yii\filters\VerbFilter;
 use yii\db\Query;
 use common\models\system\Profile;
 
+
 ?>
 
 <span style="display:inline-block;">
@@ -69,6 +70,7 @@ use common\models\system\Profile;
                 
                                if ($testreport){
                                     return $testreport->report_date;
+									
                                }else{
                                     return "";
                                }
@@ -89,5 +91,15 @@ use common\models\system\Profile;
 ],
 ]); 
 
+
+?>
+<?php 
+$testreport = Testreport::find()->where(['request_id' => $request->request_id])->one();
+                
+if ($testreport){
+	echo Html::button('<span class="glyphicon glyphicon-send"> SMS</span>', ['value' => '/lab/request/notifysms?id=' . $request->customer_id.'&reqid='.$request->request_id.'&refnum='.$request->request_ref_num,'onclick'=>'location.href=this.value', 'class' => 'btn btn-primary', 'title' => Yii::t('app', "SMS")]);
+}
+
+	
 
 ?>

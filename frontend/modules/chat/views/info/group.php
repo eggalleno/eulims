@@ -97,9 +97,9 @@ $this->registerJs($js);
 	   var x = userids.toString();
 	   var groupname= $("#chatgroup-group_name").val();
 	   var token=<?php echo json_encode($_SESSION['usertoken'])?>;
-	   var sender_userid= <?= Yii::$app->user->identity->profile->user_id?>;
+	   var sender_userid= <?php echo json_encode($_SESSION['userid'])?>;
 		$.ajax({
-			url: "http://www.eulims.local/api/message/setgroup", //API LINK FROM THE CENTRAL
+			url: "https://eulims.onelab.dost.gov.ph/api/message/setgroup", //API LINK FROM THE CENTRAL
 			type: 'POST',
 			dataType: "JSON",
 			beforeSend: function (xhr) {
