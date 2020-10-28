@@ -442,16 +442,44 @@ class RequestController extends Controller
 		}
         // Generate Reference Number
         $func=new Functions();
-        $Proc="spGetNextGeneratedRequestCode(:RSTLID,:LabID)";
+        /*$Proc="spGetNextGeneratedRequestCode(:RSTLID,:LabID)";
         $Params=[
             ':RSTLID'=>$rstl_id,
             ':LabID'=>$lab_id
-        ];
+        ]; */
         $Connection= Yii::$app->labdb;
         $Transaction =$Connection->beginTransaction();
-        $Row=$func->ExecuteStoredProcedureOne($Proc, $Params, $Connection);
-        $ReferenceNumber=$Row['GeneratedRequestCode'];
-        $RequestIncrement=$Row['RequestIncrement'];
+       // $Row=$func->ExecuteStoredProcedureOne($Proc, $Params, $Connection);
+        ////Reference Number Removing SP 10/282020 EGG
+		$Req= Request::find()->where(['request_id'=>$request_id])->one($Connection);
+		$requestdate=$Req->request_datetime;
+		$lastnum=(new Query)
+            ->select('MAX(number) AS lastnumber')
+            ->from('eulims_lab.tbl_requestcode')
+			->where(['lab_id' => $lab_id])
+            ->one();
+		$monthyear=date('mY',strtotime($requestdate));
+		$rstl= Rstl::find()->where(['rstl_id'=>$rstl_id])->one();
+		$code=$rstl->code;
+		
+		$lab= Lab::find()->where(['lab_id'=>$lab_id])->one();
+		$labcode=$lab->labcode;
+		
+		$str_trans_num=0;
+          if($lastnum != ''){
+            $str_trans_num=$lastnum["lastnumber"] + 1;
+            $str_trans_num=str_pad($str_trans_num, 4, "0", STR_PAD_LEFT);
+              
+          }
+          else{
+              $str_trans_num='0001';
+          }
+		  
+      
+		///////////
+		$ReferenceNumber=$code."-".$monthyear."-".$labcode."-".$str_trans_num;
+        $RequestIncrement=$str_trans_num;
+		
         //Update the tbl_requestcode
         $Requestcode= Requestcode::find()->where([
             'rstl_id'=>$rstl_id,
@@ -484,12 +512,7 @@ class RequestController extends Controller
         $total = $subtotal - ($subtotal * ($rate/100));
         
         $Request->total=$total;
-        /*
-        echo "<pre>";
-        var_dump($Request);
-        echo "</pre>";
-        exit;
-        */
+
         if($Request->save(false)){
             $Func=new Functions();
             $response=$Func->GenerateSampleCode($request_id);
@@ -508,6 +531,7 @@ class RequestController extends Controller
             $return="Failed";
         }
         return $return;
+		
     }
     /**
      * Creates a new Request model.
@@ -520,6 +544,7 @@ class RequestController extends Controller
         $Func=new Functions();
         $Func->CheckRSTLProfile();
         $GLOBALS['rstl_id']=Yii::$app->user->identity->profile->rstl_id;
+
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
            // Yii::$app->session->setFlash('success', 'Request Successfully Created!');
             return $this->redirect(['view', 'id' => $model->request_id]); ///lab/request/view?id=1
@@ -956,7 +981,7 @@ class RequestController extends Controller
            
 		}
 		
-		Yii::$app->session->setFlash('success',$decode["data"] );
+		//Yii::$app->session->setFlash('success',$decode["data"] );
 		return $this->redirect(['index']); 
     }
 }
