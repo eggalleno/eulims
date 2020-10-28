@@ -214,13 +214,20 @@ $this->registerJs($js,\yii\web\View::POS_READY);
                         'filterModel' => $searchModel,
                         'containerOptions' => ['style' => 'overflow-x: none!important','class'=>'kv-grid-container'], // only set when $responsive = false
                         'headerRowOptions' => ['class' => 'kartik-sheet-style'],
+                        'rowOptions' => function($model){
+                            if($model->status == 'Confirmed'){
+                                return ['class'=>'success'];
+                            }else{
+                                return ['class'=>'danger'];
+                            }
+                        },
                         'columns' => [
                             ['class' => 'yii\grid\SerialColumn'],
                                 'customer',
                                 'request_no',
                                 'status',
                                 'type',
-                                'created_at',
+                                'requested_at',
                                 [
                                     'class' => kartik\grid\ActionColumn::className(),
                                     'template' => $Button,
