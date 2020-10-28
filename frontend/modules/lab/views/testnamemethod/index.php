@@ -96,8 +96,8 @@ $this->params['breadcrumbs'][] = $this->title;
                 'filter' => $testnamelist,
                 'filterWidgetOptions' => [
                     'pluginOptions' => ['allowClear' => true],
-                ],
-                'filterInputOptions' => ['placeholder' => 'Test Name', 'testcategory_id' => 'grid-products-search-category_type_id']
+               ],
+               'filterInputOptions' => ['placeholder' => 'Test Name', 'testcategory_id' => 'grid-products-search-category_type_id']
             ],
             [
                 'attribute' => 'method_id',
@@ -137,18 +137,8 @@ $this->params['breadcrumbs'][] = $this->title;
 
             ['class' => 'kartik\grid\ActionColumn',
             'contentOptions' => ['style' => 'width: 8.7%'],
-           'template' => '{sync}{view}{update}{delete}',
+           'template' => '{view}{update}{delete}{workflow}',
             'buttons'=>[
-                'sync'=>function ($url, $model) {
-                    $check = $model->checking($model->method->method_reference_id);
-
-                    if($check == '"Synced"'){
-                        return Html::button('<span class="glyphicon glyphicon-cloud"></span>', ['value'=>Url::to(['/lab/testnamemethod/checkmethod','id'=>$model->method->method_reference_id]), 'onclick'=>'LoadModal(this.title, this.value);', 'class' => 'btn btn-success','title' => Yii::t('app', "Sync Test Name Method")]);
-                    }else{
-                        return Html::button('<span class="glyphicon glyphicon-cloud"></span>', ['value'=>Url::to(['/lab/testnamemethod/checkmethod','id'=>$model->method->method_reference_id]), 'onclick'=>'LoadModal(this.title, this.value);', 'class' => 'btn btn-warning','title' => Yii::t('app', "Sync Test Name Method")]);
-                    }
-                    //return Html::button('<span class="glyphicon glyphicon-cloud"></span>', ['value'=>Url::to(['/lab/testnamemethod/checkmethod','id'=>$model->method->method_reference_id]), 'onclick'=>'LoadModal(this.title, this.value);', 'class' => 'btn btn-warning','title' => Yii::t('app', "Sync Test Name Method")]);
-                },
                 'view'=>function ($url, $model) {
                     return Html::button('<span class="glyphicon glyphicon-eye-open"></span>', ['value'=>Url::to(['/lab/testnamemethod/view','id'=>$model->testname_method_id]), 'onclick'=>'LoadModal(this.title, this.value);', 'class' => 'btn btn-primary','title' => Yii::t('app', "View Test Name Method")]);
                 },

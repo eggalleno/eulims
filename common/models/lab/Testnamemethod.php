@@ -3,7 +3,6 @@
 namespace common\models\lab;
 
 use Yii;
-use linslin\yii2\curl;
 
 /**
  * This is the model class for table "tbl_testname_method".
@@ -86,17 +85,5 @@ class Testnamemethod extends \yii\db\ActiveRecord
     public function getSampletype()
     {
         return $this->hasOne(Sampletype::className(), ['sampletype_id' => 'sampletype_id']);
-    }
-
-    public static function checking($id){
-        
-        $curl = new curl\Curl();
-        $curl->setOption(CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
-        $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
-        $curl->setOption(CURLOPT_TIMEOUT, 180);
-        $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
-        $response = $curl->setGetParams(['id' => Yii::$app->user->identity->profile->rstl_id.'-'.$id,])->get($GLOBALS['local_api_url']."restpstc/checkmethod");
-
-        return $response;
     }
 }
