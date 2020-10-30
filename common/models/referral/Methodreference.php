@@ -41,7 +41,7 @@ class Methodreference extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['method', 'reference', 'fee', 'create_time'], 'required'],
+            [['method', 'reference', 'fee', 'sync_id', 'create_time'], 'required'],
             [['fee'], 'number'],
             [['create_time', 'update_time'], 'safe'],
             [['method', 'reference'], 'string', 'max' => 200],
@@ -59,6 +59,7 @@ class Methodreference extends \yii\db\ActiveRecord
             'method' => 'Method',
             'reference' => 'Reference',
             'fee' => 'Fee',
+            'sync_id'=> 'Sync ID',
             'create_time' => 'Create Time',
             'update_time' => 'Update Time',
         ];

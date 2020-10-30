@@ -43,6 +43,7 @@ use yii\helpers\Json;
                         'headerOptions' => ['class' => 'text-center'],
                         'contentOptions' => ['class' => 'text-center','style'=>'max-width:20px;'],
                     ],
+                    'sync_id',
                     [
                         'attribute'=>'method',
                         'header' => 'Method',

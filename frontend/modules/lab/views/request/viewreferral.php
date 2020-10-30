@@ -679,10 +679,13 @@ if($requeststatus > 0 && $notified == 1 && $hasTestingAgency > 0 && !empty($mode
                     'headerOptions' => ['class' => 'kartik-sheet-style'],
                     'buttons' => [
                         'notification' => function ($url, $data) use ($model,$referralcomp,$rstlId) {
+                             $checkActive = null;
+                            $checkNotify = null;
+                            $checkConfirm = null;
 
-                            $checkActive = $referralcomp->checkActiveLab($model->lab_id,$data['agency_id']);
-                            $checkNotify = $referralcomp->checkNotify($model->request_id,$data['agency_id']);
-                            $checkConfirm = $referralcomp->checkConfirm($model->request_id,$rstlId,$data['agency_id']);
+                            // $checkActive = $referralcomp->checkActiveLab($model->lab_id,$data['agency_id']);
+                            // $checkNotify = $referralcomp->checkNotify($model->request_id,$data['agency_id']);
+                            // $checkConfirm = $referralcomp->checkConfirm($model->request_id,$rstlId,$data['agency_id']);
 
                             if($model->status_id > 0) {
                                 switch ($checkNotify) {

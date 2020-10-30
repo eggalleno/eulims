@@ -64,8 +64,8 @@ class TestnamemethodController extends Controller
         $labid = $_GET['lab_id'];
         $testname_id = $_GET['id'];
     
-         $methodreference = Methodreference::find()->orderBy(['method_reference_id' => SORT_DESC])->all();
-         $testnamedataprovider = new ArrayDataProvider([
+        $methodreference = Methodreference::find()->orderBy(['method_reference_id' => SORT_DESC])->all();
+        $testnamedataprovider = new ArrayDataProvider([
                  'allModels' => $methodreference,
                  'pagination' => [
                      'pageSize' =>false,
@@ -127,7 +127,8 @@ class TestnamemethodController extends Controller
      * @throws NotFoundHttpException if the model cannot be found
      */
     public function actionView($id)
-    {
+    {   
+
         if(Yii::$app->request->isAjax){
             return $this->renderAjax('view', [
                     'model' => $this->findModel($id),
@@ -135,6 +136,69 @@ class TestnamemethodController extends Controller
         }
     }
 
+    public function actionCheckmethod($id)
+    {
+        $methodreference = Methodreference::find()->where(['method_reference_id' => $id])->one();
+        
+        $curl = new curl\Curl();
+        $curl->setOption(CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+        $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
+        $curl->setOption(CURLOPT_TIMEOUT, 180);
+        $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
+        $response = $curl->setGetParams(['id' => Yii::$app->user->identity->profile->rstl_id.'-'.$id,])->get($GLOBALS['local_api_url']."restpstc/checkmethod");
+
+        if ($curl->errorCode != null) {
+           $response = 'Please try again later.';
+        }
+        
+        $curl = new curl\Curl();
+        $curl->setOption(CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+        $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
+        $curl->setOption(CURLOPT_TIMEOUT, 180);
+        $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
+        $lists = $curl->get($GLOBALS['local_api_url']."restpstc/listlab");
+
+       $list = json_decode($lists);
+
+    //    var_dump($list->labs); exit();
+        if(Yii::$app->request->isAjax){
+            return $this->renderAjax('sync', [
+                'response' => $response,
+                'model' => $methodreference,
+                'laboratories' => $list->labs,
+                'sampletypes' => $list->sampletypes,
+                'testnamelist' => $list->testnamelist,
+
+            ]);
+        }
+    }
+
+    public function actionSyncmethod(){
+        $id = Yii::$app->request->post('id');
+
+        $methodreference = Methodreference::find()->where(['method_reference_id' => $id])->one();
+        
+        $params = [
+            'sync_id' => Yii::$app->user->identity->profile->rstl_id.'-'.$methodreference->method_reference_id,
+            'method' => $methodreference->method,
+            'reference' =>$methodreference->reference,
+            'fee' => $methodreference->fee,
+            'testname_id' => Yii::$app->request->post('testname_id'),
+            'sampletype_id' => Yii::$app->request->post('sampletype_id'),
+            'lab_id' => Yii::$app->request->post('lab_id')
+        ];
+
+        $curl = new curl\Curl();
+        $curl->setRequestBody(json_encode($params));
+        $curl->setOption(CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+        $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
+        $curl->setOption(CURLOPT_TIMEOUT, 180);
+        return $data = $curl->post($GLOBALS['local_api_url']."restpstc/syncmethod");
+    }
+
+
+
+    
     /**
      * Creates a new Testnamemethod model.
      * If creation is successful, the browser will be redirected to the 'index' page.
@@ -454,4 +518,5 @@ class TestnamemethodController extends Controller
 
         throw new NotFoundHttpException('The requested page does not exist.');
     }
+
 }
