@@ -70,6 +70,7 @@ class RequestController extends Controller
      */
     public function actionIndex()
     { 
+
         $Func=new Functions();
         $Func->CheckRSTLProfile();
         
@@ -456,7 +457,7 @@ class RequestController extends Controller
 		$lastnum=(new Query)
             ->select('MAX(number) AS lastnumber')
             ->from('eulims_lab.tbl_requestcode')
-			->where(['lab_id' => $lab_id])
+			->where(['lab_id' => $lab_id, 'year'=> date('y')])
             ->one();
 		$monthyear=date('mY',strtotime($requestdate));
 		$rstl= Rstl::find()->where(['rstl_id'=>$rstl_id])->one();
