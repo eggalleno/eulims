@@ -320,7 +320,7 @@ function mes(id,type) {
 		?>;
 		
 			$.ajax({
-			url: "https://eulims.onelab.dost.gov.ph/api/message/getcontact", //API LINK FROM THE CENTRAL
+			url: "/chat/info/getcontact", //API LINK FROM THE CENTRAL
 			type: 'POST',
 			dataType: "JSON",
 			beforeSend: function (xhr) {
