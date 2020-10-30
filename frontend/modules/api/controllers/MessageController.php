@@ -75,8 +75,8 @@ class MessageController extends \yii\rest\Controller
             'login' => ['POST'],
             'logout' => ['POST'],
             'user' => ['GET'],
-             'setmessage' => ['POST'],
-             'data' => ['GET'],
+            'setmessage' => ['POST','GET'],
+            'data' => ['GET'],
         ];
     }
 	
