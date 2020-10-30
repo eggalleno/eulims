@@ -321,4 +321,37 @@ class InfoController extends Controller
 		}
 		
 	}
+	
+	public function actionGetcontact(){
+		if(isset($_SESSION['usertoken'])){
+			
+			$token=$_SESSION['usertoken'];
+			$userid= $_SESSION['userid'];
+			
+			$my_var = \Yii::$app->request->post();
+			
+			$authorization = "Authorization: Bearer ".$token; 
+			$apiUrl=$this->source.'getcontact';
+			$params = [
+				'userid' => $my_var['userid'],
+				'recipientid' => $my_var['recipientid'],
+				'type' => $my_var['type']
+			];
+			$curl = new curl\Curl();
+			$curl->setRequestBody(json_encode($params));
+			$curl->setOption(CURLOPT_HTTPHEADER, ['Content-Type: application/json' , $authorization]);
+			$curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
+			$curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
+			$curl->setOption(CURLOPT_TIMEOUT, 180);
+			$list = $curl->get($apiUrl);
+		
+			return $list;
+		}	
+		else{
+			$model = new LoginForm();
+			return $this->render('login', [
+			'model' => $model
+			]);
+		}
+	}	
 }
