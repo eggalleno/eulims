@@ -475,6 +475,42 @@ class SiteController extends Controller
             $loginlogs->rstl_id = (int) Yii::$app->user->identity->profile->rstl_id;
             $loginlogs->login_date = date('Y-m-d H:i:s');
 
+          
+            $user = User::find()->Where(['user_id'=>Yii::$app->user->identity->profile->user_id])->one();
+  
+
+            if ($user) {
+                $user_data = array(
+                'username' => $user->username,
+                'auth_key' => $user->auth_key,
+                'password_hash'=>$user->password_hash,
+                'email'=>$user->email,
+                'user_id'=>Yii::$app->user->identity->profile->user_id,
+                'lastname'=>Yii::$app->user->identity->profile->lastname,
+                'firstname'=>Yii::$app->user->identity->profile->firstname,
+                'designation'=>Yii::$app->user->identity->profile->designation,
+                'middleinitial'=>Yii::$app->user->identity->profile->middleinitial,
+                'rstl_id'=>Yii::$app->user->identity->profile->rstl_id,
+                'lab_id'=>Yii::$app->user->identity->profile->lab_id,
+                'contact_numbers'=>Yii::$app->user->identity->profile->contact_numbers,
+              );
+                $curl = curl_init();
+      
+                curl_setopt($curl, CURLOPT_POST, 1);
+            
+                curl_setopt($curl, CURLOPT_URL, 'https://eulims.onelab.dost.gov.ph/api/sync/passlogin');
+
+                curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+                curl_setopt($curl, CURLOPT_PROXY, ''); //!! FIX
+                curl_setopt($curl, CURLOPT_FOLLOWLOCATION, 1);
+                curl_setopt($curl, CURLOPT_POSTFIELDS, $user_data);
+                curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, false);
+                curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
+                $result = curl_exec($curl);
+                curl_close($curl);
+            
+            } 
+
             if($loginlogs->save()){
                 return $this->goBack();
             } else {
