@@ -337,7 +337,7 @@ class MessageController extends \yii\rest\Controller
 	
 	public function actionSavefile(){
 		$valid_extensions = ['jpeg', 'jpg', 'png', 'gif', 'bmp' , 'pdf' , 'doc' , 'ppt','docx','xlsx', 'pptx']; 
-		$path = $_SERVER['DOCUMENT_ROOT'].'uploads/message/'; // upload directory
+		$path = $_SERVER['DOCUMENT_ROOT'].'/uploads/message/'; // upload directory
 
 		$img = $_FILES['filetoupload']['name'];
         $tmp = $_FILES['filetoupload']['tmp_name'];
