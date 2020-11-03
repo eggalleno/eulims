@@ -457,7 +457,7 @@ class RequestController extends Controller
 		$lastnum=(new Query)
             ->select('MAX(number) AS lastnumber')
             ->from('eulims_lab.tbl_requestcode')
-			->where(['lab_id' => $lab_id, 'year'=> date('y')])
+			->where(['lab_id' => $lab_id, 'year'=> date('Y')])
             ->one();
 		$monthyear=date('mY',strtotime($requestdate));
 		$rstl= Rstl::find()->where(['rstl_id'=>$rstl_id])->one();
