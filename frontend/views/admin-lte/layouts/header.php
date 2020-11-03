@@ -492,7 +492,7 @@ window.setInterval(function(){
 	  //alert("wala");   
    }
    else{
-	  //mes(id,type); 
+	  mes(id,type); 
    } 
   
    
