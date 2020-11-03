@@ -95,12 +95,7 @@ class RestreferralController extends \yii\rest\Controller
                 CALL spGetMatchAgency(:rstlId,:labId,:sampletypeId,:testnameId,:methodrefId,:packageId)");
         $query->bindValues($params);
         $result = $query->queryAll();
-
-        if($query->queryScalar() === false){
-                return false;
-            } else {
-                return $result;
-            }
+        return $result; 
 
     }
 
