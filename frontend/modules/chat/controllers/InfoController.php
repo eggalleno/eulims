@@ -354,4 +354,55 @@ class InfoController extends Controller
 			]);
 		}
 	}	
+	
+	public function actionSavefile(){
+		if(isset($_SESSION['usertoken'])){
+			
+			$token=$_SESSION['usertoken'];
+			$userid= $_SESSION['userid'];
+			
+			$my_var = \Yii::$app->request->post();
+			$apiUrl=$this->source.'uploads/message/';
+			
+			
+			$valid_extensions = ['jpeg', 'jpg', 'png', 'gif', 'bmp' , 'pdf' , 'doc' , 'ppt','docx','xlsx', 'pptx']; 
+			$path = $apiUrl; // upload directory
+
+			$img = $_FILES['filetoupload']['name'];
+			$tmp = $_FILES['filetoupload']['tmp_name'];
+		
+			$ext = strtolower(pathinfo($img, PATHINFO_EXTENSION));
+			// can upload same image using rand function
+			$final_image = rand(1000,1000000).$img;
+			// check's valid format
+			if(in_array($ext, $valid_extensions)) 
+			{ 
+				$path = $path.strtolower($final_image); 
+				if(move_uploaded_file($tmp,$path)) 
+				{
+					
+				}
+			} 
+			/*$authorization = "Authorization: Bearer ".$token; 
+			$apiUrl=$this->source.'savefile';
+			$params = [
+				'data' => $my_var['data'],
+			];
+			$curl = new curl\Curl();
+			$curl->setRequestBody(json_encode($params));
+			$curl->setOption(CURLOPT_HTTPHEADER, ['Content-Type: application/json' , $authorization]);
+			$curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
+			$curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
+			$curl->setOption(CURLOPT_TIMEOUT, 180);
+			$list = $curl->get($apiUrl);
+		
+			return $list; */
+		}	
+		else{
+			$model = new LoginForm();
+			return $this->render('login', [
+			'model' => $model
+			]);
+		}
+	}
 }
