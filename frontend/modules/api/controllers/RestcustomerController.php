@@ -590,4 +590,42 @@ foreach ($querySql  as $eachRow)
       return $this->asJson($arrayTestname);
 
     }
+
+    //this function will return list of sampletype using the the labid , btc
+    //cann trigger this during lab dropdown on change event
+    public function actionSampletypebylab($lab_id){
+        $model = Testnamemethod::find()
+            ->joinWith('sampletype')
+            ->select(['tbl_testname_method.sampletype_id','tbl_sampletype.type'])
+            ->where(['lab_id'=>$lab_id])
+            ->groupby('sampletype_id')
+            ->asArray()
+            ->all();
+
+        return $this->asJson($model);
+    }
+
+    public function actionTestnamebysampletypeandlab($lab_id,$sampletype_id){
+        $model = Testnamemethod::find()
+            ->joinWith('testname')
+            ->select(['tbl_testname_method.testname_id','tbl_testname.testName'])
+            ->where(['lab_id'=>$lab_id,'sampletype_id'=>$sampletype_id])
+            ->groupby('testname_id')
+            ->asArray()
+            ->all();
+
+        return $this->asJson($model);
+    }
+
+    public function actionMethodbylabsampletypeandtestname($lab_id,$sampletype_id,$testname_id){
+         $model = Testnamemethod::find()
+            ->joinWith('method')
+            ->select(['testname_method_id','method_id','methodnamefee'=>'CONCAT(tbl_methodreference.method,tbl_methodreference.fee)'])
+            ->where(['lab_id'=>$lab_id,'sampletype_id'=>$sampletype_id,'tbl_testname_method.testname_id'=>$testname_id])
+            ->groupby('testname_method_id')
+            ->asArray()
+            ->all();
+
+        return $this->asJson($model);
+    }
 }
