@@ -17,160 +17,64 @@ use yii\helpers\Json;
 /* @var $form yii\widgets\ActiveForm */
 ?>
 
-<?php
-if(count($sampletype) > 0){
-    $dataSampletype = $sampletype;
-} else {
-    $dataSampletype = ['' => 'No sample type'] + $sampletype;
-}
 
-if(count($testcategory) > 0){
-    $dataTestcategory = $testcategory;
-} else {
-    $dataTestcategory = ['' => 'No test category'] + $testcategory;
-}
-
-//$sameSampletype = !empty($model->sampletype_id) ? $model->sampletype_id : 0;
-$sameSampletype = 0;
-?>
 
 <div class="pstc-sample-form">
 
     <div class="image-loader" style="display: hidden;"></div>
 
-    <?php $form = ActiveForm::begin(['id'=>'pstc_sample']); ?>
+    <?php $form = ActiveForm::begin(['method' => 'post', 'action' => ['/pstc/pstcrequest/createsample'],]); ?>
+   
+    <div class="row">
+        <div class="col-sm-3" style="margin-top: 10px;">
+            <label>Sample Quantity</label>
+        </div>
+        <div class="col-sm-3">
+            <div class="input-group" style="margin-bottom: 15px;">
+                <span class="input-group-btn">
+                    <button type="button" class="btn btn-default btn-number" disabled="disabled" data-type="minus" data-field="qnty">
+                        <span class="glyphicon glyphicon-minus"></span>
+                    </button>
+                </span>
+                <input type="text" name="qnty" class="form-control input-number" value="1" min="1" max="100" style="width: 50px;text-align: center;">
+                <span class="input-group-btn" style="float:left;">
+                    <button type="button" class="btn btn-default btn-number" data-type="plus" data-field="qnty">
+                        <span class="glyphicon glyphicon-plus"></span>
+                    </button>
+                </span>
+            </div>
+        </div>
+        <div class="err-message" style="margin-top: 10px;font-size: 12px;color: #FF0000;"></div>
+    </div>
 
-    <em style="color:#990000;">Note: Editing test category or sample type is not allowed. It might affect test names.</em>
-    <br><br>
-    <?php
-
-        $testcategoryOptions = [
-            'language' => 'en-US',
-            'width' => '100%',
-            'theme' => Select2::THEME_KRAJEE,
-            'placeholder' => 'Select Test Category',
-            'allowClear' => true,
-        ];
-
-        $sampletypeOptions = [
-            'language' => 'en-US',
-            'width' => '100%',
-            'theme' => Select2::THEME_KRAJEE,
-            'placeholder' => 'Select Sample Type',
-            'allowClear' => true,
-        ];
-
-        if($sample_data['is_referral'] == 0):
-    ?>
-    <div class="form-group required">
-        <label class="control-label">Test Category</label>
+    <div class="row">
+        <div class="col-sm-12">
         <?php
-
+            echo '<label class="control-label">Sample Template</label>';
             echo Select2::widget([
-                'name'=>'testcategory_id',
-                'id'=>'pstcsample-testcategory_id',
-                'data' => $dataTestcategory,
+                'name' => 'saved_templates',
+                'data' => $sampletemplates,
                 'theme' => Select2::THEME_KRAJEE,
-                'size' => Select2::MEDIUM,
-                //'theme' => Select2::THEME_BOOTSTRAP,
-                'options' => $testcategoryOptions,
-                'value' => $sample_data['testcategory_id'],
-                'pluginOptions' => [
-                    'allowClear' => true,
-                    'disabled'=>true,
-                    'class'=>'form-control',
-                ],
-                'pluginEvents' => [
-                    "change" => "function() {
-                        var testcategoryId = this.value;
-                        var select = $('#pstcsample-sampletype_id');
-                        select.find('option').remove().end();
-                        if (testcategoryId > 0){
-                            $.ajax({
-                                url: '".Url::toRoute("pstcrequest/get_sampletype")."',
-                                method: 'GET',
-                                data: {testcategory_id:testcategoryId},
-                                success: function (data) {
-                                    var select2options = ".Json::encode($sampletypeOptions).";
-                                    select2options.data = data.data;
-                                    select.select2(select2options);
-                                    select.val(data.selected).trigger('change');
-                                    $('.image-loader').removeClass('img-loader');
-                                },
-                                beforeSend: function (xhr) {
-                                    $('.image-loader').addClass('img-loader');
-                                },
-                                error: function (jqXHR, textStatus, errorThrown) {
-                                    alertWarning.alert(\"<p class='text-danger' style='font-weight:bold;'>Error Encountered!</p>\");
-                                }
-                            });
-                        } else {
-                            //alertWarning.alert(\"<p class='text-danger' style='font-weight:bold;'>No test category selected!</p>\");
-                            console.log('No test category selected!');
-                            select.val('').trigger('change');
-                        }
-                    }",
-                ],
+                'pluginOptions' => ['allowClear' => true,'placeholder' => 'Search sample template ...'],
+                'options' => ['id' => 'saved_templates']
             ]);
+            echo "<br>";
         ?>
-    </div>
-    <?php endif; ?>
-    <div class="form-group required">
-        <label class="control-label">Sample Type</label>
-        <?php
-            echo Select2::widget([
-                'name'=>'sampletype_id',
-                'id'=>'pstcsample-sampletype_id',
-                'data' => $dataSampletype,
-                'theme' => Select2::THEME_KRAJEE,
-                'size' => Select2::MEDIUM,
-                //'theme' => Select2::THEME_BOOTSTRAP,
-                'options' => $sampletypeOptions,
-                'value' => $sample_data['sampletype_id'],
-                'pluginOptions' => [
-                    //'allowClear' => true,
-                    'disabled'=>true,
-                ],
-            ]);
-        ?>
-    </div>
-    <div class="form-group">
-        <label class="control-label">Sampling Date</label>
-        <?php
-            echo DateTimePicker::widget([
-                'name'=>'sampling_date',
-                'id'=>'pstcsample-sampling_date',
-                //'type' => DateTimePicker::TYPE_INPUT,
-                'value' => empty($sample_data['sampling_date']) ? '' : date("m/d/Y h:i:s A", strtotime($sample_data['sampling_date'])),
-                'options' => [
-                    'placeholder' => 'Enter sampling date ...',
-                    'autocomplete'=>'off',
-                    'class'=>'form-control',
-                ],
-                'pluginOptions' => [
-                    'autoclose'=>true,
-                    'format' => 'mm/dd/yyyy HH:ii:ss P',
-                    'todayHighlight' => true,
-                    //'startDate' => date('m/d/Y h:i:s A'),
-                    'todayBtn' => true,
-                    //'removeButton' => false,
-                ]
-            ]);
-		?>
-    </div>
-    <div class="form-group">
-        <div class="required">
-            <label class="control-label">Sample Name</label>
-            <?= Html::textInput('sample_name',$sample_data['sample_name'],['class'=>'form-control','placeholder' => 'Enter sample name ...','autocomplete'=>'off']) ?>
         </div>
     </div>
-    <div class="form-group required">
-        <label class="control-label">Sample Description</label>
-        <?= Html::textarea('sample_description',$sample_data['sample_description'],['class'=>'form-control','rows' => 4]) ?>
-    </div>
+    <input type="hidden" name="pstc_request_id" value="<?php echo $request_id; ?>">
+    <?= $form->field($model, 'sample_name')->textInput(['maxlength' => true,'placeholder' => 'Enter sample name ...','id' => 'sample-samplename']) ?>
+    <?= $form->field($model, 'sample_description')->textarea(['rows' => 3,'id' => 'sample-description']) ?>
+
+    <?php
+        if(empty($model->sample_id)){
+            echo Html::checkbox('sample_template', false, ['label' => '&nbsp;Save as template','value'=>"1"]);
+            echo "<br>";
+        }
+    ?>
     <div class="form-group" style="padding-bottom: 3px;">
         <div style="float:right;">
-            <?= Html::submitButton('Update', ['class' => 'btn btn-primary','id'=>'btn-update']) ?>
+            <?= Html::submitButton($model->isNewRecord ? 'Save' : 'Update', ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary','id'=>'btn-update']) ?>
             <?= Html::button('Close', ['class' => 'btn', 'data-dismiss' => 'modal']) ?>
             <br>
         </div>
@@ -203,13 +107,89 @@ function confirmSampletype(){
         ]
     });
 }
+
+$('.btn-number').click(function(e){
+    e.preventDefault();
+    
+    $(".err-message").html("");
+    fieldName = $(this).attr('data-field');
+    type      = $(this).attr('data-type');
+    var input = $("input[name='"+fieldName+"']");
+    var currentVal = parseInt(input.val());
+    if (!isNaN(currentVal)) {
+        if(type == 'minus') {
+            
+            if(currentVal > input.attr('min')) {
+                input.val(currentVal - 1).change();
+            } 
+            if(parseInt(input.val()) == input.attr('min')) {
+                $(this).attr('disabled', true);
+            }
+
+        } else if(type == 'plus') {
+
+            if(currentVal < input.attr('max')) {
+                input.val(currentVal + 1).change();
+            }
+            if(parseInt(input.val()) == input.attr('max')) {
+                $(this).attr('disabled', true);
+            }
+
+        }
+    } else {
+        input.val(0);
+    }
+});
+$('.input-number').focusin(function(){
+   $(this).data('oldValue', $(this).val());
+});
+$('.input-number').change(function() {
+    
+    minValue =  parseInt($(this).attr('min'));
+    maxValue =  parseInt($(this).attr('max'));
+    valueCurrent = parseInt($(this).val());
+    $(".err-message").html("");
+    
+    name = $(this).attr('name');
+    if(valueCurrent >= minValue) {
+        $(".btn-number[data-type='minus'][data-field='"+name+"']").removeAttr('disabled')
+    } else {
+        //alert('Sorry, the minimum value was reached');
+        $(".err-message").html("Sorry, the minimum value was reached.");
+        $(this).val($(this).data('oldValue'));
+    }
+    if(valueCurrent <= maxValue) {
+        $(".btn-number[data-type='plus'][data-field='"+name+"']").removeAttr('disabled')
+    } else {
+        //alert('Sorry, the maximum value was reached');
+        $(".err-message").html("Sorry, the maximum value was reached.");
+        $(this).val($(this).data('oldValue'));
+    }
+    
+});
+
+$(".input-number").keydown(function (e) {
+        // Allow: backspace, delete, tab, escape, enter and .
+        if ($.inArray(e.keyCode, [46, 8, 9, 27, 13, 190]) !== -1 ||
+             // Allow: Ctrl+A
+            (e.keyCode == 65 && e.ctrlKey === true) || 
+             // Allow: home, end, left, right
+            (e.keyCode >= 35 && e.keyCode <= 39)) {
+                 // let it happen, don't do anything
+                 return;
+        }
+        // Ensure that it is a number and stop the keypress
+        if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
+            e.preventDefault();
+        }
+    });
 </script>
 <?php
 $this->registerJs("$('#saved_templates').on('change',function(){
     var id = $('#saved_templates').val();
         $.ajax({
-            //url: '".Url::toRoute("sample/getlisttemplate?template_id='+id+'")."',
-            url: '".Url::toRoute("sample/getlisttemplate")."',
+            //url: '".Url::toRoute("getlisttemplate?template_id='+id+'")."',
+            url: '".Url::toRoute("getlisttemplate")."',
             dataType: 'json',
             method: 'GET',
             //data: {id: $(this).val()},

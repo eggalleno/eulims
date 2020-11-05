@@ -18,7 +18,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
       <?= GridView::widget([
         'dataProvider' => $dataProvider,
-        'filterModel' => $searchModel,
+        //'filterModel' => $searchModel,
         'id'=>'pstcrequest-grid',
         'pjax'=>true,
         'pjaxSettings' => [
@@ -48,15 +48,36 @@ $this->params['breadcrumbs'][] = $this->title;
                 'attribute' => 'customer_id',
                 'format' => 'raw',
                 'value' => function($data){ 
-                    return !empty($data->customer) ? $data->customer->customer_name : null;
+                    return !empty($data['customer']) ? $data['customer']['customer_name'] : null;
                 },
                 'filterType' => GridView::FILTER_SELECT2,
-                'filter' => $customers,
+                //'filter' => $customers,
                 'filterWidgetOptions' => [
                     'pluginOptions' => ['allowClear' => true],
                 ],
                 'filterInputOptions' => ['placeholder' => 'Search customer name', 'id' => 'grid-search-customer_id'],
                 'headerOptions' => ['class' => 'text-center'],
+                'contentOptions' => ['class' => 'text-center'],
+            ],
+            [
+                'header' => 'Submitted By',
+                'attribute' => 'submitted_by',
+                'format' => 'raw',
+                // 'value' => function($data){
+                //     return !empty($data->customer) ? $data->agencyreceiving->name : null;
+                // },
+                'headerOptions' => ['class' => 'text-center'],
+                'contentOptions' => ['class' => 'text-center'],
+            ],
+            [
+                'header' => 'Received By',
+                'attribute' => 'received_by',
+                'format' => 'raw',
+                // 'value' => function($data){
+                //     return !empty($data->customer) ? $data->agencyreceiving->name : null;
+                // },
+                'headerOptions' => ['class' => 'text-center'],
+                'contentOptions' => ['class' => 'text-center'],
             ],
             [
                 'header' => 'Date Created',
@@ -64,12 +85,13 @@ $this->params['breadcrumbs'][] = $this->title;
                 'format' => 'raw',
                 'value' => function($data){
                     //return Yii::$app->formatter->asDate($data->created_at, 'php:F j, Y h:i A');
-                    return date('F j, Y h:i A',strtotime($data->created_at));
+                    return date('F j, Y h:i A',strtotime($data['created_at']));
                 },
                 'headerOptions' => ['class' => 'text-center'],
+                'contentOptions' => ['class' => 'text-center'],
                 'filterType'=> GridView::FILTER_DATE,
                 'filterWidgetOptions' => [
-                    'model' => $searchModel,
+                    //'model' => $searchModel,
                     'options' => ['placeholder' => 'Select date created'],
                     'attribute' => 'created_at',
                     //'type' => DatePicker::TYPE_INPUT,
@@ -81,22 +103,14 @@ $this->params['breadcrumbs'][] = $this->title;
                 ],
             ],
             [
-                'header' => 'Submitted By',
-                'attribute' => 'submitted_by',
+                'header' => 'Status',
+                'attribute' => 'accepted',
                 'format' => 'raw',
-                // 'value' => function($data){
-                //     return !empty($data->customer) ? $data->agencyreceiving->name : null;
-                // },
+                'value' => function($data){
+                    return ($data['accepted'] == 0) ? '<span class="label label-danger">Not Accepted</span>' : '<span class="label label-success">Accepted</span>';
+                },
                 'headerOptions' => ['class' => 'text-center'],
-            ],
-            [
-                'header' => 'Received By',
-                'attribute' => 'received_by',
-                'format' => 'raw',
-                // 'value' => function($data){
-                //     return !empty($data->customer) ? $data->agencyreceiving->name : null;
-                // },
-                'headerOptions' => ['class' => 'text-center'],
+                'contentOptions' => ['class' => 'text-center'],
             ],
             [
                 'class' => 'kartik\grid\ActionColumn',
@@ -106,11 +120,11 @@ $this->params['breadcrumbs'][] = $this->title;
                 'headerOptions' => ['class' => 'kartik-sheet-style'],
                 'buttons' => [
                     'view' => function($url, $data) {
-                        return Html::button('<span class="glyphicon glyphicon-eye-open"></span>', ['value'=>Url::to(['pstcrequest/view','id'=>$data->pstc_request_id]),'onclick'=>'window.open(this.value,"_blank")', 'class' => 'btn btn-primary','title' => 'View PSTC Request']);
+                        return Html::button('<span class="glyphicon glyphicon-eye-open"></span>', ['value'=>Url::to(['pstcrequest/view','request_id'=>$data['pstc_request_id'],'pstc_id'=>$data['pstc_id']]),'onclick'=>'window.open(this.value,"_blank")', 'class' => 'btn btn-primary','title' => 'View PSTC Request']);
                         //return Html::a('<span class="glyphicon glyphicon-eye-open"></span>', ['referral/view', 'id' => $data->referral_id], ['class' => 'btn btn-primary','title' => 'View '.$data->referral_code,'target'=>"_blank"]);
                     },
                     'edit' => function($url, $data) {
-                        return Html::button('<span class="glyphicon glyphicon-pencil"></span>', ['value'=>Url::to(['pstcrequest/view','id'=>$data->pstc_request_id]),'onclick'=>'window.open(this.value,"_blank")', 'class' => 'btn btn-primary','title' => 'View PSTC Request']);
+                        return Html::button('<span class="glyphicon glyphicon-pencil"></span>', ['value'=>Url::to(['pstcrequest/view','id'=>$data['pstc_request_id']]),'onclick'=>'window.open(this.value,"_blank")', 'class' => 'btn btn-primary','title' => 'View PSTC Request']);
                     }
                 ],
             ],

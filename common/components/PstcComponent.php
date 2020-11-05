@@ -24,32 +24,92 @@ use linslin\yii2\curl;
  */
 class PstcComponent extends Component {
 
-    public $source = 'https://eulimsapi.onelab.ph';
+    public $source = 'http://eulims.test/api/restpstc/';
+    public $authorization = 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiIsImp0aSI6IjRmMWcyM2ExMmFhIn0.eyJpc3MiOiJodHRwOlwvXC9leGFtcGxlLmNvbSIsImF1ZCI6Imh0dHA6XC9cL2V4YW1wbGUub3JnIiwianRpIjoiNGYxZzIzYTEyYWEiLCJpYXQiOjE2MDE5NTY5MTUsImV4cCI6MTAyNDE5NTY5MTUsInVpZCI6NTB9.lMIUidFxtg9jXF9VLFJuKghHzqgVlu2S7s5OrZMUHoQ';
     //public $source = 'http://localhost/eulimsapi.onelab.ph';
     
-	//list to view
-	function getRequest($rstlId,$accepted)
+    //list to view
+    
+    function getAll($rstlId)
 	{
-		if($rstlId > 0 && isset($accepted)) {
-            $apiUrl=$this->source.'/api/web/referral/pstcrequests/request?rstl_id='.$rstlId.'&accepted='.$accepted;
+		if($rstlId > 0) {
+            $apiUrl=$this->source.'request?rstl_id='.$rstlId;
             $curl = new curl\Curl();
+            $curl->setOption(CURLOPT_HTTPHEADER, ['Content-Type: application/json' , $this->authorization]);
             $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
             $curl->setOption(CURLOPT_TIMEOUT, 180);
+            $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
             $list = $curl->get($apiUrl);
 			return $list;
         } else {
             return 0;
         }
+    }
+    
+	function getRequest($rstlId,$accepted)
+	{
+		if($rstlId > 0 && isset($accepted)) {
+            $apiUrl=$this->source.'request?rstl_id='.$rstlId.'&accepted='.$accepted;
+            $curl = new curl\Curl();
+            $curl->setOption(CURLOPT_HTTPHEADER, ['Content-Type: application/json' , $this->authorization]);
+            $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
+            $curl->setOption(CURLOPT_TIMEOUT, 180);
+            $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
+            $list = $curl->get($apiUrl);
+			return $list;
+        } else {
+            return 0;
+        }
+    }
+    
+    function getRequestcreate($data)
+	{
+        $apiUrl=$this->source.'requestcreate';
+        $params = [
+            'customer_id' => $data['customer_id'],
+            'user_id' => $data['user_id'],
+            'submitted' =>$data['submitted'],
+            'received' => $data['received'],
+        ];
+        $curl = new curl\Curl();
+        $curl->setRequestBody(json_encode($params));
+        $curl->setOption(CURLOPT_HTTPHEADER, ['Content-Type: application/json' , $this->authorization]);
+        $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
+        $curl->setOption(CURLOPT_TIMEOUT, 180);
+        $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
+        return $data = $curl->post($apiUrl);
+        
+    }
+    
+    function getSamplecreate($data)
+	{
+        $apiUrl=$this->source.'sample';
+        $params = [
+            'pstc_request_id' => $data['pstc_request_id'],
+            'qnty' => $data['qnty'],
+            'sample_name' =>$data['sample_name'],
+            'sample_description' => $data['sample_description'],
+        ];
+        $curl = new curl\Curl();
+        $curl->setRequestBody(json_encode($params));
+        $curl->setOption(CURLOPT_HTTPHEADER, ['Content-Type: application/json' , $this->authorization]);
+        $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
+        $curl->setOption(CURLOPT_TIMEOUT, 180);
+        $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
+        return $data = $curl->post($apiUrl);
+        
 	}
 	
     //for viewing single pstc request
     function getViewRequest($requestId,$rstlId,$pstcId)
     {
         if($requestId > 0 && $rstlId > 0 && $pstcId > 0) {
-            $apiUrl=$this->source.'/api/web/referral/pstcrequests/viewrequest?request_id='.$requestId.'&rstl_id='.$rstlId.'&pstc_id='.$pstcId;
+            $apiUrl=$this->source.'requestview?request_id='.$requestId.'&rstl_id='.$rstlId.'&pstc_id='.$pstcId;
             $curl = new curl\Curl();
+            $curl->setOption(CURLOPT_HTTPHEADER, ['Content-Type: application/json' , $this->authorization]);
             $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
             $curl->setOption(CURLOPT_TIMEOUT, 180);
+            $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
             $list = $curl->get($apiUrl);
             return $list;
         } else {
@@ -61,10 +121,12 @@ class PstcComponent extends Component {
     function getRequestDetails($requestId,$rstlId,$pstcId)
     {
         if($requestId > 0 && $rstlId > 0 && $pstcId > 0) {
-            $apiUrl=$this->source.'/api/web/referral/pstcrequests/request_details?request_id='.$requestId.'&rstl_id='.$rstlId.'&pstc_id='.$pstcId;
+            $apiUrl=$this->source.'request_details?request_id='.$requestId.'&rstl_id='.$rstlId.'&pstc_id='.$pstcId;
             $curl = new curl\Curl();
+            $curl->setOption(CURLOPT_HTTPHEADER, ['Content-Type: application/json' , $this->authorization]);
             $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
             $curl->setOption(CURLOPT_TIMEOUT, 180);
+            $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
             $list = $curl->get($apiUrl);
             return $list;
         } else {
@@ -75,10 +137,12 @@ class PstcComponent extends Component {
     //get sample by sample ID
     function getSampleOne($sampleId,$requestId,$rstlId,$pstcId) {
         if($sampleId > 0 && $requestId > 0 && $rstlId > 0 && $pstcId > 0) {
-            $apiUrl=$this->source.'/api/web/referral/pstcrequests/get_pstcsample?sample_id='.$sampleId.'&request_id='.$requestId.'&rstl_id='.$rstlId.'&pstc_id='.$pstcId;
+            $apiUrl=$this->source.'get_pstcsample?sample_id='.$sampleId.'&request_id='.$requestId.'&rstl_id='.$rstlId.'&pstc_id='.$pstcId;
             $curl = new curl\Curl();
+            $curl->setOption(CURLOPT_HTTPHEADER, ['Content-Type: application/json' , $this->authorization]);
             $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
             $curl->setOption(CURLOPT_TIMEOUT, 180);
+            $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
             $list = $curl->get($apiUrl);
             return $list;
         } else {
@@ -113,8 +177,10 @@ class PstcComponent extends Component {
         if($requestId > 0 && $rstlId > 0 && $fileId > 0) {
             $apiUrl=$this->source.'/api/web/referral/pstcattachments/download?request_id='.$requestId.'&rstl_id='.$rstlId.'&file='.$fileId;
             $curl = new curl\Curl();
+            $curl->setOption(CURLOPT_HTTPHEADER, ['Content-Type: application/json' , $this->authorization]);
             $curl->setOption(CURLOPT_CONNECTTIMEOUT, 120);
             $curl->setOption(CURLOPT_TIMEOUT, 120);
+            $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
             $list = $curl->get($apiUrl);
 
             if($list == 'false') {
@@ -126,5 +192,62 @@ class PstcComponent extends Component {
             return false;
         }
     }
+
+    ////////////////////////////////
+    //////// TEST METHOD API ///////
+
+    function checkMethod($id)
+    {
+        $curl = new curl\Curl();
+        $curl->setOption(CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+        $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
+        $curl->setOption(CURLOPT_TIMEOUT, 180);
+        $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
+        $response = $curl->setGetParams(['id' => Yii::$app->user->identity->profile->rstl_id.'-'.$id,])->get($GLOBALS['local_api_url']."restpstc/checkmethod");
+        
+        if($curl->errorCode != null){
+            $response = 'Please try again later.';
+        }
+        return $response;
+    }
+
+    function listLab()
+    {
+        $curl = new curl\Curl();
+        $curl->setOption(CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+        $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
+        $curl->setOption(CURLOPT_TIMEOUT, 180);
+        $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
+        $lists = $curl->get($GLOBALS['local_api_url']."restpstc/listlab");
+
+        return $lists;
+    }
+
+    function syncMethod($params)
+    {
+        $curl = new curl\Curl();
+        $curl->setRequestBody(json_encode($params));
+        $curl->setOption(CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+        $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
+        $curl->setOption(CURLOPT_TIMEOUT, 180);
+
+        return $data = $curl->post($GLOBALS['local_api_url']."restpstc/syncmethod");
+    }
+
+
+    ///////////////////////////////////////////////////////////////
+    //////// UPDATE PSTC REQUEST # INFO WHEN SAVE TO LOCAL ////////
+
+    function updatePstc($params)
+    {
+        $curl = new curl\Curl();
+        $curl->setRequestBody(json_encode($params));
+        $curl->setOption(CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+        $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
+        $curl->setOption(CURLOPT_TIMEOUT, 180);
+
+        return $data = $curl->post($GLOBALS['local_api_url']."restpstc/updatepstc");
+    }
+
 }
 

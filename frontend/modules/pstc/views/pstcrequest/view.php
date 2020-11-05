@@ -70,28 +70,9 @@ $accepted = $request['accepted'];
                 [
                     'columns' => [
                         [
-                            'label'=>'Request Reference Number',
-                            'format' => 'raw',
-                            'displayOnly'=>true,
-                            'valueColOptions'=>['style'=>'width:30%'],
-                            'value'=> $reference_num,
-                        ],
-                        [
                             'label'=>'Customer / Agency',
                             'format'=>'raw',
                             'value'=> $request['customer_id'] > 0 && !empty($customer) ? $customer['customer_name'] : "",
-                            'valueColOptions'=>['style'=>'width:30%'], 
-                            'displayOnly'=>true
-                        ],
-                    ],
-                    
-                ],
-                [
-                    'columns' => [
-                       [
-                            'label'=>'Local Request Created Date',
-                            'format'=>'raw',
-                            'value'=> !empty($respond['request_date_created'])  ? date('F j, Y h:i A', strtotime($respond['request_date_created'])) : "<i class='text-danger font-italic'>Pending request</i>",
                             'valueColOptions'=>['style'=>'width:30%'], 
                             'displayOnly'=>true
                         ],
@@ -103,6 +84,7 @@ $accepted = $request['accepted'];
                             'displayOnly'=>true
                         ],
                     ],
+                    
                 ],
                 [
                     'columns' => [
@@ -155,6 +137,7 @@ $accepted = $request['accepted'];
     <div class="container">
         <div class="table-responsive">
         <?php
+        $btn_saveRequest = ($request['is_referral'] == 0) ? Html::button('<span class="glyphicon glyphicon-save"></span> Save as Local Request', ['value' => Url::to(['/pstc/pstcrequest/request_local','request_id'=>$request['pstc_request_id'],'pstc_id'=>$request['pstc_id']]),'title'=>'Save as Local Request', 'onclick'=>'saveRequest(this.value,this.title)', 'class' => 'btn btn-primary','id' => 'modalBtn']) : Html::button('<span class="glyphicon glyphicon-save"></span> Save as Referral Request', ['value' => Url::to(['/pstc/pstcrequest/request_referral','request_id'=>$request['pstc_request_id'],'pstc_id'=>$request['pstc_id']]),'title'=>'Save as Referral Request', 'onclick'=>'saveRequest(this.value,this.title)', 'class' => 'btn btn-primary','id' => 'modalBtn']);
             $sampleGridColumns = [
                 [
                     'header' => 'Sample Code',
@@ -269,7 +252,8 @@ $accepted = $request['accepted'];
                     'type'=>'primary',
                     //'before'=>null,
                     'after'=>false,
-                    //'before'=> Html::button('<i class="glyphicon glyphicon-plus"></i> Add Sample', ['value' => Url::to(['/pstc/pstcsample/create','request_id'=>$request['pstc_request_id']]),'title'=>'Add Sample', 'onclick'=>'addSample(this.value,this.title)', 'class' => 'btn btn-success','id' => 'modalBtn']),
+                    'before'=> ($request['accepted'] == 0) ? Html::button('<i class="glyphicon glyphicon-plus"></i> Add Sample', ['value' => Url::to(['/pstc/pstcrequest/createsample','request_id'=>$request['pstc_request_id']]),'title'=>'Add Sample', 'onclick'=>'addSample(this.value,this.title)', 'class' => 'btn btn-success','id' => 'modalBtn']) : '',
+                    'footer'=> ($countSample > 0 && empty($respond['request_ref_num']) && $request['accepted'] == 0) ? $btn_saveRequest : '',
                 ],
                 'columns' => $sampleGridColumns,
                 'toolbar' => [
@@ -282,7 +266,7 @@ $accepted = $request['accepted'];
         ?>
         </div>
     </div>
-    <div class="container">
+    <!-- <div class="container">
         <?php
             $analysisgridColumns = [
                 [
@@ -300,9 +284,10 @@ $accepted = $request['accepted'];
                     'header'=>'Sample Name',
                     'format' => 'raw',
                     'enableSorting' => false,
-                    //'value' => function($data) use ($sample) {
-                    //    return !empty($data['sample']) ? $sample['sample_name'] : null;
-                    //},
+                    'value' => function($data) use ($sample) {
+                       
+                        // return $sample['samples'] ? 'wew' : '-';
+                    },
                     'contentOptions' => ['style' => 'width:10%; white-space: normal;'],
                 ],
                 [
@@ -427,11 +412,12 @@ $accepted = $request['accepted'];
                 'panel' => [
                     'heading'=>'<h3 class="panel-title">Analysis</h3>',
                     'type'=>'primary',
-                    //'before'=> Html::button('<i class="glyphicon glyphicon-plus"></i> Add Analysis', ['value' => Url::to(['/pstc/pstcanalysis/create','request_id'=>$request['pstc_request_id']]),'title'=>'Add Analysis', 'onclick'=>'addAnalysis(this.value,this.title)', 'class' => 'btn btn-success','id' => 'modalBtn']).' '.Html::button('<i class="glyphicon glyphicon-plus"></i> Add Package', ['value' => Url::to(['/pstc/pstcanalysis/package','request_id'=>$request['pstc_request_id']]),'title'=>'Add Package', 'onclick'=>'addAnalysis(this.value,this.title)', 'class' => 'btn btn-success','id' => 'modalBtn']).' '.Html::button('<i class="glyphicon glyphicon-plus"></i> Add Analysis Not Offered', ['value' => Url::to(['/pstc/pstcanalysis/add_not_offer','request_id'=>$request['pstc_request_id']]),'title'=>'Add Analysis Not Offered', 'onclick'=>'addAnalysis(this.value,this.title)', 'class' => 'btn btn-success','id' => 'modalBtn']),
+                    // 'before'=> Html::button('<i class="glyphicon glyphicon-plus"></i> Add Analysis', ['value' => Url::to(['/pstc/pstcrequest/createanalysis','request_id'=>$request['pstc_request_id']]),'title'=>'Add Analysis', 'onclick'=>'addAnalysis(this.value,this.title)', 'class' => 'btn btn-success','id' => 'modalBtn']).' '.Html::button('<i class="glyphicon glyphicon-plus"></i> Add Package', ['value' => Url::to(['/pstc/pstcanalysis/package','request_id'=>$request['pstc_request_id']]),'title'=>'Add Package', 'onclick'=>'addAnalysis(this.value,this.title)', 'class' => 'btn btn-success','id' => 'modalBtn']).' '.Html::button('<i class="glyphicon glyphicon-plus"></i> Add Analysis Not Offered', ['value' => Url::to(['/pstc/pstcanalysis/add_not_offer','request_id'=>$request['pstc_request_id']]),'title'=>'Add Analysis Not Offered', 'onclick'=>'addAnalysis(this.value,this.title)', 'class' => 'btn btn-success','id' => 'modalBtn']),
                     'after'=> false,
                     //'footer'=>$actionButtonConfirm.$actionButtonSaveLocal,
                     //'footer'=>null,
-                    'footer'=> ($countSample > 0 && $countAnalysis > 0 && empty($respond['request_ref_num']) && $request['accepted'] == 0) ? $btn_saveRequest : '',
+                    //'footer'=> ($countSample > 0 && $countAnalysis > 0 && empty($respond['request_ref_num']) && $request['accepted'] == 0) ? $btn_saveRequest : '',
+                    'footer'=> ($countSample > 0 && empty($respond['request_ref_num']) && $request['accepted'] == 0) ? $btn_saveRequest : '',
                 ],
                 'columns' => $analysisgridColumns,
                 'toolbar' => [
@@ -442,8 +428,11 @@ $accepted = $request['accepted'];
                 ],
             ]);
         ?>
-    </div>
-    <?php if(!empty($respond['request_ref_num']) && $request['accepted'] == 1 && $request['local_request_id'] > 0): ?>
+    </div> -->
+    
+    <?php 
+    
+    if(!empty($respond['request_ref_num']) && $request['accepted'] == 1 && $request['local_request_id'] > 0): ?>
     <div class="container">
         <div class="panel panel-primary">
         <div class="panel-body">
@@ -501,6 +490,13 @@ $accepted = $request['accepted'];
             .load(url);
     }
 
+    function addSample(url,title){
+        $('.modal-title').html(title);
+        $('#modal').modal('show')
+            .find('#modalContent')
+            .load(url);
+    }
+
     function updateSample(id,requestId,pstcId,title){
         var url = '/pstc/pstcrequest/sample_update?sample_id='+id+'&request_id='+requestId+'&pstc_id='+pstcId;
         $('.modal-title').html(title);
@@ -519,7 +515,7 @@ $accepted = $request['accepted'];
 
     function addAnalysis(url,title){
         $(".modal-title").html(title);
-        $('#modalAnalysis').modal('show')
+        $('#modal').modal('show')
             .find('#modalContent')
             .load(url);
     }

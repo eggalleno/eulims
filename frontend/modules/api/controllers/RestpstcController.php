@@ -45,6 +45,7 @@ class RestpstcController extends \yii\rest\Controller
 
     public function actionRequestcreate() //Create or Update pstc request
     {
+        $request = Yii::$app->request;
         $data = ($request->isPut) ? Pstcrequest::find()->where(['id' => $id])->one() : new Pstcrequest;
         $data->rstl_id = 11;
         $data->pstc_id = 113;
@@ -108,6 +109,10 @@ class RestpstcController extends \yii\rest\Controller
         }else{
             throw new \yii\web\HttpException(400, 'Please specify parameters correctly. :)');
         }
+    }
+
+    public function actionUpdatepstc(){
+        
     }
 
     // ------------------------------------

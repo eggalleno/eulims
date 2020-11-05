@@ -20,6 +20,7 @@ use yii\data\ActiveDataProvider;
 use yii\helpers\Json;
 use yii\data\ArrayDataProvider;
 use linslin\yii2\curl;
+use common\components\PstcComponent;
 
 
 /**
@@ -140,27 +141,11 @@ class TestnamemethodController extends Controller
     {
         $methodreference = Methodreference::find()->where(['method_reference_id' => $id])->one();
         
-        $curl = new curl\Curl();
-        $curl->setOption(CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
-        $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
-        $curl->setOption(CURLOPT_TIMEOUT, 180);
-        $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
-        $response = $curl->setGetParams(['id' => Yii::$app->user->identity->profile->rstl_id.'-'.$id,])->get($GLOBALS['local_api_url']."restpstc/checkmethod");
+        $function = new PstcComponent();
+        $response = $function->checkMethod($id);
+        $lists = $function->listLab();
+        $list = json_decode($lists);
 
-        if ($curl->errorCode != null) {
-           $response = 'Please try again later.';
-        }
-        
-        $curl = new curl\Curl();
-        $curl->setOption(CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
-        $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
-        $curl->setOption(CURLOPT_TIMEOUT, 180);
-        $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
-        $lists = $curl->get($GLOBALS['local_api_url']."restpstc/listlab");
-
-       $list = json_decode($lists);
-
-    //    var_dump($list->labs); exit();
         if(Yii::$app->request->isAjax){
             return $this->renderAjax('sync', [
                 'response' => $response,
@@ -168,14 +153,13 @@ class TestnamemethodController extends Controller
                 'laboratories' => $list->labs,
                 'sampletypes' => $list->sampletypes,
                 'testnamelist' => $list->testnamelist,
-
             ]);
         }
     }
 
-    public function actionSyncmethod(){
+    public function actionSyncmethod()
+    {
         $id = Yii::$app->request->post('id');
-
         $methodreference = Methodreference::find()->where(['method_reference_id' => $id])->one();
         
         $params = [
@@ -188,12 +172,9 @@ class TestnamemethodController extends Controller
             'lab_id' => Yii::$app->request->post('lab_id')
         ];
 
-        $curl = new curl\Curl();
-        $curl->setRequestBody(json_encode($params));
-        $curl->setOption(CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
-        $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
-        $curl->setOption(CURLOPT_TIMEOUT, 180);
-        return $data = $curl->post($GLOBALS['local_api_url']."restpstc/syncmethod");
+        $function = new PstcComponent();
+        $response = $function->syncMethod($params);
+        return $response;
     }
 
 

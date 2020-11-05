@@ -80,11 +80,12 @@ if(count($sampletype) > 0){
 ?>
 
 <div class="pstc-request-form">
-    <?php $form = ActiveForm::begin(); ?>
+    <?php $form = ActiveForm::begin(['action' => ['savetolocal'],'options' => ['method' => 'post']]); ?>
     <?php if($model->request_ref_num!=NULL){ ?>
     <?= $form->field($model, 'request_ref_num')->hiddenInput(['maxlength' => true])->label(false) ?>
     <?php } ?>
     <div class="row">
+       <?php echo Html::hiddenInput('request_id', $_GET['request_id']); ?>
         <div class="col-md-6">
         <?= $form->field($model, 'request_type_id')->widget(Select2::classname(), [
             'data' => ArrayHelper::map(RequestType::find()->where('request_type_id =:requestTypeId',[':requestTypeId'=>1])->all(),'request_type_id','request_type'),
@@ -526,7 +527,7 @@ if(count($sampletype) > 0){
         ?>
         </div>
     </div>
-    <div class="row">
+    <!-- <div class="row">
         <div class="col-md-12">
         <?php
             $analysisgridColumns = [
@@ -655,7 +656,7 @@ if(count($sampletype) > 0){
             ]);
         ?>
         </div>
-    </div>
+    </div> -->
     <div class="row" style="float: right;padding-right: 15px">
         <?= Html::submitButton($model->isNewRecord ? 'Create' : 'Update', ['disabled'=>$disabled,'class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary','id'=>'btn-save']) ?>
         <?= Html::Button('Close', ['class' => 'btn btn-default', 'id' => 'modalCancel', 'data-dismiss' => 'modal']) ?>
