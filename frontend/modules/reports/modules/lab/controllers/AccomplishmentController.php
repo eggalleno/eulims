@@ -8,6 +8,7 @@ use common\models\lab\Sample;
 use common\models\lab\SampleSearch;
 use common\models\lab\Request;
 use frontend\modules\reports\modules\models\Requestextension;
+use frontend\modules\reports\modules\models\Requestextend;
 use common\models\lab\Lab;
 use yii\web\NotFoundHttpException;
 use yii\helpers\ArrayHelper;
