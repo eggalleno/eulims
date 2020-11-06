@@ -5,7 +5,6 @@
     padding: 10px;
     background-color: #A8DDFD;
     width: 200px;
-    height: 50px;
     text-align: left;
     font: 400 .9em 'Open Sans', sans-serif;
     border: 1px solid #97C6E3;
@@ -19,7 +18,6 @@
     padding: 10px;
     background-color: #f8e896;
     width: 200px;
-    height: 50px;
     text-align: left;
     font: 400 .9em 'Open Sans', sans-serif;
     border: 1px solid #dfd087;
@@ -29,6 +27,8 @@
 .message-content {
     padding: 0;
     margin: 0;
+	word-wrap: break-word;
+	padding-bottom: 10px;
 }
 
 .message-timestamp-right {
@@ -50,20 +50,17 @@
 .message-blue:after {
     content: '';
     position: absolute;
-    width: 0;
-    height: 0;
     border-top: 15px solid #A8DDFD;
     border-left: 15px solid transparent;
     border-right: 15px solid transparent;
     top: 0;
     left: -15px;
+	bottom: 5px;
 }
 
 .message-blue:before {
     content: '';
     position: absolute;
-    width: 0;
-    height: 0;
     border-top: 17px solid #97C6E3;
     border-left: 16px solid transparent;
     border-right: 16px solid transparent;
@@ -74,20 +71,16 @@
 .message-orange:after {
     content: '';
     position: absolute;
-    width: 0;
-    height: 0;
     border-bottom: 15px solid #f8e896;
     border-left: 15px solid transparent;
     border-right: 15px solid transparent;
-    bottom: 0;
+    bottom: 5px;
     right: -15px;
 }
 
 .message-orange:before {
     content: '';
     position: absolute;
-    width: 0;
-    height: 0;
     border-bottom: 17px solid #dfd087;
     border-left: 16px solid transparent;
     border-right: 16px solid transparent;
