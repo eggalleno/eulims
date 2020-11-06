@@ -19,6 +19,7 @@ use common\models\lab\Purpose;
 use common\models\lab\Modeofrelease;
 use common\models\lab\Testnamemethod;
 use common\models\lab\Testname;
+use common\models\lab\Lab;
 
 
 class RestcustomerController extends \yii\rest\Controller
@@ -569,9 +570,12 @@ class RestcustomerController extends \yii\rest\Controller
     
     }
     public function actionGetcustomerquotation(){
-        $querySql = Yii::$app->labdb->createCommand("SELECT a.testname_method_id, b.testName, c.method, c.fee from tbl_testname_method AS a
+        $querySql = Yii::$app->labdb->createCommand("SELECT a.testname_method_id, b.testName, c.method, c.fee, d.labname, a.lab_id
+            from tbl_testname_method AS a
       INNER JOIN tbl_testname AS b ON a.testname_id = b.testname_id
-      INNER JOIN tbl_methodreference AS c ON a.method_id = c.method_reference_id")->queryAll();
+      INNER JOIN tbl_methodreference AS c ON a.method_id = c.method_reference_id
+      INNER JOIN tbl_lab as d ON a.lab_id = d.lab_id
+      ORDER BY a.lab_id ASC, b.testName ASC") ->queryAll();
 $arrayTestname =array();
 foreach ($querySql  as $eachRow)
         {
@@ -582,6 +586,8 @@ foreach ($querySql  as $eachRow)
           $recData['testName']=  $eachRow['testName'];
           $recData['method']=  $eachRow['method'];
           $recData['fee'] =  $eachRow['fee'];
+          $recData['labname'] = $eachRow['labname'];
+          $recData['lab_id'] = $eachRow['lab_id'];
           array_push($arrayTestname,$recData);
 
  
@@ -589,6 +595,10 @@ foreach ($querySql  as $eachRow)
   //Yii::$app->labdb->createCommand("CALL spPerformanceDashboardRealtime('" . $kpirec . "'," . $currentmonth . ",'" . $currentmonthchar  . "',". $currentyear .",'Accomplishments','". $rstlId ."');")->execute();
       return $this->asJson($arrayTestname);
 
+    }
+    public function actionLaboratorylist(){
+        $model = Lab::find()->orderby(['lab_id'=>SORT_ASC])->all();
+        return $this->asJson($model);
     }
 
     //this function will return list of sampletype using the the labid , btc

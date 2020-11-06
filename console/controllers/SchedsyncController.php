@@ -189,7 +189,7 @@ class SchedsyncController extends Controller
             $generatedtoken = $reqtoken['token'];
             if($generatedtoken == '')
             {
-                SchedsyncController::sendemailerror('cronsyncbycustomer',$profile->rstl_id,'Token not generated');
+                SchedsyncController::sendemailerror('croncustomer',$profile->rstl_id,'Token not generated');
                 exit();
             }
 
@@ -360,6 +360,13 @@ class SchedsyncController extends Controller
         $session = new Session;
         $session['sessiontoken'] = $reqtoken['token'];
 
+        $generatedtoken = $reqtoken['token'];
+            if($generatedtoken == '')
+            {
+                SchedsyncController::sendemailerror('cronbookinglocal',$profile->rstl_id,'Token not generated');
+                exit();
+            }
+
         $booking = Booking::find()->select(['booking_reference'])->asArray()->all();
         $data_sync = array('rstl_id'=>$rstlid );
         $booking_list = SchedsyncController::callrestapireturn('POST', 'https://eulims.onelab.dost.gov.ph/api/sync/syncgetbooking', $data_sync);
@@ -454,6 +461,13 @@ public function actionCronrealtime()
             $session = new Session;
             $session['sessiontoken'] = $reqtoken['token'];
 
+            $generatedtoken = $reqtoken['token'];
+            if($generatedtoken == '')
+            {
+                SchedsyncController::sendemailerror('cronrealtime',$profile->rstl_id,'Token not generated');
+                exit();
+            }
+
       
             // $paramID =Yii::$app->user->identity->profile->rstl_id;// Yii::$app->request->get('rstlid');
             //  $model = new $this->modelClass;
@@ -462,7 +476,7 @@ public function actionCronrealtime()
             $now = new DateTime();
 
             $currentyear=$now->format('Y');
-            $currentmonth= 10; // $now->format('m');
+            $currentmonth= $now->format('m');
        
             $currentmonthchar=substr(strtolower(date('F', mktime(0, 0, 0, $currentmonth, 1))), 0, 3); //strtolower($now->format('M'));
        
@@ -491,6 +505,7 @@ public function actionCronrealtime()
             'chem'=> $eachRow[$currentmonthchar.'chem'],
             'micro'=>$eachRow[$currentmonthchar.'micro'],
             'metro'=>$eachRow[$currentmonthchar.'metro'],
+
             'halal'=> $eachRow[$currentmonthchar.'halal'],
            // 'sync_date'=>date('Y-m-d H:i:s'),
         );

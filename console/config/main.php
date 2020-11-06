@@ -9,7 +9,7 @@
 
 $server = "localhost";
 $username = "eulims";
-$password = "eulims";
+$password = "eulims";//
 
 
 
@@ -40,8 +40,8 @@ return [
             'db' => [
                 'class' => yii\db\Connection::class,
                 'dsn' => 'mysql:host=localhost;dbname=eulims',
-                'username' => 'eulims',
-                'password' => 'eulims',
+                'username' => $username,
+                'password' => $password,
             ],
         ],
     ],
@@ -72,9 +72,9 @@ return [
         ],
          'inventorydb'=>[
             'class' => 'yii\db\Connection',  
-            'dsn' => 'mysql:host=localhost;dbname=eulims_inventory',
-            'username' => 'eulims',
-            'password' => 'eulims',
+            'dsn' => 'mysql:host='.$server.';dbname=eulims_inventory',
+            'username' => $username,
+            'password' => $password,
             //'username'=>'arisro9',
             //'password'=>'qwerty!@#$%', 
             'charset' => 'utf8',
@@ -82,9 +82,9 @@ return [
         ],
         'labdb'=>[
             'class' => 'yii\db\Connection',  
-            'dsn' => 'mysql:host=localhost;dbname=eulims_lab',
-            'username' => 'eulims',
-            'password' => 'eulims',
+            'dsn' => 'mysql:host='.$server.';dbname=eulims_lab',
+            'username' => $username,
+            'password' => $password,
             //'username'=>'arisro9',
             //'password'=>'qwerty!@#$%', 
             'charset' => 'utf8',
@@ -92,9 +92,9 @@ return [
         ],
         'financedb'=>[
             'class' => 'yii\db\Connection',  
-            'dsn' => 'mysql:host=localhost;dbname=eulims_finance',
-            'username' => 'eulims',
-            'password' => 'eulims',
+            'dsn' => 'mysql:host='.$server.';dbname=eulims_finance',
+            'username' => $username,
+            'password' => $password,
             //'username'=>'arisro9',
             //'password'=>'qwerty!@#$%', 
             'charset' => 'utf8',
