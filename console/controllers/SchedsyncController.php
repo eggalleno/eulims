@@ -476,7 +476,7 @@ public function actionCronrealtime()
             $now = new DateTime();
 
             $currentyear=$now->format('Y');
-            $currentmonth= 10; // $now->format('m');
+            $currentmonth= $now->format('m');
        
             $currentmonthchar=substr(strtolower(date('F', mktime(0, 0, 0, $currentmonth, 1))), 0, 3); //strtolower($now->format('M'));
        
