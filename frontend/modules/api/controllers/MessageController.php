@@ -474,18 +474,19 @@ class MessageController extends \yii\rest\Controller
         $connection= Yii::$app->messagedb;
 		$countmesuser = $connection->createCommand('SELECT count(*) as sum FROM tbl_chat 
 		INNER JOIN tbl_contacts ON tbl_chat.contact_id = tbl_contacts.contact_id
-		WHERE  tbl_contacts.user_id = :userid || tbl_contacts.user_id = :userid
-		AND status_id = 1
-		AND sender_userid != :userid')
-		->bindParam(':userid',$userid )
+		WHERE  tbl_contacts.user_id =' . $userid . ' || tbl_contacts.user_id = ' . $userid .
+		' AND status_id = 1
+		AND sender_userid != ' $userid)
+		//->bindParam(':userid',$userid )
 		->queryAll();
+		
 
 		$countmesgroup = $connection->createCommand('SELECT count(*) as total FROM tbl_chat 
 		INNER JOIN tbl_group_member ON tbl_chat.group_id = tbl_group_member.group_id
-		WHERE  user_id = :userid
+		WHERE  user_id = ' . $userid . '
 		AND status_id = 1
-		AND sender_userid != :userid')
-		->bindParam(':userid',$userid )
+		AND sender_userid != ' . $userid)
+	//	->bindParam(':userid',$userid )
 		->queryAll();
 		$messagecounter= $countmesuser[0]["sum"] + $countmesgroup[0]["total"];
 		
