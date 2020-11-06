@@ -476,7 +476,7 @@ class MessageController extends \yii\rest\Controller
 		INNER JOIN tbl_contacts ON tbl_chat.contact_id = tbl_contacts.contact_id
 		WHERE  tbl_contacts.user_id =' . $userid . ' || tbl_contacts.user_id = ' . $userid .
 		' AND status_id = 1
-		AND sender_userid != ' $userid)
+		AND sender_userid != ' . $userid)
 		//->bindParam(':userid',$userid )
 		->queryAll();
 		
