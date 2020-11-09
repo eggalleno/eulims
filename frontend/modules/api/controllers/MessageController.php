@@ -472,7 +472,7 @@ class MessageController extends \yii\rest\Controller
 	
 	public function actionCountunread($userid){
         $connection= Yii::$app->messagedb;
-		$countmesuser = $connection->createCommand("SELECT COUNT(*) FROM tbl_chat 
+		$countmesuser = $connection->createCommand("SELECT COUNT(*) as sum FROM tbl_chat 
 		INNER JOIN tbl_contacts ON tbl_chat.contact_id = tbl_contacts.contact_id
 		WHERE ( tbl_contacts.user_id LIKE '%," . $userid . "' || tbl_contacts.user_id LIKE '" . $userid . ",%') 
 		AND status_id = 1
@@ -482,7 +482,7 @@ class MessageController extends \yii\rest\Controller
 		
 
 		$countmesgroup = $connection->createCommand("
-		SELECT count(*) FROM tbl_chat 
+		SELECT count(*) as total FROM tbl_chat 
 		INNER JOIN tbl_group_member ON tbl_chat.group_id = tbl_group_member.group_id
 		WHERE  user_id = " . $userid.
 		" AND status_id = 1 " .
