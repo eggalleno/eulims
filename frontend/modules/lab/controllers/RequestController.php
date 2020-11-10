@@ -948,13 +948,15 @@ class RequestController extends Controller
        
        $customer = Customer::find()->where(['customer_id' => $id])->one();
        $contactnum = $customer->tel;
-	   
+	   $email= $customer->email;
 	    $notif= new Notification();
+		if($email){
+			$notif->sendEmail($email,$refnum);	
+		}
 		$title="Test Report";
 		$mes= "Good Day dear customer! Your test report for reference#: ".$refnum." is ready and available for pick-up.";
 		$res=$notif->sendSMS("", "", $contactnum, $title, $mes, "eULIMS", $this->module->id,$this->action->id);
 		$decode=Json::decode($res);
-		//var_dump($decode["data"]);
 		Yii::$app->session->setFlash('success',$decode["data"] );
 		return $this->redirect(['index']); 
     }
