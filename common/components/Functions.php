@@ -34,6 +34,7 @@ use common\models\system\ApiSettings;
 use linslin\yii2\curl;
 
 
+
 /**
  * Description of Functions
  * @property string $pesoSign
@@ -804,7 +805,22 @@ SCRIPT;
             $reorder = new Reorder();
             $reorder->product_id=$id;
             $reorder->date_created=date("Y-m-d");
-            $reorder->save();
+            if($reorder->save()){
+                $tomorrow = date("Y-m-d", strtotime("+1 day"));
+                //$request = Request::find()->where(['report_due' => $tomorrow])->all();
+
+                    $users = Profile::find()->where(['designation' => 'Lab Analyst'])->all();
+                    $title="Product for Reorder";
+
+                    foreach ($users as $analyst){
+                         $contactnum = "639956200353";// $analyst->contact_numbers;   
+                         if($contactnum){
+                             $notif= new Notification();
+                             $mes= "Hello dear analyst! Product [".$product->product_name."] falls below the reorder threshold point, check the dashboard for more info :)";
+                             $res=$notif->sendSMS("", "", $contactnum, $title, $mes, "eULIMS", "Inventory Module","Reorder Point");
+                         }
+                    } 
+            }
             //return true;
         }
         //return false;
