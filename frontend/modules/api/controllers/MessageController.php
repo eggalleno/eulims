@@ -477,7 +477,6 @@ class MessageController extends \yii\rest\Controller
 		WHERE ( tbl_contacts.user_id LIKE '%," . $userid . "' || tbl_contacts.user_id LIKE '" . $userid . ",%') 
 		AND status_id = 1
 		AND sender_userid !=" . $userid)
-		//->bindParam(':userid',$userid )
 		->queryAll();
 		
 
@@ -491,6 +490,15 @@ class MessageController extends \yii\rest\Controller
 		$messagecounter= $countmesuser[0]["sum"] + $countmesgroup[0]["total"];
 		
 		return $messagecounter;
+	}
+	
+	public function actionReadmessage($userid){
+		$chat = Chat::find()->where(['sender_userid'=>$userid])->all();
+		foreach($chat as $c){
+			$c->status_id=2;
+			$c->save(false);
+		}
+		return ['message' => 'success'];
 	}
 	
 }
