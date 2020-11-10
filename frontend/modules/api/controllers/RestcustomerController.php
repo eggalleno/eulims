@@ -20,6 +20,7 @@ use common\models\lab\Modeofrelease;
 use common\models\lab\Testnamemethod;
 use common\models\lab\Testname;
 use common\models\lab\Lab;
+use common\models\lab\Quotation;
 
 
 class RestcustomerController extends \yii\rest\Controller
@@ -570,18 +571,19 @@ class RestcustomerController extends \yii\rest\Controller
     
     }
     public function actionGetcustomerquotation(){
-        $querySql = Yii::$app->labdb->createCommand("SELECT a.testname_method_id, b.testName, c.method, c.reference, c.fee, d.labname, a.lab_id
+        $querySql = Yii::$app->labdb->createCommand("SELECT a.testname_id, a.testname_method_id, b.testName, c.method, c.reference, c.fee, d.labname, a.lab_id
             from tbl_testname_method AS a
       INNER JOIN tbl_testname AS b ON a.testname_id = b.testname_id
       INNER JOIN tbl_methodreference AS c ON a.method_id = c.method_reference_id
       INNER JOIN tbl_lab as d ON a.lab_id = d.lab_id
       ORDER BY a.lab_id ASC, b.testName ASC") ->queryAll();
-$arrayTestname =array();
-foreach ($querySql  as $eachRow)
+        $arrayTestname =array();
+        foreach ($querySql  as $eachRow)
         {
          $recData=array();
         //  $recFeesData['type']='column';
         //  $recData['name']=$eachRow['legend'];
+         $recData['testname_id'] = $eachRow['testname_id'];
           $recData['testname_method_id'] = $eachRow['testname_method_id'];
           $recData['testName'] =  $eachRow['testName'];
           $recData['method'] =  $eachRow['method'];
@@ -593,6 +595,42 @@ foreach ($querySql  as $eachRow)
 
  
         }; 
+
+        //Save customer Quotation
+        public function actionSetquotation(){
+             $my_var = \Yii::$app->request->post();
+
+
+       if(!$my_var){
+            return $this->asJson([
+                'success' => false,
+                'message' => 'POST empty',
+            ]); 
+       }
+        //attributes Purpose, Sample Quantity, Sample type, Sample Name and Description, schedule date and datecreated
+        $quot = new Quotation;
+        //$bookling->scheduled_date = $my_var['Schedule Date'];
+        //$bookling->booking_reference = '34ertgdsg'; //reference how to generate? is it before save? or 
+        $quot->quotation_id = $my_var[''];
+        $quot->customer_id = $my_var[''];
+        $quot->content = $my_var[''];
+        $quot->status_id = $my_var[''];
+        $quot->qty = $my_var[''];
+        $quot->rstl_id = $my_var[''];
+
+        if($quot->save()){
+            return $this->asJson([
+                'success' => true,
+                'message' => 'You have Request successfully',
+            ]); 
+        }
+        else{
+            return $this->asJson([
+                'success' => false,
+                'message' => 'Request Failed',
+            ]); 
+        }
+        }
   //Yii::$app->labdb->createCommand("CALL spPerformanceDashboardRealtime('" . $kpirec . "'," . $currentmonth . ",'" . $currentmonthchar  . "',". $currentyear .",'Accomplishments','". $rstlId ."');")->execute();
       return $this->asJson($arrayTestname);
 
