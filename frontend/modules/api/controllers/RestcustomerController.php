@@ -583,7 +583,7 @@ class RestcustomerController extends \yii\rest\Controller
          $recData=array();
         //  $recFeesData['type']='column';
         //  $recData['name']=$eachRow['legend'];
-         $recData['testname_id'] = $eachRow['testname_id'];
+          $recData['testname_id'] = $eachRow['testname_id'];
           $recData['testname_method_id'] = $eachRow['testname_method_id'];
           $recData['testName'] =  $eachRow['testName'];
           $recData['method'] =  $eachRow['method'];
@@ -595,10 +595,12 @@ class RestcustomerController extends \yii\rest\Controller
 
  
         }; 
+    }
 
         //Save customer Quotation
         public function actionSetquotation(){
-             $my_var = \Yii::$app->request->post();
+                // return false; exit;    
+           $my_var = \Yii::$app->request->post();
 
 
        if(!$my_var){
@@ -607,6 +609,7 @@ class RestcustomerController extends \yii\rest\Controller
                 'message' => 'POST empty',
             ]); 
        }
+
         //attributes Purpose, Sample Quantity, Sample type, Sample Name and Description, schedule date and datecreated
         $quot = new Quotation;
         //$bookling->scheduled_date = $my_var['Schedule Date'];
@@ -622,17 +625,19 @@ class RestcustomerController extends \yii\rest\Controller
             return $this->asJson([
                 'success' => true,
                 'message' => 'You have Request successfully',
+                'data' => $qout,
             ]); 
         }
         else{
             return $this->asJson([
                 'success' => false,
                 'message' => 'Request Failed',
+                'data' => null,
             ]); 
         }
-        }
-  //Yii::$app->labdb->createCommand("CALL spPerformanceDashboardRealtime('" . $kpirec . "'," . $currentmonth . ",'" . $currentmonthchar  . "',". $currentyear .",'Accomplishments','". $rstlId ."');")->execute();
-      return $this->asJson($arrayTestname);
+  //       }
+  // //Yii::$app->labdb->createCommand("CALL spPerformanceDashboardRealtime('" . $kpirec . "'," . $currentmonth . ",'" . $currentmonthchar  . "',". $currentyear .",'Accomplishments','". $rstlId ."');")->execute();
+      // return $this->asJson($qout);
 
     }
     public function actionLaboratorylist(){
