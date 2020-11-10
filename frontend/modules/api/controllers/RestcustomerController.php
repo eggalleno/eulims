@@ -583,7 +583,6 @@ class RestcustomerController extends \yii\rest\Controller
          $recData=array();
         //  $recFeesData['type']='column';
         //  $recData['name']=$eachRow['legend'];
-          $recData['testname_id'] = $eachRow['testname_id'];
           $recData['testname_method_id'] = $eachRow['testname_method_id'];
           $recData['testName'] =  $eachRow['testName'];
           $recData['method'] =  $eachRow['method'];
