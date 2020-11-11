@@ -33,18 +33,13 @@ class ArchiveController extends Controller
 
     public function actionIndex()
     {
-        $year = date('Y')-5; 
-        $count = Request::find()->where('year(request_datetime) = '.$year)->andWhere(['completed' => null])->count();
-        $total = Request::find()->where('year(request_datetime) <= '.$year)->andWhere(['completed' => null])->count();
+      
         $searchModel = new ArchiveSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
         return $this->render('index', [
             'searchModel' => $searchModel,
-            'dataProvider' => $dataProvider,
-            'count' => $count,
-            'total' => $total,
-            'year' => $year
+            'dataProvider' => $dataProvider
         ]);
     }
 
