@@ -631,12 +631,12 @@ class RestcustomerController extends \yii\rest\Controller
         $quot = new Quotation;
         //$bookling->scheduled_date = $my_var['Schedule Date'];
         //$bookling->booking_reference = '34ertgdsg'; //reference how to generate? is it before save? or 
-        $quot->quotation_id = $my_var[''];
-        $quot->customer_id = $my_var[''];
-        $quot->content = $my_var[''];
-        $quot->status_id = $my_var[''];
-        $quot->qty = $my_var[''];
-        $quot->rstl_id = $my_var[''];
+       // $quot->quotation_id = $my_var[''];
+        $quot->customer_id = $my_var['customer_id'];
+        $quot->content = $my_var['content'];
+        $quot->status_id = $my_var['status_id'];
+        $quot->qty = $my_var['qty'];
+        $quot->rstl_id = $my_var['rstl_id'];
 
         if($quot->save()){
             return $this->asJson([
