@@ -431,7 +431,7 @@ class BookingController extends Controller
 		$customer->save(false);
 		$model->customer_id=$customer->customer_id;
 		$model->customerstat=1; //Customer updated
-		$model->save();
+		$model->save(false);
 		Yii::$app->session->setFlash('success','Customer Updated!');
 		return $this->redirect(['/lab/booking/view', 'id' => $id]);
 	}	
@@ -440,7 +440,7 @@ class BookingController extends Controller
 		$model = $this->findModel($id);
 		if ($model->load(Yii::$app->request->post())) {
 			$model->booking_status=2;//cancelled
-			$model->save();
+			$model->save(false);
 		}
 		else{
 			return $this->renderAjax('cancel', [
@@ -459,7 +459,7 @@ class BookingController extends Controller
 			//echo $model->customer_id;
 			//exit;
 			$model->customerstat=1; //Customer updated
-			$model->save();
+			$model->save(false);
 		}
 		else{
 			return $this->renderAjax('existingcustomer', [
