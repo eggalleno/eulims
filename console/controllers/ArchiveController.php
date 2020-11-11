@@ -115,7 +115,10 @@ class ArchiveController extends Controller
                 $new->save();
             
             }else{
-                return false;
+                $id = $request->request_id;
+                $status = Request::find()->where(['request_id' => $id])->one();
+                $status->is_migrated = 1;
+                $status->save(false);
             }
         }
 
