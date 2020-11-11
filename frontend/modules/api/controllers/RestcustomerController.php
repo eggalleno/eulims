@@ -642,7 +642,6 @@ class RestcustomerController extends \yii\rest\Controller
             return $this->asJson([
                 'success' => true,
                 'message' => 'You have Request successfully',
-                'data' => $qout,
             ]); 
         }
         else{
