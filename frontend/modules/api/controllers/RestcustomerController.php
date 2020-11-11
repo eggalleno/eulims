@@ -571,10 +571,10 @@ class RestcustomerController extends \yii\rest\Controller
     
     }
     public function actionGetcustomerquotation(){
-        $querySql = Yii::$app->labdb->createCommand("SELECT a.testname_method_id, b.testName, b.testname_id, c.method, c.reference, c.fee, d.labname, a.lab_id
+       /* $querySql = Yii::$app->labdb->createCommand("SELECT a.testname_method_id, b.testName, b.testname_id, c.method, c.reference, c.fee, d.labname, a.lab_id
             from tbl_testname_method AS a
       INNER JOIN tbl_testname AS b ON a.testname_id = b.testname_id
-      INNER JOIN tbl_methodreference AS c ON a.method_id = c.method_reference_id
+      LEFT JOIN tbl_methodreference AS c ON a.method_id = c.method_reference_id
       INNER JOIN tbl_lab as d ON a.lab_id = d.lab_id
       ORDER BY a.lab_id ASC, b.testName ASC") ->queryAll();
         $arrayTestname =array();
@@ -592,7 +592,25 @@ class RestcustomerController extends \yii\rest\Controller
           $recData['labname'] = $eachRow['labname'];
           $recData['lab_id'] = $eachRow['lab_id'];
           array_push($arrayTestname,$recData);
+        };*/
+        $query = Yii::$app->labdb->createCommand("SELECT b.testname_id, b.testName, d.labname, a.lab_id
+                                                  FROM tbl_testname_method AS a
+                                                  INNER JOIN tbl_testname AS b ON a.testname_id = b.testname_id
+                                                  INNER JOIN tbl_lab AS d ON a.lab_id = d.lab_id
+                                                  GROUP BY b.testname_id, b.testName, d.labname, a.lab_id
+                                                  ORDER BY a.lab_id, b.testName") ->queryAll();
+        $arrayTestname =array();
+        foreach ($query as $eachRow)
+        {
+            $recData=array();
+
+            $recData['testname_id'] = $eachRow['testname_id'];
+            $recData['testName'] = $eachRow['testName'];
+            $recData['labname'] = $eachRow['labname'];
+            $recData['lab_id'] = $eachRow['lab_id'];
+            array_push($arrayTestname,$recData);
         };
+
          return $this->asJson($arrayTestname);
     }
 
