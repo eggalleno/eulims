@@ -571,29 +571,29 @@ class RestcustomerController extends \yii\rest\Controller
     
     }
     public function actionGetcustomerquotation(){
-        $querySql = Yii::$app->labdb->createCommand("SELECT a.testname_id, a.testname_method_id, b.testName, c.method, c.reference, c.fee, d.labname, a.lab_id
+        $querySql = Yii::$app->labdb->createCommand("SELECT a.testname_method_id, b.testName, b.testname_id, c.method, c.reference, c.fee, d.labname, a.lab_id
             from tbl_testname_method AS a
       INNER JOIN tbl_testname AS b ON a.testname_id = b.testname_id
       INNER JOIN tbl_methodreference AS c ON a.method_id = c.method_reference_id
       INNER JOIN tbl_lab as d ON a.lab_id = d.lab_id
       ORDER BY a.lab_id ASC, b.testName ASC") ->queryAll();
         $arrayTestname =array();
-        foreach ($querySql  as $eachRow)
+        foreach ($querySql as $eachRow)
         {
          $recData=array();
         //  $recFeesData['type']='column';
-        //  $recData['name']=$eachRow['legend'];
+          
           $recData['testname_method_id'] = $eachRow['testname_method_id'];
           $recData['testName'] =  $eachRow['testName'];
+          $recData['testname_id'] = $eachRow['testname_id'];
           $recData['method'] =  $eachRow['method'];
           $recData['reference'] = $eachRow['reference'];
           $recData['fee'] =  $eachRow['fee'];
           $recData['labname'] = $eachRow['labname'];
           $recData['lab_id'] = $eachRow['lab_id'];
           array_push($arrayTestname,$recData);
-
- 
-        }; 
+        };
+         return $this->asJson($arrayTestname);
     }
 
         //Save customer Quotation
