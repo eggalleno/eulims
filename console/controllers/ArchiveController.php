@@ -46,7 +46,7 @@ class ArchiveController extends Controller
             $req_status = $request['status_id'];
             $check = Archive::find()->where(['request_no' => $req_no])->limit(1)->all();
             
-            if(count($check) > 0){
+            if(count($check) < 1){
                 $content = []; $samples = []; 
                 ($request->customer['customer_name'] == null ) ? $customer = 'Not Available' : $customer = $request->customer['customer_name']; 
                 ($request->request_ref_num == null ) ? $ref = 'Not Available' : $ref = $request->request_ref_num;
