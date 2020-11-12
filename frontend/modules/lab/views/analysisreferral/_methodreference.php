@@ -43,7 +43,13 @@ use yii\helpers\Json;
                         'headerOptions' => ['class' => 'text-center'],
                         'contentOptions' => ['class' => 'text-center','style'=>'max-width:20px;'],
                     ],
-                    'sync_id',
+                    [
+                        'attribute'=>'method',
+                        'header' => 'Agency',
+                        'value' => function($data){
+                            return $data['methodreference']['sync_id'];
+                        },
+                    ],
                     [
                         'attribute'=>'method',
                         'header' => 'Method',

@@ -33,6 +33,8 @@ use common\models\lab\Samplecode;//used to point to old referral
 class ReferralComponent extends Component {
 
     public $source = 'http://www.eulims.local/api/restreferral';
+    // public $source = 'https://eulims.dost9.ph/api/restreferral';
+    // public $source = 'https://eulims.onelab.dost.gov.ph/api/restreferral';
 
     /**
      * Get Source
@@ -53,6 +55,7 @@ class ReferralComponent extends Component {
             $curl = new curl\Curl();
             $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
             $curl->setOption(CURLOPT_TIMEOUT, 180);
+            $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
             $list = $curl->get($apiUrl);
             return json_decode($list);
         } else {
@@ -70,12 +73,31 @@ class ReferralComponent extends Component {
             $curl = new curl\Curl();
             $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
             $curl->setOption(CURLOPT_TIMEOUT, 180);
+            $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
             $list = $curl->get($apiUrl);
             return json_decode($list);
         } else {
             return "Not valid method reference";
         }
     }
+
+
+
+     function getAgencybyMethodrefOne($methodrefId){
+        if($methodrefId > 0){
+            $apiUrl=$this->source.'/agencymethodreferenceone?methodref_id='.$methodrefId;
+            $curl = new curl\Curl();
+            $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
+            $curl->setOption(CURLOPT_TIMEOUT, 180);
+            $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
+            $list = $curl->get($apiUrl);
+            return json_decode($list);
+        } else {
+            return "Not valid method reference";
+        }
+    }
+
+
     /**
      * FindOne Discount
      * @param integer $discountId
@@ -87,6 +109,7 @@ class ReferralComponent extends Component {
             $curl = new curl\Curl();
             $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
             $curl->setOption(CURLOPT_TIMEOUT, 180);
+            $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
             $list = $curl->get($apiUrl);
             return json_decode($list);
         } else {
@@ -104,6 +127,7 @@ class ReferralComponent extends Component {
             $curl = new curl\Curl();
             $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
             $curl->setOption(CURLOPT_TIMEOUT, 180);
+            $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
             $list = $curl->get($apiUrl);
             return $list;
         } else {
@@ -118,6 +142,7 @@ class ReferralComponent extends Component {
             $curl = new curl\Curl();
             $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
             $curl->setOption(CURLOPT_TIMEOUT, 180);
+            $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
             $list = $curl->get($apiUrl);
             return $list;
         } else {
@@ -131,6 +156,7 @@ class ReferralComponent extends Component {
             $curl = new curl\Curl();
             $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
             $curl->setOption(CURLOPT_TIMEOUT, 180);
+            $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
             $list = $curl->get($apiUrl);
             return $list;
         } else {
@@ -145,6 +171,7 @@ class ReferralComponent extends Component {
             $curl = new curl\Curl();
             $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
             $curl->setOption(CURLOPT_TIMEOUT, 180);
+            $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
             $list = $curl->get($apiUrl);
             return $list;
         } else {
@@ -174,6 +201,7 @@ class ReferralComponent extends Component {
         $curl = new curl\Curl();
         $curl->setOption(CURLOPT_CONNECTTIMEOUT, 120);
         $curl->setOption(CURLOPT_TIMEOUT, 120);
+        $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
         $data = $curl->get($apiUrl);
         return $data;
     }
@@ -185,6 +213,7 @@ class ReferralComponent extends Component {
         $curl = new curl\Curl();
         $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
         $curl->setOption(CURLOPT_TIMEOUT, 180);
+        $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
         $list = $curl->get($apiUrl);
         return $list;
     }
@@ -195,6 +224,7 @@ class ReferralComponent extends Component {
         $curl = new curl\Curl();
         $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
         $curl->setOption(CURLOPT_TIMEOUT, 180);
+        $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
         $list = $curl->get($apiUrl);
         return $list;
     }
@@ -205,6 +235,7 @@ class ReferralComponent extends Component {
         $curl = new curl\Curl();
         $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
         $curl->setOption(CURLOPT_TIMEOUT, 180);
+        $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
         $list = $curl->get($apiUrl);
         return $list;
     }
@@ -215,20 +246,19 @@ class ReferralComponent extends Component {
         $curl = new curl\Curl();
         $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
         $curl->setOption(CURLOPT_TIMEOUT, 180);
+        $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
         $list = $curl->get($apiUrl);
         return $list;
     }
+
     //get matching services
     function listMatchAgency($requestId){
 
+        //only get the method_reference used by this request then call the listcmatch agency to return list of agency use and status if the referral can be submitted to the target rstl agency.
+
+        // return false;//temporarily returns false
+        
         $request = exRequestreferral::findOne($requestId);
-
-        $sample = Sample::find()
-            ->select('sampletype_id')
-            ->where('request_id =:requestId', [':requestId' => $requestId])
-            ->groupBy('sampletype_id')
-            ->asArray()->all();
-
 
         $analysis = Analysis::find()
             ->joinWith('sample')
@@ -236,46 +266,50 @@ class ReferralComponent extends Component {
             ->groupBy(['test_id','methodref_id'])
             ->asArray()->all();
 
-        $package = Analysis::find()
-            ->joinWith('sample')
-            ->where('tbl_sample.request_id =:requestId AND is_package =:packageName AND type_fee_id =:typeFee',[':requestId'=>$requestId,':packageName'=>1,':typeFee'=>2])
-            ->groupBy(['package_id'])
-            ->asArray()->all();
+        //if there are no tests then dont proceed
+        if(!$analysis)
+            return false;
 
+        //also check the package if the testmethodrefs are done
+        // $package = Analysis::find()
+        //     ->joinWith('sample')
+        //     ->where('tbl_sample.request_id =:requestId AND is_package =:packageName AND type_fee_id =:typeFee',[':requestId'=>$requestId,':packageName'=>1,':typeFee'=>2])
+        //     ->groupBy(['package_id'])
+        //     ->asArray()->all();
+    
 
-        $sampletypeId = implode(',', array_map(function ($data) {
-            return $data['sampletype_id'];
-        }, $sample));
-
-        $testnameId = implode(',', array_map(function ($data) {
-            return $data['test_id'];
-        }, $analysis));
+        // $testnameId = implode(',', array_map(function ($data) {
+        //     return $data['test_id'];
+        // }, $analysis));
 
         $methodrefId = implode(',', array_map(function ($data) {
             return $data['methodref_id'];
         }, $analysis));
 
-        $packageId = implode(',', array_map(function ($data) {
-            return $data['package_id'];
-        }, $package));
+        $packageId=""; //empty for now
 
-        $apiUrl=$this->source.'/listmatchagency?rstl_id='.$request->rstl_id.'&lab_id='.$request->lab_id.'&sampletype_id='.$sampletypeId.'&testname_id='.$testnameId.'&methodref_id='.$methodrefId.'&package_id='.$packageId;
+
+        // $packageId = implode(',', array_map(function ($data) {
+        //     return $data['package_id'];
+        // }, $package));
+
+
+
+        //this should not trigger if there are no anlyses , packages or samples, throws err if no test found
+        // $apiUrl=$this->source.'/listmatchagency?rstl_id='.$request->rstl_id.'&lab_id='.$request->lab_id.'&sampletype_id='.$sampletypeId.'&testname_id='.$testnameId.'&methodref_id='.$methodrefId.'&package_id='.$packageId;
+
+        $apiUrl=$this->source.'/listmatchagency?rstl_id='.$request->rstl_id.'&lab_id='.$request->lab_id.'&methodref_id='.$methodrefId.'&package_id='.$packageId;
+
         $curl = new curl\Curl();
         $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
         $curl->setOption(CURLOPT_TIMEOUT, 180);
-        $data = $curl->get($apiUrl);
-
-        $list = false;
-        if($data == 'false'){
-            return null;
-        } else {
-            $agencyId = implode(',', array_map(function ($data) {
-                return $data['agency_id'];
-            }, json_decode($data,true)));
-            $list_agency = $this->listAgency($agencyId);
-            return $list_agency;
-        }
+        $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
+        $data = $curl->get($apiUrl); //data now holds a list of rstls
+    
+        $list_agency = $this->listAgency($data);
+        return $list_agency;        
     }
+    
     //get list agencies
     function listAgency($agencyId)
     {   
@@ -285,20 +319,22 @@ class ReferralComponent extends Component {
             $curl = new curl\Curl();
             $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
             $curl->setOption(CURLOPT_TIMEOUT, 180);
+            $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
             $list = $curl->get($apiUrl);
             return $list;
         } else {
             return null;
         }
     }
-    //check if notified
+    //check if notified //btc was here XD
     function checkNotify($requestId,$agencyId)
     {
         if($requestId > 0 && $agencyId > 0) {
-            $apiUrl=$this->source.'/api/web/referral/notifications/checknotify?request_id='.$requestId.'&agency_id='.$agencyId;
+            $apiUrl=$this->source.'/checknotify?request_id='.$requestId.'&agency_id='.$agencyId;
             $curl = new curl\Curl();
             $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
             $curl->setOption(CURLOPT_TIMEOUT, 180);
+            $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
             $list = $curl->get($apiUrl);
             return $list;
         } else {
@@ -319,7 +355,7 @@ class ReferralComponent extends Component {
             return 'Not valid request!';
         }
     }*/
-    //check if confirmed
+    //check if confirmed //btc has been here
     function checkConfirm($requestId,$rstlId,$testingAgencyId)
     {
         if($requestId > 0 && $rstlId > 0 && $testingAgencyId > 0) {
@@ -327,6 +363,7 @@ class ReferralComponent extends Component {
             $curl = new curl\Curl();
             $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
             $curl->setOption(CURLOPT_TIMEOUT, 180);
+            $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
             $list = $curl->get($apiUrl);
             return $list;
         } else {
@@ -351,10 +388,11 @@ class ReferralComponent extends Component {
     function checkActiveLab($labId, $agencyId)
     {
         if($labId > 0 && $agencyId > 0) {
-            $apiUrl=$this->source.'/api/web/referral/referrals/checkactivelab?lab_id='.$labId.'&agency_id='.$agencyId;
+            $apiUrl=$this->source.'/checkactivelab?lab_id='.$labId.'&agency_id='.$agencyId;
             $curl = new curl\Curl();
             $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
             $curl->setOption(CURLOPT_TIMEOUT, 180);
+            $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
             $list = $curl->get($apiUrl);
             return $list;
         } else {
@@ -369,6 +407,7 @@ class ReferralComponent extends Component {
             $curl = new curl\Curl();
             $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
             $curl->setOption(CURLOPT_TIMEOUT, 180);
+            $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
             $list = $curl->get($apiUrl);
             return $list;
         } else {
@@ -383,6 +422,7 @@ class ReferralComponent extends Component {
             $curl = new curl\Curl();
             $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
             $curl->setOption(CURLOPT_TIMEOUT, 180);
+            $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
             $data = Json::encode(['request_id'=>$requestId,'rstl_id'=>$agencyId],JSON_NUMERIC_CHECK);
             $response = $curl->setRequestBody($data)
             ->setHeaders([
@@ -403,6 +443,7 @@ class ReferralComponent extends Component {
             $curl = new curl\Curl();
             $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
             $curl->setOption(CURLOPT_TIMEOUT, 180);
+            $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
             $list = $curl->get($apiUrl);
             return $list;
         } else {
@@ -417,6 +458,7 @@ class ReferralComponent extends Component {
             $curl = new curl\Curl();
             $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
             $curl->setOption(CURLOPT_TIMEOUT, 180);
+            $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
             $list = $curl->get($apiUrl);
             return $list;
         } else {
@@ -432,6 +474,7 @@ class ReferralComponent extends Component {
             $curl = new curl\Curl();
             $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
             $curl->setOption(CURLOPT_TIMEOUT, 180);
+            $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
             $list = $curl->get($apiUrl);
             return $list;
         } else {
@@ -445,6 +488,7 @@ class ReferralComponent extends Component {
             $curl = new curl\Curl();
             $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
             $curl->setOption(CURLOPT_TIMEOUT, 180);
+            $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
             $list = $curl->get($apiUrl);
             return $list;
         } else {
@@ -459,6 +503,7 @@ class ReferralComponent extends Component {
             $curl = new curl\Curl();
             $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
             $curl->setOption(CURLOPT_TIMEOUT, 180);
+            $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
             $list = $curl->get($apiUrl);
             return $list;
         } else {
@@ -473,6 +518,7 @@ class ReferralComponent extends Component {
             $curl = new curl\Curl();
             $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
             $curl->setOption(CURLOPT_TIMEOUT, 180);
+            $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
             $list = $curl->get($apiUrl);
             return $list;
         } else {
@@ -490,6 +536,7 @@ class ReferralComponent extends Component {
             $curl = new curl\Curl();
             $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
             $curl->setOption(CURLOPT_TIMEOUT, 180);
+            $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
             $list = $curl->get($apiUrl);
             return $list;
         } else {
@@ -504,6 +551,7 @@ class ReferralComponent extends Component {
             $curl = new curl\Curl();
             $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
             $curl->setOption(CURLOPT_TIMEOUT, 180);
+            $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
             $list = $curl->get($apiUrl);
             return $list;
         } else {
@@ -518,6 +566,7 @@ class ReferralComponent extends Component {
             $curl = new curl\Curl();
             $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
             $curl->setOption(CURLOPT_TIMEOUT, 180);
+            $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
             $list = $curl->get($apiUrl);
             return $list;
         } else {
@@ -532,6 +581,7 @@ class ReferralComponent extends Component {
             $curl = new curl\Curl();
             $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
             $curl->setOption(CURLOPT_TIMEOUT, 180);
+            $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
             $list = $curl->get($apiUrl);
             return $list;
         } else {
@@ -546,6 +596,7 @@ class ReferralComponent extends Component {
             $curl = new curl\Curl();
             $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
             $curl->setOption(CURLOPT_TIMEOUT, 180);
+            $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
             $list = $curl->get($apiUrl);
             return $list;
         } else {
@@ -556,10 +607,11 @@ class ReferralComponent extends Component {
     function getDuedate($requestId,$rstlId,$senderId)
     {
         if($rstlId > 0 && $requestId > 0 && $senderId > 0) {
-            $apiUrl=$this->source.'/api/web/referral/notifications/showdue?request_id='.$requestId.'&rstl_id='.$rstlId.'&sender_id='.$senderId;
+            $apiUrl=$this->source.'/showdue?request_id='.$requestId.'&rstl_id='.$rstlId.'&sender_id='.$senderId;
             $curl = new curl\Curl();
             $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
             $curl->setOption(CURLOPT_TIMEOUT, 180);
+            $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
             $list = $curl->get($apiUrl);
             return $list;
         } else {
@@ -574,6 +626,7 @@ class ReferralComponent extends Component {
             $curl = new curl\Curl();
             $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
             $curl->setOption(CURLOPT_TIMEOUT, 180);
+            $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
             $list = $curl->get($apiUrl);
             return $list;
         } else {
@@ -588,6 +641,7 @@ class ReferralComponent extends Component {
             $curl = new curl\Curl();
             $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
             $curl->setOption(CURLOPT_TIMEOUT, 180);
+            $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
             $list = $curl->get($apiUrl);
             return $list;
         } else {
@@ -601,6 +655,7 @@ class ReferralComponent extends Component {
             $curl = new curl\Curl();
             $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
             $curl->setOption(CURLOPT_TIMEOUT, 180);
+            $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
             $list = $curl->get($apiUrl);
             return $list;
         } else {
@@ -615,6 +670,7 @@ class ReferralComponent extends Component {
             $curl = new curl\Curl();
             $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
             $curl->setOption(CURLOPT_TIMEOUT, 180);
+            $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
             $list = $curl->get($apiUrl);
             return $list;
         } else {
@@ -644,6 +700,7 @@ class ReferralComponent extends Component {
             $curl = new curl\Curl();
             $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
             $curl->setOption(CURLOPT_TIMEOUT, 180);
+            $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
             $list = $curl->get($apiUrl);
             return $list;
         } else {
@@ -656,6 +713,7 @@ class ReferralComponent extends Component {
             $curl = new curl\Curl();
             $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
             $curl->setOption(CURLOPT_TIMEOUT, 180);
+            $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
             $list = $curl->get($apiUrl);
             return $list;
         } else {
@@ -671,6 +729,7 @@ class ReferralComponent extends Component {
             $curl = new curl\Curl();
             $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
             $curl->setOption(CURLOPT_TIMEOUT, 180);
+            $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
             $list = $curl->get($apiUrl);
             return $list; exit;
         } else {
@@ -683,6 +742,7 @@ class ReferralComponent extends Component {
             $curl = new curl\Curl();
             $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
             $curl->setOption(CURLOPT_TIMEOUT, 180);
+            $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
             $list = $curl->get($apiUrl);
             return $list;
         } else {
@@ -695,6 +755,7 @@ class ReferralComponent extends Component {
         $curl = new curl\Curl();
         $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
         $curl->setOption(CURLOPT_TIMEOUT, 180);
+        $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
         $referralreturn = $curl->setRequestBody($data)
         ->setHeaders([
             'Content-Type' => 'application/json',
@@ -709,6 +770,7 @@ class ReferralComponent extends Component {
         $curl = new curl\Curl();
         $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
         $curl->setOption(CURLOPT_TIMEOUT, 180);
+        $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
         $referralreturn = $curl->setRequestBody($data)
         ->setHeaders([
             'Content-Type' => 'application/json',
@@ -724,6 +786,7 @@ class ReferralComponent extends Component {
             $curl = new curl\Curl();
             $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
             $curl->setOption(CURLOPT_TIMEOUT, 180);
+            $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
             $check = $curl->get($apiUrl);
             return $check;
         } else {
@@ -737,6 +800,7 @@ class ReferralComponent extends Component {
             $curl = new curl\Curl();
             $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
             $curl->setOption(CURLOPT_TIMEOUT, 180);
+            $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
             $offeredby = $curl->get($apiUrl);
             return $offeredby;
         } else {
@@ -751,6 +815,7 @@ class ReferralComponent extends Component {
             $curl = new curl\Curl();
             $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
             $curl->setOption(CURLOPT_TIMEOUT, 180);
+            $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
             $list = $curl->get($apiUrl);
             return $list;
         } else {
@@ -765,6 +830,7 @@ class ReferralComponent extends Component {
             $curl = new curl\Curl();
             $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
             $curl->setOption(CURLOPT_TIMEOUT, 180);
+            $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
             $list = $curl->get($apiUrl);
             return $list;
         } else {
@@ -804,6 +870,7 @@ class ReferralComponent extends Component {
             $curl = new curl\Curl();
             $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
             $curl->setOption(CURLOPT_TIMEOUT, 180);
+            $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
             $list = $curl->get($apiUrl);
             return $list;
         } else {
@@ -818,6 +885,7 @@ class ReferralComponent extends Component {
             $curl = new curl\Curl();
             $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
             $curl->setOption(CURLOPT_TIMEOUT, 180);
+            $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
             $list = $curl->get($apiUrl);
             return $list;
         } else {
@@ -833,6 +901,7 @@ class ReferralComponent extends Component {
             $curl = new curl\Curl();
             $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
             $curl->setOption(CURLOPT_TIMEOUT, 180);
+            $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
             $list = $curl->get($apiUrl);
             return $list;
         } else {
@@ -851,6 +920,7 @@ class ReferralComponent extends Component {
             $curl = new curl\Curl();
             $curl->setOption(CURLOPT_CONNECTTIMEOUT, 120);
             $curl->setOption(CURLOPT_TIMEOUT, 120);
+            $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
             $list = $curl->get($apiUrl);
             return $list;
         } else {
@@ -866,6 +936,7 @@ class ReferralComponent extends Component {
             $curl = new curl\Curl();
             $curl->setOption(CURLOPT_CONNECTTIMEOUT, 120);
             $curl->setOption(CURLOPT_TIMEOUT, 120);
+            $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
             $list = $curl->get($apiUrl);
             return $list;
         } else {
@@ -882,6 +953,7 @@ class ReferralComponent extends Component {
             $curl = new curl\Curl();
             $curl->setOption(CURLOPT_CONNECTTIMEOUT, 120);
             $curl->setOption(CURLOPT_TIMEOUT, 120);
+            $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
             $list = $curl->get($apiUrl);
             return $list;
         } else {
@@ -897,6 +969,7 @@ class ReferralComponent extends Component {
             $curl = new curl\Curl();
             $curl->setOption(CURLOPT_CONNECTTIMEOUT, 120);
             $curl->setOption(CURLOPT_TIMEOUT, 120);
+            $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
             $list = $curl->get($apiUrl);
             return $list;
         } else {
@@ -911,6 +984,7 @@ class ReferralComponent extends Component {
             $curl = new curl\Curl();
             $curl->setOption(CURLOPT_CONNECTTIMEOUT, 120);
             $curl->setOption(CURLOPT_TIMEOUT, 120);
+            $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
             $list = $curl->get($apiUrl);
             if($list){
                 return $list;
@@ -925,6 +999,7 @@ class ReferralComponent extends Component {
             $curl = new curl\Curl();
             $curl->setOption(CURLOPT_CONNECTTIMEOUT, 120);
             $curl->setOption(CURLOPT_TIMEOUT, 120);
+            $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
             $list = $curl->get($apiUrl);
             if($list){
                 return $list;
@@ -941,6 +1016,7 @@ class ReferralComponent extends Component {
             $curl = new curl\Curl();
             $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
             $curl->setOption(CURLOPT_TIMEOUT, 180);
+            $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
             $list = $curl->get($apiUrl);
             return $list;
         } else {
@@ -954,6 +1030,7 @@ class ReferralComponent extends Component {
         $curl = new curl\Curl();
         $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
         $curl->setOption(CURLOPT_TIMEOUT, 180);
+        $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
         $request = json_decode($curl->get($apiUrl),true);
 
         $lab = Lab::findOne($request['lab_id']);

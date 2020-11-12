@@ -502,6 +502,24 @@ if($requeststatus > 0 && $notified == 1 && $hasTestingAgency > 0 && !empty($mode
                 },
             ],
             [
+                'attribute'=>'methodref_id',
+                'header'=>'Agency',
+                'enableSorting' => false,  
+                'contentOptions' => ['style' => 'width: 50%;word-wrap: break-word;white-space:pre-line;'],
+                'format' => 'raw',
+                'value' => function($model) use($referralcomp) {
+                    if($model->methodref_id!=0){
+                        $methodref = $referralcomp->getAgencybyMethodrefOne($model->methodref_id);
+
+                        if(!$methodref)
+                            return "No Data";
+                        
+                        return $methodref->name;
+                    }
+                    return false;
+                },
+            ],
+            [
                 'attribute'=>'quantity',
                 'header'=>'Quantity',
                 'hAlign'=>'center',
@@ -679,13 +697,10 @@ if($requeststatus > 0 && $notified == 1 && $hasTestingAgency > 0 && !empty($mode
                     'headerOptions' => ['class' => 'kartik-sheet-style'],
                     'buttons' => [
                         'notification' => function ($url, $data) use ($model,$referralcomp,$rstlId) {
-                             $checkActive = null;
-                            $checkNotify = null;
-                            $checkConfirm = null;
 
-                            // $checkActive = $referralcomp->checkActiveLab($model->lab_id,$data['agency_id']);
-                            // $checkNotify = $referralcomp->checkNotify($model->request_id,$data['agency_id']);
-                            // $checkConfirm = $referralcomp->checkConfirm($model->request_id,$rstlId,$data['agency_id']);
+                            $checkActive = $referralcomp->checkActiveLab($model->lab_id,$data['agency_id']);
+                            $checkNotify = $referralcomp->checkNotify($model->request_id,$data['agency_id']);
+                            $checkConfirm = $referralcomp->checkConfirm($model->request_id,$rstlId,$data['agency_id']);
 
                             if($model->status_id > 0) {
                                 switch ($checkNotify) {
@@ -729,8 +744,8 @@ if($requeststatus > 0 && $notified == 1 && $hasTestingAgency > 0 && !empty($mode
                 'panel' => [
                     'heading'=>'<h3 class="panel-title">Agency</h3>',
                     'type'=>'primary',
-                    'before'=>'<p class="text-primary"><strong>Note:</strong> Agency that offers the testname and method.</p>',
-                    'after'=>false,
+                    'before'=>'<p class="text-danger"><strong>Note:</strong> Sending Notification to the target agency is disabled if there are testmethods that are not offered from them.</p>',
+                    'after'=>'<p class="text-primary"><strong>Note:</strong> To be able to refer to other member, make sure to select testmethod for a specific agency only.</p>',
                 ],
                 'columns' => $agencyGridColumns,
                 'toolbar' => [
