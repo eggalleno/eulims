@@ -97,7 +97,7 @@ use common\models\system\Profile;
 $testreport = Testreport::find()->where(['request_id' => $request->request_id])->one();
                 
 if ($testreport){
-	echo Html::button('<span class="glyphicon glyphicon-send"> SMS</span>', ['value' => '/lab/request/notifysms?id=' . $request->customer_id.'&reqid='.$request->request_id.'&refnum='.$request->request_ref_num,'onclick'=>'location.href=this.value', 'class' => 'btn btn-primary', 'title' => Yii::t('app', "SMS")]);
+	echo Html::button('<span class="glyphicon glyphicon-send"> SMS and Email</span>', ['value' => '/lab/request/notifysms?id=' . $request->customer_id.'&reqid='.$request->request_id.'&refnum='.$request->request_ref_num,'onclick'=>'location.href=this.value', 'class' => 'btn btn-primary', 'title' => Yii::t('app', "SMS")]);
 }
 
 	

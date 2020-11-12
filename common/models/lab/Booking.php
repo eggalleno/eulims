@@ -4,7 +4,7 @@ namespace common\models\lab;
 
 use Yii;
 use yii\db\Query;
-//use common\models\lab\Customer;
+use common\models\lab\Customer;
 use common\models\lab\CustomerBooking;
 use common\models\lab\Modeofrelease;
 use common\models\lab\Purpose;
@@ -76,9 +76,14 @@ class Booking extends \yii\db\ActiveRecord
 			'samplename' => 'Sample Name',
         ];
     }
-    public function getCustomer()
+    /*public function getCustomer()
     {
         return $this->hasOne(CustomerBooking::className(), ['customer_booking_id' => 'customer_id']);
+    }*/
+	
+	public function getCustomer()
+    {
+        return $this->hasOne(Customer::className(), ['customer_id' => 'customer_id']);
     }
 
     public function beforeSave($insert)

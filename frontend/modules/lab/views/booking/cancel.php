@@ -14,12 +14,12 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'reason')->textInput() ?>
 
-    <div class="form-group">
-	    <div class="form-group pull-right">
-			<?= Html::submitButton('Cancel', ['class' => 'btn btn-danger']) ?>
-		</div>
+	<div class="form-group pull-right">
+            <?= Html::submitButton('Confirm', ['class' => 'btn btn-success']) ?>
+            <?php if(Yii::$app->request->isAjax){ ?>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+            <?php } ?>
     </div>
-
     <?php ActiveForm::end(); ?>
 
 </div>
