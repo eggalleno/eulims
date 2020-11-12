@@ -24,6 +24,7 @@ use yii\captcha\Captcha;
 <div class="booking-form">
 
     <?php $form = ActiveForm::begin(); ?>
+	<div class="customer-form" style="border-style:groove">
 	<div class="row">
 		<div class="col-md-6">
 			<?= $form->field($customer, 'customer_name')->textInput(['maxlength' => true]) ?>
@@ -97,7 +98,7 @@ use yii\captcha\Captcha;
 		
    
     </div>    
-  
+    </div>
     <div class="row">
 		 <div class="col-sm-6">
 		 <?= $form->field($model, 'purpose')->widget(Select2::classname(), [
