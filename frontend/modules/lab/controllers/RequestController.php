@@ -142,21 +142,21 @@ class RequestController extends Controller
 
             //gets the attachement details ??? //btc
 			//set third parameter to 1 for attachment type deposit slip
-            //updated to new api with false return temporarily //btc
+            //updated to new api with false return temporarily //btc TODOOOOOOOOOOOOOO
             $deposit = json_decode($refcomponent->getAttachment($reqModel->referral_id,Yii::$app->user->identity->profile->rstl_id,1),true);
             //set third parameter to 2 for attachment type or
-            //updated to new api with false return temporarily //btc
+            //updated to new api with false return temporarily //btc TODOOOOOOOOOOOOOO
             $or = json_decode($refcomponent->getAttachment($reqModel->referral_id,Yii::$app->user->identity->profile->rstl_id,2),true);
 
             //get the referred Agency details //btc
-            //updated to new api with false return temporarily //btc
+            //updated to new api with false return temporarily //btc TODOOOOOOOOOOOOOO
             $referred_agency = json_decode($refcomponent->getReferredAgency($reqModel->referral_id,Yii::$app->user->identity->profile->rstl_id),true);
    
             $as_receiving = !empty($referred_agency['receiving_agency']) && $referred_agency > 0 ? $referred_agency['receiving_agency']['name'] : null;
             $as_testing = !empty($referred_agency['testing_agency']) && $referred_agency > 0 ? $referred_agency['testing_agency']['name'] : null;
-            //updated to new api with false return temporarily //btc
+            //updated to new api with false return temporarily //btc TODOOOOOOOOOOOOO
             $bid = json_decode($refcomponent->getBidderAgency($id,Yii::$app->user->identity->profile->rstl_id),true);
-            //updated to new api with false return temporarily //btc
+            //updated to new api with false return temporarily //btc TODOOOOOOOOOOOOO
             $countBidnotice = json_decode($refcomponent->countBidnotice($id,Yii::$app->user->identity->profile->rstl_id),true);
             
             $noSampleCode = Sample::find()->where("request_id =:requestId AND ISNULL(sample_code)",[':requestId'=>$id])->count();
@@ -168,12 +168,6 @@ class RequestController extends Controller
                 $countBid = $bid['count_bid'];
                 if($countBid > 0){
                     $bidders = $bid['bidders'];
-                    //$bidderAgencyId = implode(',', array_map(function ($data) {
-                    //    return $data['bidder_agency_id'];
-                    //}, $bidder));
-                    //$bidders = json_decode($refcomponent->listBidders($bidderAgencyId),true);
-                    //print_r($bidders);
-                    //exit;
                 } else {
                     $bidders = [];
                 }
