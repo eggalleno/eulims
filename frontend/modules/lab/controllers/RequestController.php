@@ -961,7 +961,7 @@ class RequestController extends Controller
 	   $tomorrow = date("Y-m-d", strtotime("+1 day"));
 	  // echo $tomorrow;
        $request = Request::find()->where(['report_due' => $tomorrow])->all();
-	   
+	    $countdue=0;
 		foreach ($request as $res){
 			$refnum= $res->request_ref_num;
 			$users = Profile::find()->where(['designation' => 'Lab Analyst'])->all();
@@ -975,10 +975,10 @@ class RequestController extends Controller
 					 $decode=Json::decode($res); 
 				 }
 			}
-           
+           $countdue++;
 		}
 		
-		//Yii::$app->session->setFlash('success',$decode["data"] );
+		Yii::$app->session->setFlash('success',$countdue ." request(s) due tomorrow!");
 		return $this->redirect(['index']); 
     }
 }

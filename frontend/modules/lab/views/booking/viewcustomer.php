@@ -85,4 +85,7 @@ if($model->booking_status == 0){
 	
 <h2>Status</h2>
     <h4><?php echo "Booking is ".$stat; ?></h4>
+	<?php if($model->booking_status == 2){
+	 echo "Reason: ".$model->reason;	
+	}?>
 </div>

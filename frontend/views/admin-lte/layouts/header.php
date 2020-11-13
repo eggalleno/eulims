@@ -89,7 +89,7 @@ $group="";
 if(isset($_SESSION['usertoken'])){
 	
 	$sourcetoken=$_SESSION['usertoken'];
-	$userid= Yii::$app->user->identity->profile->user_id;
+	$userid= $_SESSION['userid'];
 	//get profile
 	$authorization = "Authorization: Bearer ".$sourcetoken; 
 	$apiUrl=$source.'getuser';
@@ -116,9 +116,22 @@ if(isset($_SESSION['usertoken'])){
 	$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 	
 	$contacts=$decode; 
+	
+
+	$countunreadurl=$source.'countunread?userid='.$userid;
+	$countunreadcurl = new curl\Curl();
+	$countunreadcurl->setOption(CURLOPT_HTTPHEADER, ['Content-Type: application/json' , $authorization]);
+	$countunreadcurl->setOption(CURLOPT_SSL_VERIFYPEER, false);
+	$countunreadcurl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
+	$countunreadcurl->setOption(CURLOPT_TIMEOUT, 180);
+	$countunreadlist = $countunreadcurl->get($countunreadurl);
+	$countunread=Json::decode($countunreadlist);
+	
+	//var_dump($countunread);
+	//exit;
 	$flag=1;
 	?>
-	<button class="open-button" onclick="openForm()"><i class="fa fa-commenting-o"></i></button>		
+	<button class="open-button" onclick="openForm()"><span class="label label-success"><?= $countunread ?></span><i class="fa fa-commenting-o"></i></button>		
     <?php
 }else{
 	$flag=0;
@@ -132,6 +145,7 @@ if(isset($_SESSION['usertoken'])){
 		//]);
 	
 }	
+
 ?>
 
 <header class="main-header">
@@ -265,14 +279,15 @@ if(isset($_SESSION['usertoken'])){
 </header>
 
 	<div class="chat-popup" id="myForm" name="myForm">
+	
 		<form class="form-container" enctype="multipart/form-data">
 			<div class="chat-popup-header">
 				<!--<span>OneLab Chat</span>-->
 				<!--i class="fa fa-plus" id="plusgc"></i -->
 				<?php 
-				echo Html::button('<h5></h5>', ['value'=>'/chat/info/group', 'class' => 'fa fa-group','title' => Yii::t('app', "Group"),'id'=>'btnOP','onclick'=>'LoadModal(this.title, this.value);'])
+				echo Html::button('<h5></h5>', ['value'=>'/chat/info/group', 'class' => 'fa fa-group','title' => Yii::t('app', "Group"),'id'=>'btnOP','onclick'=>'LoadModal(this.title, this.value);','style'=>'border-radius: 50%;'])
 	            ?>
-				<i class="fa fa-gear"></i>
+		
 				
 				<label id="profilenamepop"> &nbsp;</label>
 				<label id="chattype" hidden> &nbsp;</label> <!-- message(1) or file(2) -->
@@ -527,7 +542,14 @@ function contacts(){ //Personnal Messages
 		<?php 
 		if($contacts){
 			foreach ($contacts as $data)
-			 { ?>
+			 { 
+			 $profuserid=$data['user_id'];
+			 if(isset($_SESSION['usertoken'])){
+			 $userid2=($_SESSION['usertoken']);
+		     }
+			 
+			 
+			 ?>
 			y=y + "<a class='thismessage' onclick='mes(<?=$data['user_id']?>,1)'>";
 			y= y + "<div class='first'><img src='/uploads/user/photo/user.png' alt='/uploads/user/photo/user.png' width='42' height='42'>&nbsp;<b>"+ '<?= $data['fullname']?>' +"</div>";
 			y= y + "</a>";
@@ -569,7 +591,7 @@ function groupcontacts(){ //Group Messages
 }
 
 function sendchat(txt) {
- //  var txt=$('#chatareapop').val();
+   txt=txt.toLowerCase();
    const token =<?php 
 	if(isset($_SESSION['usertoken'])){
 		echo json_encode($_SESSION['usertoken']);

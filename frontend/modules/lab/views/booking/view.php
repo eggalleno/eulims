@@ -45,17 +45,21 @@ if($model->booking_status == 0){
     <p>
         <?php
 		if ($model->booking_status <> 1){
-			echo Html::a('Save as Request', ['saverequest', 'id' => $model->booking_id], ['class' => 'btn btn-success']);
-			echo "&nbsp;&nbsp;";
+			//echo "&nbsp;&nbsp;";
 			if($model->customerstat <> 1){
-				echo Html::a('Save as new Customer', ['savecustomer', 'id' => $model->booking_id], ['class' => 'btn btn-success']) ;
 				echo "&nbsp;&nbsp;";
+				echo Html::a('Save as new Customer', ['savecustomer', 'id' => $model->booking_id],['class' => 'btn btn-success']) ;
 				$existing="LoadModal('Update Existing Customer','/lab/booking/existingcustomer?id=".$model->booking_id."',true,500)";
-				echo $CancelButton='<button id="btnCancel" onclick="'.$existing.'" type="button" style="float: right;padding-right:5px;margin-left: 5px" class="btn btn-primary"><i class="fa fa-pencil"></i> Update Customer</button>';
+				echo $CancelButton='<button id="btnCancel" onclick="'.$existing.'" type="button" style="float: left;padding-right:15px;margin-left: 5px" class="btn btn-primary"><i class="fa fa-pencil"></i> Update Customer</button>';
 				echo "&nbsp;&nbsp;";
 			}
-			$Func="LoadModal('Cancel Booking','/lab/booking/cancelbooking?id=".$model->booking_id."',true,500)";
-            echo $CancelButton='<button id="btnCancel" onclick="'.$Func.'" type="button" style="float: right;padding-right:5px;margin-left: 5px" class="btn btn-danger"><i class="fa fa-remove"></i> Cancel Booking</button>';
+			else{
+				echo "&nbsp;&nbsp;";
+				echo Html::a('Save as Request', ['saverequest', 'id' => $model->booking_id], ['class' => 'btn btn-success']);
+				$Func="LoadModal('Cancel Booking','/lab/booking/cancelbooking?id=".$model->booking_id."',true,500)";
+                echo $CancelButton='<button id="btnCancel" onclick="'.$Func.'" type="button" style="float: left;padding-right:5px;margin-left: 5px" class="btn btn-danger"><i class="fa fa-remove"></i> Disapprove Booking</button>';
+			}
+			
 			
 				
 		}

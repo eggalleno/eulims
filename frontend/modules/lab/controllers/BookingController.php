@@ -470,4 +470,15 @@ class BookingController extends Controller
 		Yii::$app->session->setFlash('success','Customer Updated!');
 		return $this->redirect(['/lab/booking/view', 'id' => $id]);
 	}
+	
+	public function actionRequestview($id){
+		$request=eRequest::find()->where(['booking_id'=>$id])->one();
+		if($request){
+			$requestid=$request->request_id;
+			return $this->redirect(['/lab/request/view', 'id' => $requestid]); 
+		}else{
+			return;
+		}
+		
+	}
 }
