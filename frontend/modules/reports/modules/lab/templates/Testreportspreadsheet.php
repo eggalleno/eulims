@@ -48,8 +48,10 @@ class Testreportspreadsheet extends Spreadsheet
         switch($this->template){
             case 1:
                 $this->setDocument(IOFactory::load($this->location.$labprefix."_ISO.xlsx"));
+                break;
             case 2:
                 $this->setDocument(IOFactory::load($this->location.$labprefix."_NONISO.xlsx"));
+                break;
             case 3:
                 $this->setDocument(IOFactory::load($this->location.$labprefix."_DENR.xlsx"));
         }       
