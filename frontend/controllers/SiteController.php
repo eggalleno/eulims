@@ -510,8 +510,8 @@ class SiteController extends Controller
                 curl_close($curl);
 
                // $consoleController = new SchedsyncController ('schedsync', Yii::$app); 
-                $controller = new SchedsyncController(Yii::$app->controller->id, Yii::$app);
-                $controller->actionCroncustomer();
+              //  $controller = new SchedsyncController(Yii::$app->controller->id, Yii::$app);
+              //  $controller->actionCroncustomer();
               //  $consoleController->runAction('croncustomer');
             
             } 
