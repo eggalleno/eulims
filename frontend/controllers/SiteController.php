@@ -28,7 +28,7 @@ use DateTime;
 use common\models\lab\Loginlogs;
 use common\models\lab\Request;
 use common\models\lab\RequestSearch;
-
+use console\controllers\SchedsyncController;
 use yii\base\Model;
 use mysqli;
 //use yii\swiftmailer\Message;
@@ -498,7 +498,7 @@ class SiteController extends Controller
       
                 curl_setopt($curl, CURLOPT_POST, 1);
             
-                curl_setopt($curl, CURLOPT_URL, 'https://eulims.onelab.dost.gov.ph/api/sync/passlogin');
+                curl_setopt($curl, CURLOPT_URL, 'https://eulims.onelab.ph/api/sync/passlogin');
 
                 curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
                 curl_setopt($curl, CURLOPT_PROXY, ''); //!! FIX
@@ -508,6 +508,11 @@ class SiteController extends Controller
                 curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
                 $result = curl_exec($curl);
                 curl_close($curl);
+
+               // $consoleController = new SchedsyncController ('schedsync', Yii::$app); 
+                $controller = new SchedsyncController(Yii::$app->controller->id, Yii::$app);
+                $controller->actionCroncustomer();
+              //  $consoleController->runAction('croncustomer');
             
             } 
 
