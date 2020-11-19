@@ -592,11 +592,12 @@ class RestcustomerController extends \yii\rest\Controller
         $quot->content = $my_var['content'];
         $quot->status_id = $my_var['status_id'];
         $quot->qty = $my_var['qty'];
-        $quot->remarks = $my_var['remarks'];
-        $quot->attachment = $my_var['attachment'];
-        $quot->description = $my_var['description'];
+        $quot->sampletype = $my_var['sampletype'];
+        $quot->sampledescription = $my_var['sampledescription'];
         $quot->sendcopy = $my_var['sendcopy'];
+        $quot->remarks = $my_var['remarks'];
         $quot->rstl_id = $my_var['rstl_id'];
+        $quot->attachment = $my_var['attachment'];
 
         if($quot->save()){
             return $this->asJson([
