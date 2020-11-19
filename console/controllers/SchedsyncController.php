@@ -32,7 +32,7 @@ class SchedsyncController extends Controller
 {
     public $rstl_id;
     public $fullname;
-  //  public $mainurl ='https://eulims.onelab.dost.gov.ph/';
+  //  public $mainurl ='https://eulims.onelab.ph/';
     public function actionIndex()
     {
           $test =  Profile::find()->one();
@@ -116,7 +116,7 @@ class SchedsyncController extends Controller
                 $curl = curl_init();
                 curl_setopt($curl, CURLOPT_POST, 1);
                   
-               curl_setopt($curl, CURLOPT_URL, 'https://eulims.onelab.dost.gov.ph/api/sync/passlogin');
+               curl_setopt($curl, CURLOPT_URL, 'https://eulims.onelab.ph/api/sync/passlogin');
                 curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
                 curl_setopt($curl, CURLOPT_PROXY, ''); //!! FIX
                 curl_setopt($curl, CURLOPT_FOLLOWLOCATION, 1);
@@ -160,7 +160,7 @@ class SchedsyncController extends Controller
 
             // echo $user['email'];
     
-            curl_setopt($curl, CURLOPT_URL, 'https://eulims.onelab.dost.gov.ph/api/sync/verifylogin');
+            curl_setopt($curl, CURLOPT_URL, 'https://eulims.onelab.ph/api/sync/verifylogin');
 
             // Make it so the data coming back is put into a string
             curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
@@ -223,7 +223,7 @@ class SchedsyncController extends Controller
 
             // echo $user['email'];
     
-            curl_setopt($curl, CURLOPT_URL, 'https://eulims.onelab.dost.gov.ph/api/sync/verifylogin');
+            curl_setopt($curl, CURLOPT_URL, 'https://eulims.onelab.ph/api/sync/verifylogin');
 
             // Make it so the data coming back is put into a string
             curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
@@ -266,7 +266,7 @@ class SchedsyncController extends Controller
             'rstl_id'=>$rstlid);
             
         
-                $customer_list =   SchedsyncController::callrestapireturn('POST', 'https://eulims.onelab.dost.gov.ph/api/sync/synccustacct', $api_param);
+                $customer_list =   SchedsyncController::callrestapireturn('POST', 'https://eulims.onelab.ph/api/sync/synccustacct', $api_param);
                 $reqstatus='';
                 $samstatus='';
                 $samtypestatus='';
@@ -339,7 +339,7 @@ class SchedsyncController extends Controller
        
         curl_setopt($curl, CURLOPT_POST, 1);
     
-        curl_setopt($curl, CURLOPT_URL, 'https://eulims.onelab.dost.gov.ph/api/sync/verifylogin');
+        curl_setopt($curl, CURLOPT_URL, 'https://eulims.onelab.ph/api/sync/verifylogin');
 
         // Make it so the data coming back is put into a string
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
@@ -369,7 +369,7 @@ class SchedsyncController extends Controller
 
         $booking = Booking::find()->select(['booking_reference'])->asArray()->all();
         $data_sync = array('rstl_id'=>$rstlid );
-        $booking_list = SchedsyncController::callrestapireturn('POST', 'https://eulims.onelab.dost.gov.ph/api/sync/syncgetbooking', $data_sync);
+        $booking_list = SchedsyncController::callrestapireturn('POST', 'https://eulims.onelab.ph/api/sync/syncgetbooking', $data_sync);
         //  echo count($booking_list);
        
         if ($booking_list) {
@@ -399,7 +399,7 @@ class SchedsyncController extends Controller
                 'booking_reference'=>$rec['booking_reference'],
                 'local_booking_id'=>$rec['booking_id'],
             );
-                SchedsyncController::callrestapi('POST', 'https://eulims.onelab.dost.gov.ph/api/sync/syncupdatebooking', $data_sync);
+                SchedsyncController::callrestapi('POST', 'https://eulims.onelab.ph/api/sync/syncupdatebooking', $data_sync);
             }
         }
     }
@@ -440,7 +440,7 @@ public function actionCronrealtime()
        
             curl_setopt($curl, CURLOPT_POST, 1);
     
-            curl_setopt($curl, CURLOPT_URL, 'https://eulims.onelab.dost.gov.ph/api/sync/verifylogin');
+            curl_setopt($curl, CURLOPT_URL, 'https://eulims.onelab.ph/api/sync/verifylogin');
 
             // Make it so the data coming back is put into a string
             curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
@@ -509,7 +509,7 @@ public function actionCronrealtime()
             'halal'=> $eachRow[$currentmonthchar.'halal'],
            // 'sync_date'=>date('Y-m-d H:i:s'),
         );
-                SchedsyncController::callrestapi('POST', 'https://eulims.onelab.dost.gov.ph/api/sync/syncupdatedashboard', $data_sync);
+                SchedsyncController::callrestapi('POST', 'https://eulims.onelab.ph/api/sync/syncupdatedashboard', $data_sync);
                 echo 'Realtime : ' . $eachRow['indicator'] . ' inserted.' . "\n\r";
                 // array_push($rstlArray,$recData);
             };
@@ -529,7 +529,7 @@ public function actionCronrealtime()
 
 
         //$data_sync = array('rstl_id'=>$rstlid );
-        //$booking_list = SchedsyncController::callrestapireturn('POST', 'https://eulims.onelab.dost.gov.ph/api/sync/syncgetbooking', $data_sync);
+        //$booking_list = SchedsyncController::callrestapireturn('POST', 'https://eulims.onelab.ph/api/sync/syncgetbooking', $data_sync);
     }
 
     // -----------------------------   SYNCING FUNCTIONS
@@ -560,7 +560,7 @@ public function actionCronrealtime()
 
            
                     //return $this->asJson($data_sync);
-                    $returnvalue = SchedsyncController::callrestapi('POST', 'https://eulims.onelab.dost.gov.ph/api/sync/savesynccustomer', $data_sync);
+                    $returnvalue = SchedsyncController::callrestapi('POST', 'https://eulims.onelab.ph/api/sync/savesynccustomer', $data_sync);
                     
                     echo $custcount . '. Customer: ' .$rec->customer_name . ' inserted ' . "\r\n";
                     $custcount++;
@@ -643,7 +643,7 @@ public function actionCronrealtime()
                 'status_id'=>$rec->status_id,
                 'sync_date'=> date('Y-m-d H:i:s'),
             );
-            SchedsyncController::callrestapi('POST', 'https://eulims.onelab.dost.gov.ph/api/sync/savesyncrequest', $data_sync);
+            SchedsyncController::callrestapi('POST', 'https://eulims.onelab.ph/api/sync/savesyncrequest', $data_sync);
             echo $reqcount . '. Request : ' . $rec->request_ref_num . ' inserted ' . "\r\n";
             $reqcount++;
             }
@@ -672,7 +672,7 @@ public function actionCronrealtime()
                     'sync_date'=>  date('Y-m-d H:i:s'));
            
                     //return $this->asJson($data_sync);
-                   $test = SchedsyncController::callrestapi('POST', 'https://eulims.onelab.dost.gov.ph/api/sync/savesyncsample', $data_sync);
+                   $test = SchedsyncController::callrestapi('POST', 'https://eulims.onelab.ph/api/sync/savesyncsample', $data_sync);
                   echo $samcount . '. Sample : ' . $rec->sample_id . ' inserted ' . "\r\n";
                   // echo $test;
                     $samcount++;
@@ -703,7 +703,7 @@ public function actionCronrealtime()
                    
                    
                     //return $this->asJson($data_sync);
-                 SchedsyncController::callrestapi('POST', 'https://eulims.onelab.dost.gov.ph/api/sync/savesyncsampletype', $data_sync);
+                 SchedsyncController::callrestapi('POST', 'https://eulims.onelab.ph/api/sync/savesyncsampletype', $data_sync);
                    echo $samcount . '. SampleType : ' . $rec->type . ' inserted ' . "\r\n";
                     $samcount++;
                 }
@@ -740,7 +740,7 @@ public function actionCronrealtime()
                     );
 
              //      return $data_sync;
-           SchedsyncController::callrestapi('POST', 'https://eulims.onelab.dost.gov.ph/api/sync/savesynccustomeraccount', $data_sync);
+           SchedsyncController::callrestapi('POST', 'https://eulims.onelab.ph/api/sync/savesynccustomeraccount', $data_sync);
     
           
             }
@@ -768,7 +768,7 @@ public function actionCronrealtime()
             'sync_by'=>$fullname,//Yii::$app->user->identity->profile->fullname,
             'sync_date'=>  date('Y-m-d H:i:s'));
                    // return $this->asJson($data_sync);
-              SchedsyncController::callrestapi('POST', 'https://eulims.onelab.dost.gov.ph/api/sync/savesynccustomerwallet', $data_sync);
+              SchedsyncController::callrestapi('POST', 'https://eulims.onelab.ph/api/sync/savesynccustomerwallet', $data_sync);
               echo $walletcount . '. Wallet : ' . $rec->customer_id . ' inserted ' . "\r\n";
               $walletcount++;
                }
@@ -805,7 +805,7 @@ public function actionCronrealtime()
                        
                     );
                    // return $this->asJson($data_sync);
-               SchedsyncController::callrestapi('POST', 'https://eulims.onelab.dost.gov.ph/api/sync/savesynccustomertran', $data_sync);
+               SchedsyncController::callrestapi('POST', 'https://eulims.onelab.ph/api/sync/savesynccustomertran', $data_sync);
                echo $wallettrancount . '. Wallet Transaction : ' . $rec->date . ' inserted ' . "\r\n";
                $wallettrancount++;
              }
@@ -849,7 +849,7 @@ public function actionCronrealtime()
             // 'xxx'=>Yii::$app->user->identity->profile->fullname,
         );
                 //  return $this->asJson($data_sync);
-            SchedsyncController::callrestapi('POST', 'https://eulims.onelab.dost.gov.ph/api/sync/savesyncbooking', $data_sync);
+            SchedsyncController::callrestapi('POST', 'https://eulims.onelab.ph/api/sync/savesyncbooking', $data_sync);
             echo $bookcount . '. Booking  : ' . $rec->booking_reference . ' inserted ' . "\r\n";
             $bookcount++;
         }
@@ -874,7 +874,7 @@ public function actionCronrealtime()
                     'sync_by'=>'',//Yii::$app->user->identity->profile->fullname,
                     'sync_date'=>date('Y-m-d H:i:s'),
                 );
-              SchedsyncController::callrestapi('POST', 'https://eulims.onelab.dost.gov.ph/api/sync/savesyncpurpose', $data_sync);
+              SchedsyncController::callrestapi('POST', 'https://eulims.onelab.ph/api/sync/savesyncpurpose', $data_sync);
             }
 
 
@@ -903,7 +903,7 @@ public function actionCronrealtime()
                        
                     );
                    // return $this->asJson($data_sync);
-                 SchedsyncController::callrestapi('POST', 'https://eulims.onelab.dost.gov.ph/api/sync/savesyncmode', $data_sync);
+                 SchedsyncController::callrestapi('POST', 'https://eulims.onelab.ph/api/sync/savesyncmode', $data_sync);
                    
             }
            }
@@ -1037,7 +1037,7 @@ public function actionCronrealtime()
             'rstl_id'=>$rstlid,// Yii::$app->user->identity->profile->rstl_id,
             'tbl'=>$tbl);
       
-        $list_fromapi =   SchedsyncController::callrestapireturn('POST', 'https://eulims.onelab.dost.gov.ph/api/sync/syncgetids', $api_param);
+        $list_fromapi =   SchedsyncController::callrestapireturn('POST', 'https://eulims.onelab.ph/api/sync/syncgetids', $api_param);
      //  echo count($list_fromapi);
         if ($list_fromapi || $list_local) {
 
