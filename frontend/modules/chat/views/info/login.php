@@ -37,7 +37,7 @@ $this->params['breadcrumbs'][] = $this->title;
 	var password = $("#loginform-password").val(); 
 	//alert(email);
 	$.ajax({
-		url: "https://eulims.onelab.dost.gov.ph/api/message/login", //API LINK FROM THE CENTRAL
+		url: "http://eulims.onelab.ph/api/message/login", //API LINK FROM THE CENTRAL
 		type: 'POST',
 		dataType: "JSON",
 		data: {

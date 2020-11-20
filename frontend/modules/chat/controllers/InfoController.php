@@ -15,14 +15,16 @@ use yii\helpers\Json;
 use yii\data\ActiveDataProvider;
 
 use common\components\Notification;
+
 use  yii\web\Session;
+
 
 /**
  * InfoController implements the CRUD actions for Chat model.
  */
 class InfoController extends Controller
 {
-	public $source = 'https://eulims.onelab.dost.gov.ph/api/message/';
+	public $source = 'http://eulims.onelab.ph/api/message/';
     /**
      * @inheritdoc
      */
@@ -217,9 +219,6 @@ class InfoController extends Controller
 			$list = $curl->get($apiUrl);
 			$decode=Json::decode($list);
 			
-		    //var_dump($list);
-			//exit;
-			
 		
 			if ($model->load(Yii::$app->request->post())) {
 				
@@ -279,7 +278,7 @@ class InfoController extends Controller
 			$curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
 			$curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
 			$curl->setOption(CURLOPT_TIMEOUT, 180);
-			$list = $curl->get($apiUrl);
+			$list = $curl->post($apiUrl);
 			return $list;
 			//$decode=Json::decode($list); 
 		}else{
@@ -310,7 +309,7 @@ class InfoController extends Controller
 			$curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
 			$curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
 			$curl->setOption(CURLOPT_TIMEOUT, 180);
-			$list = $curl->get($apiUrl);
+			$list = $curl->post($apiUrl);
 			//$decode=Json::decode($list); 
 			return $list;
 		}else{
@@ -343,7 +342,7 @@ class InfoController extends Controller
 			$curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
 			$curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
 			$curl->setOption(CURLOPT_TIMEOUT, 180);
-			$list = $curl->get($apiUrl);
+			$list = $curl->post($apiUrl);
 		
 			return $list;
 		}	
@@ -355,18 +354,18 @@ class InfoController extends Controller
 		}
 	}	
 	
-	public function actionGetcountunread($userid){
+	public function actionGetcountunread(){
 		if(isset($_SESSION['usertoken'])){
 			
 
 			$userid= $_SESSION['userid'];
-			
+			$token= $_SESSION['usertoken'];
 			$my_var = \Yii::$app->request->post();
 			
 			$authorization = "Authorization: Bearer ".$token; 
-			$apiUrl=$this->source.'countunread';
+			$apiUrl=$this->source.'countunread?userid='.$userid;
 			$params = [
-				'userid' => $my_var['userid']
+				'userid' => $userid
 			];
 			$curl = new curl\Curl();
 			$curl->setRequestBody(json_encode($params));
@@ -374,7 +373,7 @@ class InfoController extends Controller
 			$curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
 			$curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
 			$curl->setOption(CURLOPT_TIMEOUT, 180);
-			$list = $curl->get($apiUrl);
+			$list = $curl->post($apiUrl);
 		
 			return $list;
 		}	
@@ -385,6 +384,39 @@ class InfoController extends Controller
 			]);
 		}
 	}
+	
+	public function actionReadmessage(){
+		if(isset($_SESSION['usertoken'])){
+			
+
+			$userid= $_SESSION['userid'];
+			$token= $_SESSION['usertoken'];
+			$my_var = \Yii::$app->request->post();
+			$id=$my_var['id'];
+			
+			$authorization = "Authorization: Bearer ".$token; 
+			$apiUrl=$this->source.'readmessage?userid='.$id;
+			/*$params = [
+				'userid' => $my_var['recipientid']
+			]; */
+			$curl = new curl\Curl();
+			//$curl->setRequestBody(json_encode($params));
+			$curl->setOption(CURLOPT_HTTPHEADER, ['Content-Type: application/json' , $authorization]);
+			$curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
+			$curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
+			$curl->setOption(CURLOPT_TIMEOUT, 180);
+			$list = $curl->post($apiUrl);
+		
+			return $list;
+		}	
+		else{
+			$model = new LoginForm();
+			return $this->render('login', [
+			'model' => $model
+			]);
+		}
+	}
+	
 	
 	
 }
