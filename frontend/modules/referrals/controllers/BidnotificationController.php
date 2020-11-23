@@ -107,8 +107,8 @@ class BidnotificationController extends Controller
         if(isset(Yii::$app->user->identity->profile->rstl_id)){
             $rstlId = (int) Yii::$app->user->identity->profile->rstl_id;
             $function = new ReferralComponent();
-            $count_all_notifications = json_decode($function->countAllNotification($rstlId),true);
-            $bidNotification = json_decode($function->listUnseenBidNofication($rstlId),true);
+            $count_all_notifications = $function->countAllNotification($rstlId);
+            $bidNotification = $function->listUnseenBidNofication($rstlId);
 			
 			if($bidNotification == false){
 				return Json::encode(['bid_notification'=>null,'all_notifications'=>null]);

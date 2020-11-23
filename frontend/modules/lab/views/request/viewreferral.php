@@ -1,5 +1,4 @@
 <?php
-
 use yii\helpers\Html;
 use kartik\detail\DetailView;
 use kartik\grid\GridView;
@@ -679,8 +678,8 @@ if($requeststatus > 0 && $notified == 1 && $hasTestingAgency > 0 && !empty($mode
                     'header' => 'Estimated due date',
                     'enableSorting' => false,
                     'value' => function($data) use ($model,$referralcomp,$rstlId){
-                        $estimated_due = json_decode($referralcomp->getDuedate($model->request_id,$rstlId,$data['agency_id']),true);
-                        return $estimated_due == 0 ? null : date('F j, Y',strtotime($estimated_due));
+                        $estimated_due = $referralcomp->getDuedate($model->request_id,$rstlId,$data['agency_id']);
+                        return $estimated_due == 0 ? "No Data" : date('F j, Y',strtotime($estimated_due));
                     },
                    'contentOptions' => [
                         'style'=>'max-width:100px; overflow: auto; white-space: normal; word-wrap: break-word;'
@@ -696,7 +695,11 @@ if($requeststatus > 0 && $notified == 1 && $hasTestingAgency > 0 && !empty($mode
                     'dropdownOptions' => ['class' => 'pull-right'],
                     'headerOptions' => ['class' => 'kartik-sheet-style'],
                     'buttons' => [
-                        'notification' => function ($url, $data) use ($model,$referralcomp,$rstlId) {
+                        'notification' => function ($url, $data) use ($model,$referralcomp,$rstlId,$multiagency) {
+
+                            //if multiple agency then dont proceed
+                            if((int)$multiagency>1)
+                                return '<span class="label label-danger">Notification Disabled</span>';
 
                             $checkActive = $referralcomp->checkActiveLab($model->lab_id,$data['agency_id']);
                             $checkNotify = $referralcomp->checkNotify($model->request_id,$data['agency_id']);
@@ -935,7 +938,7 @@ if($requeststatus > 0 && $notified == 1 && $hasTestingAgency > 0 && !empty($mode
                     ],
                 ]);
             } else {
-                echo !empty($model->request_ref_num) ? "" : Html::button('<span class="glyphicon glyphicon-share"></span> Open for Bidding', ['value'=>Url::toRoute(['/referrals/referral/open','request_id'=>$model->request_id]), 'onclick'=>'openBidding(this.value,this.title)', 'class' => 'btn btn-success','title' => 'Open for Bidding']);
+                // echo !empty($model->request_ref_num) ? "" : Html::button('<span class="glyphicon glyphicon-share"></span> Open for Bidding', ['value'=>Url::toRoute(['/referrals/referral/open','request_id'=>$model->request_id]), 'onclick'=>'openBidding(this.value,this.title)', 'class' => 'btn btn-success','title' => 'Open for Bidding']);
             }
         ?>
         </div>

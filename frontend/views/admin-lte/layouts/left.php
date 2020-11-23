@@ -37,25 +37,30 @@ if(Yii::$app->user->isGuest){
     }else{
        $UsernameDesignation=$CurrentUserName.'<br>'.$CurrentUserDesignation;
     }
+ //    //runs the action that gets all of the notification, btc was here, returns json encoded respponse
+	// $unresponded_notification = json_decode(Yii::$app->runAction('/referrals/notification/count_unresponded_notification'));
+    
+ //    //checks if there are any notification response and displays them otherwise displays none, btc was here
+	// $unresponded = $unresponded_notification->num_notification > 0 ? $unresponded_notification->num_notification : ''; //no display if 0
+
+	// //same as the first notification but only gets all of the unseen bidding notification, btc was here, returns json encoded response
+	// $unseen_bid_notification = json_decode(Yii::$app->runAction('/referrals/bidnotification/count_unseen_bidnotification'));
+
+ //    //display all or nothing, hmm btc was here
+	// $unseen = $unseen_bid_notification['bid_notification'] > 0 ? $unseen_bid_notification['bid_notification'] : '';
   
-	/*$unresponded_notification = json_decode(Yii::$app->runAction('/referrals/notification/count_unresponded_notification'),true);
-	$unresponded = $unresponded_notification['num_notification'] > 0 ? $unresponded_notification['num_notification'] : ''; //no display if 0
-	
-	 $unseen_bid_notification = json_decode(Yii::$app->runAction('/referrals/bidnotification/count_unseen_bidnotification'),true);
-	 $unseen = $unseen_bid_notification['bid_notification'] > 0 ? $unseen_bid_notification['bid_notification'] : '';
-  */
     //notification will run if the user is already logged in
-	// $this->registerJs("
-	// 	setInterval(function(e){
-	// 		get_unresponded_notifications();
-	// 	}, 30000);
-	// ");
+	$this->registerJs("
+		setInterval(function(e){
+			get_unresponded_notifications();
+		}, 30000);
+	");
 	
-	// $this->registerJs("
-	// 	setInterval(function(e){
-	// 		get_unseen_bidnotifications();
-	// 	}, 30000);
-	// ");
+	$this->registerJs("
+		setInterval(function(e){
+			get_unseen_bidnotifications();
+		}, 30000);
+	");
 }
 ?>
 <aside class="main-sidebar">
@@ -131,17 +136,18 @@ if(Yii::$app->user->isGuest){
 
 
                 //delete this 3 line if we gonna use the new referral
-                $numNotification = '';
-                $template = '<a href="{url}">{label}</a>';
-                $showURL = [$mItem->url];
+                // $numNotification = '';
+                // $template = '<a href="{url}">{label}</a>';
+                // $showURL = [$mItem->url];
                 
                 //uncomment this line if we gonna use the new referral
-                /**
-				if($mItem->extra_element == 1){
+                
+
+				if($mItem->extra_element == 1){//1 is for the referral notification
 					$numNotification = '&nbsp;&nbsp;<span class="label label-danger" id="count_noti_sub_referral">'.$unresponded.'</span>';
 					$showURL = '#';
 					$template = '<a href="{url}" onclick="showNotifications()" id="btn_unresponded_referral">{label}</a>';
-				} elseif ($mItem->extra_element == 2) {
+				} elseif ($mItem->extra_element == 2) {//2 is for the bidding notification
 					$numNotification = '&nbsp;&nbsp;<span class="label label-danger" id="count_noti_sub_bid">'.$unseen.'</span>';
 					$showURL = '#';
 					$template = '<a href="{url}" onclick="showBidNotifications()" id="btn_unseen_bid">{label}</a>';
@@ -151,7 +157,7 @@ if(Yii::$app->user->isGuest){
 					$showURL = [$mItem->url];
 				}
 
-                */
+                
                 $ItemS=[
                    'label' =>'<img src="/images/icons/' .$mItem->icon. '.png" style="width:20px">  <span>' . $mItem->Package_Detail . $numNotification . '</span>', 
                    'icon'=>' " style="display:none;width:0px"',
@@ -232,50 +238,50 @@ if(Yii::$app->user->isGuest){
 
 </aside>
 <script type="text/javascript">
-	//referral notifications
-	// function showNotifications(){
-	// 	$.ajax({
-	// 		url: '/referrals/notification/list_unresponded_notification',
-	// 		//url: '',
-	// 		success: function (data) {
-	// 			$(".modal-title").html('Referral Notifications');
-	// 			$('#modalNotification').modal('show')
-	// 				.find('#modalBody')
-	// 				.load('/referrals/notification/list_unresponded_notification');
-	// 				get_unresponded_notifications();
-	// 			$(".content-image-loader").css("display", "none");
-	// 			$('.content-image-loader').removeClass('content-img-loader');
-	// 		},
-	// 		beforeSend: function (xhr) {
-	// 			$(".content-image-loader").css("display", "block");
-	// 			$('.content-image-loader').addClass('content-img-loader');
-	// 		}
-	// 	});
+	// referral notifications
+	function showNotifications(){
+		$.ajax({
+			url: '/referrals/notification/list_unresponded_notification',
+			//url: '',
+			success: function (data) {
+				$(".modal-title").html('Referral Notifications');
+				$('#modalNotification').modal('show')
+					.find('#modalBody')
+					.load('/referrals/notification/list_unresponded_notification');
+					get_unresponded_notifications();
+				$(".content-image-loader").css("display", "none");
+				$('.content-image-loader').removeClass('content-img-loader');
+			},
+			beforeSend: function (xhr) {
+				$(".content-image-loader").css("display", "block");
+				$('.content-image-loader').addClass('content-img-loader');
+			}
+		});
 
- //        return false;
-	// }
-	//bid notifications
-	// function showBidNotifications(){
-	// 	$.ajax({
-	// 		url: '/referrals/bidnotification/list_unseen_bidnotification',
-	// 		//url: '',
-	// 		success: function (data) {
-	// 			$(".modal-title").html('Bid Notifications');
-	// 			$('#modalBidNotification').modal('show')
-	// 				.find('#modalBody')
-	// 				.load('/referrals/bidnotification/list_unseen_bidnotification');
-	// 				get_unseen_bidnotifications();
-	// 			$(".content-image-loader").css("display", "none");
-	// 			$('.content-image-loader').removeClass('content-img-loader');
-	// 		},
-	// 		beforeSend: function (xhr) {
-	// 			$(".content-image-loader").css("display", "block");
-	// 			$('.content-image-loader').addClass('content-img-loader');
-	// 		}
-	// 	});
+        return false;
+	}
+	// bid notifications
+	function showBidNotifications(){
+		$.ajax({
+			url: '/referrals/bidnotification/list_unseen_bidnotification',
+			//url: '',
+			success: function (data) {
+				$(".modal-title").html('Bid Notifications');
+				$('#modalBidNotification').modal('show')
+					.find('#modalBody')
+					.load('/referrals/bidnotification/list_unseen_bidnotification');
+					get_unseen_bidnotifications();
+				$(".content-image-loader").css("display", "none");
+				$('.content-image-loader').removeClass('content-img-loader');
+			},
+			beforeSend: function (xhr) {
+				$(".content-image-loader").css("display", "block");
+				$('.content-image-loader').addClass('content-img-loader');
+			}
+		});
 
- //        return false;
-	// }
+        return false;
+	}
 	$("#btn_unresponded_referral").on('click', function(e) {
 		e.preventDefault();
 	});

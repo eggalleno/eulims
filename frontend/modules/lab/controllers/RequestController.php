@@ -239,6 +239,7 @@ class RequestController extends Controller
                 'countBid' => $countBid,
                 'countBidnotice' => $countBidnotice,
                 'noSampleCode' => $noSampleCode,
+                'multiagency'=>count($agency)
             ]);
 
         } else {

@@ -189,6 +189,64 @@ if(isset($_SESSION['usertoken'])){
                         </li>
                     </ul>
                 </li>
+                <li class="dropdown messages-menu">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                        <i class="fa fa-bell-o"></i>
+                        <span class="label label-success" id="top_notif_header"></span>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li class="header">
+                        	<span class="label label-success" id="mid_notif_header">0</span>
+                        	Referral
+                    	</li>
+                        <li>
+                        	<ul class="menu">
+                                <li><!-- start message -->
+                                    
+                                    <a href="#">
+                                            <div >
+                                                <span><?= "Username Here"?></span>
+                                            </div>
+                                            <h4>
+                                                <?= "Message Title"?>
+                                                <small><i class="fa fa-clock-o"></i> <?= "DateTime" ?></small>
+                                            </h4>
+                                            <p><?= "The Message"?></p>
+                                        </a> 
+                                    
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="header">
+                        	<span class="label label-success" id="mid_notif_header">0</span>
+                        	Bid
+                    	</li>
+                        <li>
+                         	<ul class="menu">
+                                <li><!-- start message -->
+                                    <?php $x=1; while ( $x<= 3) { //temporary
+                                    ?>
+                                    	<a href="#">
+                                            <div >
+                                                <span><?= "Username Here"?></span>
+                                            </div>
+                                            <h4>
+                                                <?= "Message Title"?>
+                                                <small><i class="fa fa-clock-o"></i> <?= "DateTime" ?></small>
+                                            </h4>
+                                            <p><?= "The Message"?></p>
+                                        </a>
+
+                                    <?php	$x++;
+                                    }?> 
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="footer">
+                            <!-- <a href="<?= Url::to($GLOBALS['frontend_base_uri'].'message/message/inbox') ?>">View all Messages</a> -->
+                        </li>
+                    </ul>
+                </li>
                 <li class="dropdown user user-menu">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown">
 
@@ -326,11 +384,15 @@ function mes(id,type) {
 		const user_id=<?php 
 		if(isset($_SESSION['userid'])){
 			echo json_encode($_SESSION['userid']);
+		}else{
+			echo 0;
 		}
 		?>;
 		const token =<?php 
 		if(isset($_SESSION['usertoken'])){
 			echo json_encode($_SESSION['usertoken']);
+		}else{
+			echo 0;
 		}
 		?>;
 		
@@ -443,6 +505,8 @@ function sendmessage() {
 		const token =<?php 
 		if(isset($_SESSION['usertoken'])){
 			echo json_encode($_SESSION['usertoken']);
+		}else{
+			echo 0;
 		}
 		?>;
 		var formData = new FormData($('form')[0]);
@@ -595,6 +659,8 @@ function sendchat(txt) {
    const token =<?php 
 	if(isset($_SESSION['usertoken'])){
 		echo json_encode($_SESSION['usertoken']);
+	}else{
+		echo 0;
 	}
 	?>;
    var id=$('#dataid').text();
@@ -603,6 +669,8 @@ function sendchat(txt) {
    const sender_userid=<?php 
 		if(isset($_SESSION['userid'])){
 			echo json_encode($_SESSION['userid']);
+		}else{
+			echo 0;
 		}
 	?>;
 	$.ajax({
@@ -647,10 +715,12 @@ function getprofile(id) {
 	const token =<?php 
 	if(isset($_SESSION['usertoken'])){
 		echo json_encode($_SESSION['usertoken']);
+	}else{
+		echo 0;
 	}
 	?>;
 	$.ajax({
-		url: "/chat/info/profile", //API LINK FROM THE CENTRAL
+		url: "/chat/info/profile", //API LINK FROM THE CENTRAL	
 		type: 'POST',
 		dataType: "JSON",
 		data: {
