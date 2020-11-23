@@ -275,7 +275,6 @@ class RestcustomerController extends \yii\rest\Controller
         $bookling->customer_id = $this->getuserid();
         $bookling->booking_status = 0;
         $bookling->purpose = $my_var['Purpose'];
-        $bookling->modeofrelease_ids = $my_var['Modeofrelease'];
         $bookling->customerstat = 1;
 
         if($bookling->save(false)){
@@ -320,7 +319,7 @@ class RestcustomerController extends \yii\rest\Controller
             ]); 
         }
     }
-    public function actionListmode(){
+    /*public function actionListmode(){
         $model = Modeofrelease::find()->select(['modeofrelease_id','mode','status'])->where(['status'=>1])->orderBy('mode ASC')->all();
 
         if($model){
@@ -333,7 +332,7 @@ class RestcustomerController extends \yii\rest\Controller
                 'message' => 'No data Found',
             ]); 
         }
-    }
+    }*/
 
     public function actionGetbookings(){
         $my_var = Booking::find()->where(['customer_id'=>$this->getuserid()])->orderby('scheduled_date DESC')->all();
@@ -355,21 +354,9 @@ class RestcustomerController extends \yii\rest\Controller
          ->orderby('scheduled_date DESC')
          ->all();
 
-         // var_dump($my_var); exit;
          return $this->asJson(
             $my_var
         );  
-       /* if($my_var){
-        return $this->asJson(
-            $my_var
-        );    
-        }
-        else{
-            return $this->asJson([
-                'success' => false,
-                'message' => 'No data Found',
-            ]);
-        }*/
     }
 
     public function actionMailcode($email){
@@ -514,7 +501,7 @@ class RestcustomerController extends \yii\rest\Controller
             ); 
         }
     }
-    public function actionGetquotation($keyword){
+    /*public function actionGetquotation($keyword){
         $model = Testnamemethod::find()
         ->select(['testname_method_id','testname_id'=> 'tbl_testname.testName', 'method_id'=> 'tbl_methodreference.fee', 'workflow'=> 'tbl_methodreference.method', 'lab_id'=> 'tbl_lab.labname'])
         ->joinWith(['testname'])
@@ -527,17 +514,14 @@ class RestcustomerController extends \yii\rest\Controller
                 $model
             ); 
         }
-    }
+    }*/
 
     public function actionGettestnames($keyword){
         $model= Testname::find()
         ->select([
             'testname_id',
             'testName'
-        ])
-        /*->where(['like', 'testName', $keyword. '%', false])
-        ->limit(10)*/
-        ->all();
+        ])->all();
 
         if($model){
             return $this->asJson(
@@ -562,37 +546,13 @@ class RestcustomerController extends \yii\rest\Controller
                 'fee' => $model->method->fee,
             ];
         }
-
-
-        
         return $this->asJson(
             $methodfee
         ); 
     
     }
+
     public function actionGetcustomerquotation(){
-       /* $querySql = Yii::$app->labdb->createCommand("SELECT a.testname_method_id, b.testName, b.testname_id, c.method, c.reference, c.fee, d.labname, a.lab_id
-            from tbl_testname_method AS a
-      INNER JOIN tbl_testname AS b ON a.testname_id = b.testname_id
-      LEFT JOIN tbl_methodreference AS c ON a.method_id = c.method_reference_id
-      INNER JOIN tbl_lab as d ON a.lab_id = d.lab_id
-      ORDER BY a.lab_id ASC, b.testName ASC") ->queryAll();
-        $arrayTestname =array();
-        foreach ($querySql as $eachRow)
-        {
-         $recData=array();
-        //  $recFeesData['type']='column';
-          
-          $recData['testname_method_id'] = $eachRow['testname_method_id'];
-          $recData['testName'] =  $eachRow['testName'];
-          $recData['testname_id'] = $eachRow['testname_id'];
-          $recData['method'] =  $eachRow['method'];
-          $recData['reference'] = $eachRow['reference'];
-          $recData['fee'] =  $eachRow['fee'];
-          $recData['labname'] = $eachRow['labname'];
-          $recData['lab_id'] = $eachRow['lab_id'];
-          array_push($arrayTestname,$recData);
-        };*/
         $query = Yii::$app->labdb->createCommand("SELECT b.testname_id, b.testName, d.labname, a.lab_id
                                                   FROM tbl_testname_method AS a
                                                   INNER JOIN tbl_testname AS b ON a.testname_id = b.testname_id
@@ -616,7 +576,6 @@ class RestcustomerController extends \yii\rest\Controller
 
         //Save customer Quotation
         public function actionSetquotation(){
-                // return false; exit;    
            $my_var = \Yii::$app->request->post();
 
 
@@ -627,16 +586,18 @@ class RestcustomerController extends \yii\rest\Controller
             ]); 
        }
 
-        //attributes Purpose, Sample Quantity, Sample type, Sample Name and Description, schedule date and datecreated
         $quot = new Quotation;
-        //$bookling->scheduled_date = $my_var['Schedule Date'];
-        //$bookling->booking_reference = '34ertgdsg'; //reference how to generate? is it before save? or 
-       // $quot->quotation_id = $my_var[''];
+        
         $quot->customer_id = $my_var['customer_id'];
         $quot->content = $my_var['content'];
         $quot->status_id = $my_var['status_id'];
         $quot->qty = $my_var['qty'];
+        $quot->sampletype = $my_var['sampletype'];
+        $quot->sampledescription = $my_var['sampledescription'];
+        $quot->sendcopy = $my_var['sendcopy'];
+        $quot->remarks = $my_var['remarks'];
         $quot->rstl_id = $my_var['rstl_id'];
+        $quot->attachment = $my_var['attachment'];
 
         if($quot->save()){
             return $this->asJson([
@@ -651,11 +612,8 @@ class RestcustomerController extends \yii\rest\Controller
                 'data' => null,
             ]); 
         }
-  //       }
-  // //Yii::$app->labdb->createCommand("CALL spPerformanceDashboardRealtime('" . $kpirec . "'," . $currentmonth . ",'" . $currentmonthchar  . "',". $currentyear .",'Accomplishments','". $rstlId ."');")->execute();
-      // return $this->asJson($qout);
-
     }
+
     public function actionLaboratorylist(){
         $model = Lab::find()->orderby(['lab_id'=>SORT_ASC])->all();
         return $this->asJson($model);
@@ -663,7 +621,7 @@ class RestcustomerController extends \yii\rest\Controller
 
     //this function will return list of sampletype using the the labid , btc
     //cann trigger this during lab dropdown on change event
-    public function actionSampletypebylab($lab_id){
+   /* public function actionSampletypebylab($lab_id){
         $model = Testnamemethod::find()
             ->joinWith('sampletype')
             ->select(['tbl_testname_method.sampletype_id','tbl_sampletype.type'])
@@ -697,5 +655,5 @@ class RestcustomerController extends \yii\rest\Controller
             ->all();
 
         return $this->asJson($model);
-    }
+    }*/
 }

@@ -41,6 +41,8 @@ use yii\data\ArrayDataProvider;
 use common\models\lab\Lab;
 
 use common\components\Notification;
+use common\models\inventory\Equipmentservice; //use to check calibration schedule
+use common\models\inventory\InventoryEntries; //use to check expiry of products
 
 //use yii\helpers\Url;
 /**
@@ -934,7 +936,7 @@ class RequestController extends Controller
             return 0;
         }
     }
-	
+	//egg notify customer if test report is available
 	 public function actionNotifysms($id,$reqid,$refnum)
     {
        $id = $_GET['id'];
@@ -948,14 +950,16 @@ class RequestController extends Controller
 		if($email){
 			$notif->sendEmail($email,$refnum);	
 		}
+		$rstlid=Yii::$app->user->identity->profile->rstl_id;
 		$title="Test Report";
 		$mes= "Good Day dear customer! Your test report for reference#: ".$refnum." is ready and available for pick-up.";
-		$res=$notif->sendSMS("", "", $contactnum, $title, $mes, "eULIMS", $this->module->id,$this->action->id);
+		$res=$notif->sendSMS("", $rstlid, $contactnum, $title, $mes, "eULIMS", $this->module->id,$this->action->id);
 		$decode=Json::decode($res);
-		Yii::$app->session->setFlash('success',$decode["data"] );
+		//Yii::$app->session->setFlash('success',$decode["data"] );
+		Yii::$app->session->setFlash('success',"Successfully notified the customer");
 		return $this->redirect(['index']); 
     }
-	
+	//egg report due
 	 public function actionNotifyreportdue()
     {
 	  // $todaydate=date("Y-m-d");
@@ -972,14 +976,67 @@ class RequestController extends Controller
 				 if($contactnum){
 					 $notif= new Notification();
 					 $mes= "Hello dear analyst! There is a request due tomorrow with reference#: ".$refnum;
-					 $res=$notif->sendSMS("", "", $contactnum, $title, $mes, "eULIMS", $this->module->id,$this->action->id);
+					 $res=$notif->sendSMS("", $rstlid, $contactnum, $title, $mes, "eULIMS", $this->module->id,$this->action->id);
 					 $decode=Json::decode($res); 
 				 }
 			}
            $countdue++;
 		}
 		
+		$this->Notifysched();
+		$this->Notifyexpiry();
 		Yii::$app->session->setFlash('success',$countdue ." request(s) due tomorrow!");
 		return $this->redirect(['index']); 
+    }
+	//egg Calibration schedule
+	 public function Notifysched()
+    {
+	   $tomorrow = date("Y-m-d", strtotime("+1 day"));
+       $sched = Equipmentservice::find()->where(['startdate' => $tomorrow])->all();
+	  
+		$countdue=0;
+		foreach ($sched as $res){
+			$users = Profile::find()->where(['designation' => 'Lab Analyst'])->andWhere(['lab_id' => '3'])->all(); //Metro
+			$title="Calibration Schedule";
+			$item=$res->inventoryTransactions->product_name;
+			
+			foreach ($users as $analyst){
+				 $contactnum = $analyst->contact_numbers;	
+				 if($contactnum){
+					 $notif= new Notification();
+					 $mes= "Hello dear analyst! There is a scheduled calibration for tomorrow with Product Name: ".$item;
+					 $res=$notif->sendSMS("", $rstlid, $contactnum, $title, $mes, "eULIMS", "Inventory","Calibration Schedule");
+					 $decode=Json::decode($res); 
+				 }
+			}
+		}
+        
+		return; 
+    }
+	
+	//egg Near product Expiry
+	 public function Notifyexpiry()
+    {
+	   $tomorrow = date("Y-m-d", strtotime("+3 day"));
+       $sched = InventoryEntries::find()->where(['expiration_date' => $tomorrow])->all();
+	  
+		$countdue=0;
+		foreach ($sched as $res){
+			$users = Profile::find()->where(['designation' => 'Lab Analyst'])->andWhere(['lab_id' => '1'])->all(); //Metro
+			$title="Near Product Expiry";
+			$item=$res->product->product_name;
+			
+			foreach ($users as $analyst){
+				 $contactnum = $analyst->contact_numbers;	
+				 if($contactnum){
+					 $notif= new Notification();
+					 $mes= "Hello dear analyst! There is a product of near expiry date in 3days with Product Name: ".$item;
+					 $res=$notif->sendSMS("", $rstlid, $contactnum, $title, $mes, "eULIMS", "Inventory","Calibration Schedule");
+					 $decode=Json::decode($res); 
+				 }
+			}
+		}
+        
+		return; 
     }
 }

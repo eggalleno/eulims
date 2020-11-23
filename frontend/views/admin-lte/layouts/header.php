@@ -81,7 +81,7 @@ $this->registerJsFile("/js/intro.js", [
 ], 'js-intro');
 
 $session = Yii::$app->session;
-$source = 'https://eulims.onelab.dost.gov.ph/api/message/'; //API LINK
+$source = 'http://eulims.onelab.ph/api/message/'; //API LINK
 $sourcetoken="";
 $flag="";
 $contacts="";
@@ -117,21 +117,11 @@ if(isset($_SESSION['usertoken'])){
 	
 	$contacts=$decode; 
 	
-
-	$countunreadurl=$source.'countunread?userid='.$userid;
-	$countunreadcurl = new curl\Curl();
-	$countunreadcurl->setOption(CURLOPT_HTTPHEADER, ['Content-Type: application/json' , $authorization]);
-	$countunreadcurl->setOption(CURLOPT_SSL_VERIFYPEER, false);
-	$countunreadcurl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
-	$countunreadcurl->setOption(CURLOPT_TIMEOUT, 180);
-	$countunreadlist = $countunreadcurl->get($countunreadurl);
-	$countunread=Json::decode($countunreadlist);
+    $countunread=0;
 	
-	//var_dump($countunread);
-	//exit;
 	$flag=1;
 	?>
-	<button class="open-button" onclick="openForm()"><span class="label label-success"><?= $countunread ?></span><i class="fa fa-commenting-o"></i></button>		
+	<button class="open-button" onclick="openForm()"><span id="counterunread" class="label label-success"></span><i class="fa fa-commenting-o"></i></button>		
     <?php
 }else{
 	$flag=0;
@@ -140,9 +130,6 @@ if(isset($_SESSION['usertoken'])){
 	
 	 
 	<?php
-		//return $this->render('login', [
-		//'model' => $model
-		//]);
 	
 }	
 
@@ -379,6 +366,7 @@ var profname ="";
 var flag="";
 function mes(id,type) {
 	flag=<?=$flag?>;
+	//var type=1;
 	if(flag == "1"){
 		$("#recipientid").val(id);
 		const user_id=<?php 
@@ -395,14 +383,28 @@ function mes(id,type) {
 			echo 0;
 		}
 		?>;
-		
+		   if (id != ""){
+				$.ajax({
+					url: "/chat/info/readmessage", //API LINK FROM THE CENTRAL
+					type: 'POST',
+					dataType: "JSON",
+					data: {
+						id:id
+					},
+					success: function(response) {
+						//return response.fullname;
+					},
+					error: function(xhr, status, error) {
+						//alert(error);
+						location.reload();
+					}
+				}); 
+		   }
+
 			$.ajax({
 			url: "/chat/info/getcontact", //API LINK FROM THE CENTRAL
 			type: 'POST',
 			dataType: "JSON",
-			beforeSend: function (xhr) {
-				xhr.setRequestHeader('Authorization', 'Bearer '+ token);
-			}, 
 			data: {
 				userid: user_id,
 				recipientid: id,
@@ -414,7 +416,6 @@ function mes(id,type) {
 				x="";
 				x = x+'<br>';
 				for(y=0;y<response.chat.length;y++){
-				//x = x+ response.chat[y].sender_userid;
 					var dt=new Date(response.chat[y].timestamp);
 					dt=formatAMPM(dt);
 					x = x+'<div>';
@@ -431,7 +432,7 @@ function mes(id,type) {
 						if(messagetype == 1){
 							x = x+"<p class='message-content'>"+response.chat[y].chat_data+"</p>";	
 						}else{
-							x= x+ "<a href='https://eulims.onelab.dost.gov.ph/uploads/message/"+response.chat[y].chat_data+"' download>"+response.chat[y].chat_data+"</a>";
+							x= x+ "<a href='http://eulims.onelab.ph/uploads/message/"+response.chat[y].chat_data+"' download>"+response.chat[y].chat_data+"</a>";
 						}
 						
 						x = x+"<div class='message-timestamp-left'>"+dt+"</div>";
@@ -444,7 +445,7 @@ function mes(id,type) {
 						if(messagetype == 1){
 							x = x+"<p class='message-content'>"+response.chat[y].chat_data+"</p>";	
 						}else{
-							x= x+ "<a href='https://eulims.onelab.dost.gov.ph/uploads/message/"+response.chat[y].chat_data+"' download>"+response.chat[y].chat_data+"</a>";
+							x= x+ "<a href='http://eulims.onelab.ph/uploads/message/"+response.chat[y].chat_data+"' download>"+response.chat[y].chat_data+"</a>";
 						}
 						x = x+"<div class='message-timestamp-right'>"+dt+"</div>";
 						x = x+"</div>";
@@ -477,7 +478,8 @@ function mes(id,type) {
 				
 			},
 			error: function(xhr, status, error) {
-				alert(error);
+				//alert(error);
+				location.reload();
 			}
 			});  
 			
@@ -512,7 +514,7 @@ function sendmessage() {
 		var formData = new FormData($('form')[0]);
 		
 		$.ajax({
-			url: "https://eulims.onelab.dost.gov.ph/api/message/savefile", //API LINK FROM THE CENTRAL
+			url: "http://eulims.onelab.ph/api/message/savefile", //API LINK FROM THE CENTRAL
 			type: 'POST',
 			dataType: "JSON",
 			beforeSend: function (xhr) {
@@ -533,7 +535,8 @@ function sendmessage() {
 				
 			},
 			error: function(xhr, status, error) {
-				alert(error);
+				//alert(error);
+				location.reload();
 			},
 			cache: false,
 			contentType: false,
@@ -573,7 +576,7 @@ window.setInterval(function(){
    else{
 	  mes(id,type); 
    } 
-  
+   countunread();
    
   
 }, 5000);
@@ -692,7 +695,7 @@ function sendchat(txt) {
 			if(type == 1){
 				x = x+"<p class='message-content'>"+txt+"</p>";
 			}else{
-				x= x+ "<a href='https://eulims.onelab.dost.gov.ph/uploads/message/"+txt+"' download>"+txt+"</a>";
+				x= x+ "<a href='http://eulims.onelab.ph/uploads/message/"+txt+"' download>"+txt+"</a>";
 			}
 			
 			
@@ -703,7 +706,8 @@ function sendchat(txt) {
 			$('#popchatbody').html(x); 
 		},
 		error: function(xhr, status, error) {
-			alert(error);
+			//alert(error);
+			location.reload();
 		}
 	}); 	
 }
@@ -730,8 +734,45 @@ function getprofile(id) {
 			return response.fullname;
 		},
 		error: function(xhr, status, error) {
-			alert(error);
+			//alert(error);
+			location.reload();
 		}
 	}); 	
 }
+
+function countunread() {
+	const userid=<?php 
+		if(isset($_SESSION['userid'])){
+			echo json_encode($_SESSION['userid']);
+		}
+	?>;	
+	
+	if (userid != ""){
+		$.ajax({
+			url: "/chat/info/getcountunread", //API LINK FROM THE CENTRAL
+			type: 'POST',
+			dataType: "JSON",
+			data: {
+				userid:userid
+			},
+			success: function(response) {
+				//alert(response);
+				if(response == 0){
+					document.getElementById('counterunread').style.display = 'none';
+				}
+				else{
+					document.getElementById('counterunread').style.display = 'block';
+					$("#counterunread").html(response);
+				}
+				
+			},
+			error: function(xhr, status, error) {
+				//alert(error);
+				location.reload();
+			}
+		});  
+	}
+	
+}
+
  </script>

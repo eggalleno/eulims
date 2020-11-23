@@ -99,7 +99,7 @@ $this->registerJs($js);
 	   var token=<?php echo json_encode($_SESSION['usertoken'])?>;
 	   var sender_userid= <?php echo json_encode($_SESSION['userid'])?>;
 		$.ajax({
-			url: "https://eulims.onelab.dost.gov.ph/api/message/setgroup", //API LINK FROM THE CENTRAL
+			url: "http://eulims.onelab.ph/api/message/setgroup", //API LINK FROM THE CENTRAL
 			type: 'POST',
 			dataType: "JSON",
 			beforeSend: function (xhr) {
