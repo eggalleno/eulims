@@ -953,7 +953,8 @@ class RequestController extends Controller
 		$mes= "Good Day dear customer! Your test report for reference#: ".$refnum." is ready and available for pick-up.";
 		$res=$notif->sendSMS("", "", $contactnum, $title, $mes, "eULIMS", $this->module->id,$this->action->id);
 		$decode=Json::decode($res);
-		Yii::$app->session->setFlash('success',$decode["data"] );
+		//Yii::$app->session->setFlash('success',$decode["data"] );
+		Yii::$app->session->setFlash('success',"Successfully notified the customer");
 		return $this->redirect(['index']); 
     }
 	//egg report due
