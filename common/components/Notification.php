@@ -30,21 +30,6 @@ class Notification extends Component {
 		 return $response;
     }
     
-    /*public function sendEmail($hash, $sender, $recipient, $title, $message, $via, $module, $action)
-    {
-        $recipients = explode(',', $recipient);
-
-        for($i=0; $i<count($recipients); $i++)
-        {
-            Yii::$app->mailer->compose()
-            //Yii::$app->mailer->compose(['html' => 'html', 'text' => 'passwordResetToken-text'], ['user' => 'aris'])
-            ->setFrom([Yii::$app->params['supportEmail'] => Yii::$app->name . ' Mailer'])
-            ->setTo($recipients[$i])
-            ->setSubject($title)
-            ->setHtmlBody($message)
-            ->send();
-        }
-    } */
 	
 	public function sendEmail($email,$refnum)
     {

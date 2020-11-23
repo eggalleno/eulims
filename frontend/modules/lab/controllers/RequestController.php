@@ -949,9 +949,10 @@ class RequestController extends Controller
 		if($email){
 			$notif->sendEmail($email,$refnum);	
 		}
+		$rstlid=Yii::$app->user->identity->profile->rstl_id;
 		$title="Test Report";
 		$mes= "Good Day dear customer! Your test report for reference#: ".$refnum." is ready and available for pick-up.";
-		$res=$notif->sendSMS("", "", $contactnum, $title, $mes, "eULIMS", $this->module->id,$this->action->id);
+		$res=$notif->sendSMS("", $rstlid, $contactnum, $title, $mes, "eULIMS", $this->module->id,$this->action->id);
 		$decode=Json::decode($res);
 		//Yii::$app->session->setFlash('success',$decode["data"] );
 		Yii::$app->session->setFlash('success',"Successfully notified the customer");
@@ -974,7 +975,7 @@ class RequestController extends Controller
 				 if($contactnum){
 					 $notif= new Notification();
 					 $mes= "Hello dear analyst! There is a request due tomorrow with reference#: ".$refnum;
-					 $res=$notif->sendSMS("", "", $contactnum, $title, $mes, "eULIMS", $this->module->id,$this->action->id);
+					 $res=$notif->sendSMS("", $rstlid, $contactnum, $title, $mes, "eULIMS", $this->module->id,$this->action->id);
 					 $decode=Json::decode($res); 
 				 }
 			}
@@ -1003,7 +1004,7 @@ class RequestController extends Controller
 				 if($contactnum){
 					 $notif= new Notification();
 					 $mes= "Hello dear analyst! There is a scheduled calibration for tomorrow with Product Name: ".$item;
-					 $res=$notif->sendSMS("", "", $contactnum, $title, $mes, "eULIMS", "Inventory","Calibration Schedule");
+					 $res=$notif->sendSMS("", $rstlid, $contactnum, $title, $mes, "eULIMS", "Inventory","Calibration Schedule");
 					 $decode=Json::decode($res); 
 				 }
 			}
@@ -1029,7 +1030,7 @@ class RequestController extends Controller
 				 if($contactnum){
 					 $notif= new Notification();
 					 $mes= "Hello dear analyst! There is a product of near expiry date in 3days with Product Name: ".$item;
-					 $res=$notif->sendSMS("", "", $contactnum, $title, $mes, "eULIMS", "Inventory","Calibration Schedule");
+					 $res=$notif->sendSMS("", $rstlid, $contactnum, $title, $mes, "eULIMS", "Inventory","Calibration Schedule");
 					 $decode=Json::decode($res); 
 				 }
 			}

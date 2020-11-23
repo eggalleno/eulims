@@ -51,13 +51,7 @@ class InfoController extends Controller
 
 		if(isset($_SESSION['usertoken'])){
 			
-			/*$notif= new Notification();
-			
-			$res=$notif->sendSMS("", "wis", "09171044790", "title", "Hello World", "eULIMS", $this->module->id,$this->action->id);
-			echo($this->module->id);
-			echo($this->action->id);
-			
-			exit; */
+
 			
 			$token=$_SESSION['usertoken'];
 			$userid= Yii::$app->user->identity->profile->user_id;
