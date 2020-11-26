@@ -15,6 +15,7 @@ use yii\web\JsExpression;
             ],
             'title' => [
                 'text' => 'Customers by Business Nature ' ,
+                'style'=>['fontSize'=>'30px']
             ],
             'credits' => false,
             'labels' => [
@@ -36,10 +37,11 @@ use yii\web\JsExpression;
                     'size' => '100%',
                     'showInLegend' => true,
                     'dataLabels' => [
-                        'enabled' => true,
+                        'enabled' => false,
                     ],
                 ],
             ],
+            'legend'=> ['itemStyle'=>['fontSize'=>'25px']]
         ]
     ]);
 ?>

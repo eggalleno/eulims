@@ -64,18 +64,22 @@ $this->registerJsFile("/js/finance/highcharts-more.js", [
                     ],
                     'title' => [
                         'text' => 'Income Generated - '.$labtitle ,
+                        'style'=>['fontSize'=>'40px']
                     ],
                     'xAxis' => [
                         'title' => [
-                            'text' => 'Year'
+                            'text' => 'Year',
+                            'style'=>['fontSize'=>'40px']
                         ],
                         'categories' => ['January' , 'February', 'March', 'April', 'May','June', 'July', 'August', 'September', 'October','November', 'December'],
+                        'labels'=> ['style'=>['fontSize'=>'30px','font-weight'=>'bold']]
                     ],
                     'yAxis' => [
                         'title' => [
-                            'text' => 'No of Firms'
+                            'text' => 'Income',
+                            'style'=>['fontSize'=>'40px']
                         ],
-                        'stackLabels'=> ['enabled'=> true,]
+                        'stackLabels'=> ['enabled'=> true,'style'=>['fontSize'=>'30px']]
                     ],
                     'labels' => [
                         'items' => [
@@ -87,28 +91,18 @@ $this->registerJsFile("/js/finance/highcharts-more.js", [
                                 ],
                             ],
                         ],
+                        'style'=>['fontSize'=>'30px']
                     ],
                     'plotOptions'=> ['column'=>['stacking'=>'normal']],
                     'tooltip'=>['headerFormat'=>'<b>{point.x}</b><br/>','pointFormat'=>'{series.name}: {point.y}<br/>Total: {point.stackTotal}'],
                     'series' => [
-                        ['type' => 'column','name' => 'Actual Fees', 'data' => $actualfees],
+                        ['type' => 'column','name' => 'Actual Fees', 'data' => $actualfees,],
                         ['type' => 'column','name' => 'Discounts', 'data' => $discounts],
                         ['type' => 'column','name' => 'Gratis', 'data' => $gratis],
-                        // [
-                        //     'type' => 'spline',
-                        //     'tooltip'=>['headerFormat'=>'<b>{point.x}</b><br/>','pointFormat'=>'{series.name}: {point.y}'],
-                        //     'name' => 'Income Trend',
-                        //     'data' => $income,
-                        //     'marker' => [
-                        //         'lineWidth' => 5,
-                        //         'lineColor' => 'green',
-                        //         'fillColor' => 'green', 
-                        //     ],
-                        // ],
                         [
                             'type' => 'spline',
                             'tooltip'=>['headerFormat'=>'<b>{point.x}</b><br/>','pointFormat'=>'{series.name}: {point.y}'],
-                            'name' => 'Prediction',
+                            'name' => 'Avg. of Last 10 Years',
                             'data' => $prediction,
                             'marker' => [
                                 'lineWidth' => 5,
@@ -117,7 +111,8 @@ $this->registerJsFile("/js/finance/highcharts-more.js", [
                             ],
                         ],
 
-                    ]
+                    ],
+                    'legend'=> ['itemStyle'=>['fontSize'=>'25px']]
                 ]
                 ]);
                 ?>
@@ -194,8 +189,6 @@ jQuery(document).ready(function ($) {
           
         });
     }, 1000);
-
-
 });
 </script>
 
