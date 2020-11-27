@@ -38,7 +38,8 @@ $this->registerJsFile("/js/finance/highcharts-more.js", [
 		    ])->label('Lab'); ?>
 
 		    <?= $form->field($reportform, 'year')->textInput([
-                                 'type' => 'number'
+                                 'type' => 'number',
+                                 'value'=>$year
                             ]) ?>
 
 		    <div class="form-group">
@@ -94,7 +95,14 @@ $this->registerJsFile("/js/finance/highcharts-more.js", [
                         'style'=>['fontSize'=>'30px']
                     ],
                     'plotOptions'=> ['column'=>['stacking'=>'normal']],
-                    'tooltip'=>['headerFormat'=>'<b>{point.x}</b><br/>','pointFormat'=>'{series.name}: {point.y}<br/>Total: {point.stackTotal}'],
+                    'tooltip'=>[
+                        'headerFormat'=>'<b>{point.x}</b><br/>',
+                        'pointFormat'=>'<b>{series.name}: {point.y}<b/><br/><b>Total: {point.stackTotal}</b>',
+                        'style' => [
+                                    'fontSize'=>'30px',
+                                    'color'=>'green'
+                                ],
+                    ],
                     'series' => [
                         ['type' => 'column','name' => 'Actual Fees', 'data' => $actualfees,],
                         ['type' => 'column','name' => 'Discounts', 'data' => $discounts],

@@ -6,6 +6,7 @@ use common\models\lab\Reportsummary;
 use common\models\lab\Sample;
 use common\models\lab\Reportform;
 use frontend\modules\reports\modules\models\Requestextend;
+use frontend\modules\reports\modules\models\Requestextension;
 use common\models\lab\Request;
 use common\models\lab\Lab;
 use common\models\lab\Businessnature;
@@ -36,7 +37,7 @@ class AnalyticController extends \yii\web\Controller
     }
 
     public function actionIndex()
-    {       
+    {
         $session = Yii::$app->session;
         $session->set('hideMenu',true);
     	$reportform = new Reportform();
@@ -49,8 +50,6 @@ class AnalyticController extends \yii\web\Controller
 			$year = date('Y'); //current year
 		}
 
-    	//get all the sum of income generated per month
-    	$summary = Reportsummary::find()->where(['year'=> $year,'lab_id'=>$labId,'rstl_id'=>$rstlId])->all();
     	$actualfees = [];
     	$discounts = [];
         $gratis = [];
@@ -64,41 +63,55 @@ class AnalyticController extends \yii\web\Controller
         $income = [];
 
 		while ( $month<= 11) {
-			if(isset($summary[$month])){
-				$actualfees[] = (int)$summary[$month]->actualfees;
-				$discounts[] = (int)$summary[$month]->discount;
-                $gratis[]= (int)$summary[$month]->gratis;
-				$monthlyname[]  = $summary[$month]->year."-".$summary[$month]->month;
-                //get all the ; 
+            $myear = $year.'-'.sprintf("%02d", $month +1);
+            //updated this to use and look in the live data instead on the report summary
+            $modelRequest = Requestextension::find()
+            ->select([
+                'monthnum'=>'DATE_FORMAT(`request_datetime`, "%m")',
+                'totalrequests'=>'SUM(total)',
+            ])
+            ->where('rstl_id =:rstlId AND status_id > :statusId AND lab_id = :labId AND DATE_FORMAT(`request_datetime`, "%Y-%m") = :year AND request_ref_num != ""', [':rstlId'=>$rstlId,':statusId'=>0,':labId'=>$labId,':year'=>$myear])
+            ->groupBy(['DATE_FORMAT(request_datetime, "%Y-%m")'])
+            ->orderBy('request_datetime ASC')
+            ->one();
+
+			if($modelRequest){
+				$actualfees[] = (int)$modelRequest->totalrequests;
+				$discounts[] = (int)$modelRequest->countTables($myear,$labId,'discount');
+                $gratis[]= (int)$modelRequest->countTables($myear,$labId,'gratis');;
+				$monthlyname[]  = $myear;
+
+				$finalize[] = "green";
+
+			}
+			else{
+				$actualfees[] =0;
+				$discounts[] = 0;
+                $gratis[]=0;
+
+				$finalize[] = "red";
+                $income[]=null;
+			}
+
+
+            //get all the ; 
                 $factor_up[] = (int)Reportfactors::find()
                 ->joinWith(['factor'=>function($query){
                     return $query->andWhere(['type'=>'1']);
                 }])
-                ->where(['yearmonth'=>$summary[$month]->year."-".$summary[$month]->month,'lab_id'=>$labId])
+                ->where(['yearmonth'=>$myear,'lab_id'=>$labId])
                 ->count();
                 // ->all();
                 $factor_down[] = (int)Reportfactors::find()
                 ->joinWith(['factor'=>function($query){
                     return $query->andWhere(['type'=>'0']);
                 }])
-                ->where(['yearmonth'=>$summary[$month]->year."-".$summary[$month]->month,'lab_id'=>$labId])
+                ->where(['yearmonth'=>$myear,'lab_id'=>$labId])
                 ->count();
-                // ->all();
-				$finalize[] = "green";
 
-                $income[] = (int)$summary[$month]->actualfees+(int)$summary[$month]->discount;
-                // $prediction[] = null;
-			}
-			else{
-				$actualfees[] =0;
-				$discounts[] = 0;
-                $gratis[]=0;
-                $factor_up[]=null;
-                $factor_down[]=null;
-				$finalize[] = "red";
-                $income[]=null;
-			}
+
              //prediction  get the 10 year behoavior of the income as base
+                //we will just let this avg of 10 years to look on the retport summary for ahile untill we found the faster query to get the avg
                 $avg = Reportsummary::find()
                 ->select(['request'=>'AVG(gross)'])
                 ->where(['lab_id'=>$labId,'rstl_id'=>$rstlId,'month'=>sprintf("%02d", ($month+1))])
@@ -115,6 +128,7 @@ class AnalyticController extends \yii\web\Controller
                     $prediction[]=null;
 			$month ++;
 		}
+        
 		$lab = Lab::findOne($labId);//get the lab profile
 
         $session = Yii::$app->session; 
