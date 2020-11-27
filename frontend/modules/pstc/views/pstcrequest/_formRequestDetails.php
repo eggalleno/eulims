@@ -183,43 +183,43 @@ if(count($sampletype) > 0){
                        'LoadingText'=>'Loading...',
                        'allowClear' => true
                     ],
-                    'pluginEvents' => [
-                        "change" => "function() {
-                            if(this.value == 3){//Metrology
-                                $('#div_met').show();
-                            } else {
-                                $('#div_met').hide();
-                            }
+                    // 'pluginEvents' => [
+                    //     "change" => "function() {
+                    //         if(this.value == 3){//Metrology
+                    //             $('#div_met').show();
+                    //         } else {
+                    //             $('#div_met').hide();
+                    //         }
 
-                            var labId = this.value;
-                            var select = $('#erequest-testcategory_id');
-                            select.find('option').remove().end();
-                            if (labId > 0){
-                                $.ajax({
-                                    url: '".Url::toRoute("pstcrequest/get_testcategory")."',
-                                    method: 'GET',
-                                    data: {lab_id:labId},
-                                    success: function (data) {
-                                        var select2options = ".Json::encode($testcategoryOptions).";
-                                        select2options.data = data.data;
-                                        select.select2(select2options);
-                                        select.val(data.selected).trigger('change');
-                                        $('.image-loader').removeClass('img-loader');
-                                    },
-                                    beforeSend: function (xhr) {
-                                        $('.image-loader').addClass('img-loader');
-                                    },
-                                    error: function (jqXHR, textStatus, errorThrown) {
-                                        alertWarning.alert(\"<p class='text-danger' style='font-weight:bold;'>Error Encountered!</p>\");
-                                    }
-                                });
-                            } else {
-                                //alertWarning.alert(\"<p class='text-danger' style='font-weight:bold;'>No sample type selected!</p>\");
-                                console.log('No lab selected!');
-                                select.val('').trigger('change');
-                            }
-                        }",
-                    ],
+                    //         var labId = this.value;
+                    //         var select = $('#erequest-testcategory_id');
+                    //         select.find('option').remove().end();
+                    //         if (labId > 0){
+                    //             $.ajax({
+                    //                 url: '".Url::toRoute("pstcrequest/get_testcategory")."',
+                    //                 method: 'GET',
+                    //                 data: {lab_id:labId},
+                    //                 success: function (data) {
+                    //                     var select2options = ".Json::encode($testcategoryOptions).";
+                    //                     select2options.data = data.data;
+                    //                     select.select2(select2options);
+                    //                     select.val(data.selected).trigger('change');
+                    //                     $('.image-loader').removeClass('img-loader');
+                    //                 },
+                    //                 beforeSend: function (xhr) {
+                    //                     $('.image-loader').addClass('img-loader');
+                    //                 },
+                    //                 error: function (jqXHR, textStatus, errorThrown) {
+                    //                     alertWarning.alert(\"<p class='text-danger' style='font-weight:bold;'>Error Encountered!</p>\");
+                    //                 }
+                    //             });
+                    //         } else {
+                    //             //alertWarning.alert(\"<p class='text-danger' style='font-weight:bold;'>No sample type selected!</p>\");
+                    //             console.log('No lab selected!');
+                    //             select.val('').trigger('change');
+                    //         }
+                    //     }",
+                    // ],
                 ])->label('Laboratory');
             ?>
         </div>
@@ -233,7 +233,7 @@ if(count($sampletype) > 0){
             </div>
         </div>
     </div>
-    <div class="panel panel-success" id="div_met" style="padding-bottom: 10px;<?= $PanelStyle ?>">
+    <!-- <div class="panel panel-success" id="div_met" style="padding-bottom: 10px;<?= $PanelStyle ?>">
         <div class="panel-heading">Metrology Request Details</div>
         <div class="row" style="padding-left: 5px">*
             <div class="col-md-6">
@@ -339,7 +339,7 @@ if(count($sampletype) > 0){
                 </div>
             </div>
         </div>
-    </div>
+    </div> -->
     <div class="row">
         <div class="col-md-6">
                 <div class="input-group">
