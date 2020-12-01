@@ -39,7 +39,7 @@ Highcharts.chart('tests', {
                 filter: {
                     property: 'y',
                     operator: '>',
-                    value: 30
+                    value: 20
                 },
                 style: {
                     fontSize: '20px',

@@ -12,6 +12,7 @@ use yii\web\JsExpression;
         'options' => [
             'chart' => [
                 'type' => 'pie',
+                'height' => '900px'
             ],
             'title' => [
                 'text' => 'Customers by Business Nature ' ,
