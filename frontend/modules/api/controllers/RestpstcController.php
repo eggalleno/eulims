@@ -12,6 +12,7 @@ use \yii\db\ActiveQuery;
 use common\models\referral\Pstcrequest;
 use common\models\referral\Pstcsample;
 use common\models\referral\Lab;
+use common\models\referral\Sample;
 use common\models\referral\Testname;
 use common\models\referral\Testnamemethod;
 use common\models\referral\Sampletype;
@@ -154,18 +155,22 @@ class RestpstcController extends \yii\rest\Controller
 
     public function actionAnalysis()
     {   
-        $id = (int) Yii::$app->request->post('rstl_id');
+        $method_id = (int) Yii::$app->request->post('method_id');
+        $method = Methodreference::findOne($method_id);
+
+        $testname_id = (int) Yii::$app->request->post('testname');
+        $testname = Testname::findOne($testname_id);
 
         $data = (Yii::$app->request->isPut) ? Psctanalysis::findOne($id)  : new Pstcanalysis; 
         $data->rstl_id = Yii::$app->request->post('rstl_id');
         $data->pstc_id = Yii::$app->request->post('pstc_id');
-        $data->pstc_sample_id = Yii::$app->request->post('pstc_sample_id');
+        $data->pstc_sample_id = Yii::$app->request->post('sample_id');
         $data->testname_id = 0;
-        $data->testname = Yii::$app->request->post('testname');
-        $data->method_id = 0;
-        $data->method = Yii::$app->request->post('method');
-        $data->reference = Yii::$app->request->post('reference');
-        $data->fee = Yii::$app->request->post('fee');
+        $data->testname = $testname->test_name;
+        $data->method_id = $method_id;
+        $data->method = $method->method;
+        $data->reference = $method->reference;
+        $data->fee = $method->fee   ;
         $data->quantity = 1;
         $data->package_old =0;
         $data->deleted_old = 0;
@@ -253,6 +258,11 @@ class RestpstcController extends \yii\rest\Controller
 
     public function actionListlab() // GET LISTS OF LAB, SAMPLE TYPE AND TESTNAME IN THE MAIN SERVER
     {
+        // $testnamelist = ArrayHelper::map(Customer::find()->all(), 'testname_id', 
+        //     function($testnamelist, $defaultValue) {
+        //         return $testnamelist->test_name;
+        // });
+        
         $labs = ArrayHelper::map(Lab::find()->all(), 'lab_id', 
             function($laboratory, $defaultValue) {
                 return $laboratory->labname;
@@ -263,18 +273,55 @@ class RestpstcController extends \yii\rest\Controller
                 return $sampletypes->type;
         });
 
-         $testnamelist = ArrayHelper::map(Testname::find()->all(), 'testname_id', 
+        $testnamelist = ArrayHelper::map(Testname::find()->all(), 'testname_id', 
             function($testnamelist, $defaultValue) {
                 return $testnamelist->test_name;
         });
+
+        // $sampletemplates = ArrayHelper::map(Testname::find()->all(), 'testname_id', 
+        //     function($testnamelist, $defaultValue) {
+        //         return $testnamelist->test_name;
+        // });
         
         $lists = array(
             'labs' => $labs,
             'sampletypes' => $sampletypes,
-            'testnamelist' => $testnamelist
+            'testnamelist' => $testnamelist,
+            // 'sampletemplates' => $sampletemplates
         );
 
         return $lists;
+    }
+
+    public function actionTestnamemethods(){
+
+        $getrequest = Yii::$app->request;
+        $id = (int) $getrequest->get('id');
+        $testnamemethods = Testnamemethod::find()->with('testname')->where(['sampletype_id'=>$id])->asArray()->all();
+
+        return $testnamemethods;
+    }
+
+    public function actionTestnamemethod(){
+
+        $getrequest = Yii::$app->request;
+        $testname_id = (int) $getrequest->get('testname_id');
+        $sampletype_id = (int) $getrequest->get('sampletype_id');
+
+        $testnamemethod = Testnamemethod::find()
+        ->where(['tbl_testname_method.testname_id'=>$testname_id,'tbl_testname_method.sampletype_id'=>$sampletype_id])->all();
+     
+
+        return $testnamemethod;
+    }
+
+    public function actionSampletest(){
+
+        $getrequest = Yii::$app->request;
+        $id = (int) $getrequest->get('id');
+
+        $sample = Sample::findOne($id);
+        return $sample;
     }
 
 }
