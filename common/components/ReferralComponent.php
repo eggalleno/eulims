@@ -22,8 +22,11 @@ use linslin\yii2\curl;
 use common\models\lab\exRequestreferral;
 use common\models\lab\Analysis;
 use common\models\lab\Sample;
-use common\models\lab\Lab;//used to point to old referralhttps://eulims.onelab.dost.gov.ph/api/restcustomer/index
+use common\models\lab\Lab;//used to point to old referral
 use common\models\lab\Samplecode;//used to point to old referral
+use common\models\lab\Referralrequest;
+use yii\helpers\Json;
+
 
 /**
  * Description of Referral Component
@@ -42,6 +45,170 @@ class ReferralComponent extends Component {
      */
     function getSource(){
         return $this->source;
+    }
+
+
+    /**
+    *
+    * Notifies refered agency about the referral
+    * @return boolean
+    */
+    function notifyAgency($referral_id,$agency_id){
+        //salvaged from sTG
+        $mi = !empty(Yii::$app->user->identity->profile->middleinitial) ? " ".substr(Yii::$app->user->identity->profile->middleinitial, 0, 1).". " : " ";
+        $senderName = Yii::$app->user->identity->profile->firstname.$mi.Yii::$app->user->identity->profile->lastname;
+
+        $details = [
+            'referral_id' => $referral_id,
+            'sender_id' => Yii::$app->user->identity->profile->rstl_id,
+            'recipient_id' => $agency_id,
+            'sender_user_id' => Yii::$app->user->identity->profile->user_id,
+            'sender_name' => $senderName,
+            'remarks' => "Notification sent"
+        ];
+        
+        $notificationData = Json::encode(['notice_details'=>$details],JSON_NUMERIC_CHECK);
+
+        //trying to contact the mothership as API :D oh GOD how long do i need to read these code
+        $apiUrl=$this->source.'/notify';
+        $curl = new curl\Curl();
+        $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
+        $curl->setOption(CURLOPT_TIMEOUT, 180);
+        $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
+        $response = $curl->setRequestBody($notificationData)
+        ->setHeaders([
+            'Content-Type' => 'application/json',
+            'Content-Length' => strlen($notificationData),
+        ])->post($apiUrl);
+
+
+        //check the response
+        if($response)
+            return $response;
+
+        return false;
+    }
+
+    /**
+     * Sync Referral
+     * BTC
+     * Saves the Referral information on the central server
+     * @return boolean
+     */
+    function syncReferral($request_id,$agency_id){
+
+        $sample_data = [];
+        $analysis_data = [];
+
+        //gets the request information in the local server 
+        $request = exRequestreferral::find()->where(['request_id'=>$request_id,'request_type_id'=>2])->asArray()->one();
+        //gets the referral information which is related to request above
+        $ref_request = Referralrequest::find()->where('request_id =:requestId',[':requestId'=>$request_id])->one();
+        //get the associated sample of the request above
+        $samples = Sample::find()->where(['request_id'=>$request_id])->asArray()->all();
+        //get the associated analyses of the request above
+        $analyses = Analysis::find()->where(['request_id'=>$request_id])->asArray()->all();
+
+        if(count($request) > 0 && count($ref_request) > 0 && count($samples) > 0 && count($analyses) > 0){
+
+            //perform the extraction of request data, salvaged the data from STG
+            // BTC why do we have to reformat given that the returned value of the query is already in array, maybe because the structure of the local and Centralize dbase is not the same??????
+            $requestData = [
+                    'request_id' => $request['request_id'],
+                    'request_datetime' => $request['request_datetime'],
+                    'rstl_id' => $request['rstl_id'],
+                    'lab_id' => $request['lab_id'],
+                    'customer_id' => $request['customer_id'],
+                    'payment_type_id' => $request['payment_type_id'],
+                    'modeofrelease_ids' => $request['modeofrelease_ids'],
+                    'discount_id' => $request['discount_id'],
+                    'discount' => $request['discount'],
+                    'purpose_id' => $request['purpose_id'],
+                    'total' => $request['total'],
+                    'report_due' => $request['report_due'], //initial estimated due date sent by the receiving lab
+                    'conforme' => $request['conforme'],
+                    'receivedBy' => $request['receivedBy'],
+                    'status_id' => $request['status_id'],
+                    'request_type_id' => $request['request_type_id'],
+                    'created_at' => $request['created_at'],
+                    'sample_received_date' => $ref_request['sample_received_date'],
+                    'user_id_receiving' => Yii::$app->user->identity->profile->user_id,
+                    'bid'=>0
+                ];
+
+            //perform the extraction of the sample data, salvaged code from STG
+            foreach ($samples as $sample) {
+                $sampleData = [
+                    'sample_id' => $sample['sample_id'],
+                    'rstl_id' => $sample['rstl_id'],
+                    'sampletype_id' => $sample['sampletype_id'],
+                    'sample_code' => $sample['sample_code'],
+                    'samplename' => $sample['samplename'],
+                    'description' => $sample['description'],
+                    'customer_description' => $sample['customer_description'],
+                    'sampling_date' => $sample['sampling_date'],
+                    'remarks' => $sample['remarks'],
+                    'request_id' => $sample['request_id'],
+                    'sample_month' => $sample['sample_month'],
+                    'sample_year' => $sample['sample_year'],
+                    'active' => $sample['active'],
+                    'completed' => $sample['completed']
+                ];
+                array_push($sample_data, $sampleData);
+            }
+
+            //another one for analyses
+            foreach ($analyses as $analysis) {
+                $analysisData = [
+                    'analysis_id' => $analysis['analysis_id'],
+                    'date_analysis' => $analysis['date_analysis'],
+                    'rstl_id' => $analysis['rstl_id'],
+                    'request_id' => $analysis['request_id'],
+                    'sample_id' => $analysis['sample_id'],
+                    'sample_code' => $analysis['sample_code'],
+                    'package_id' => $analysis['package_id'],
+                    'testname' => $analysis['testname'],
+                    'method' => $analysis['method'],
+                    'methodref_id' => $analysis['methodref_id'],
+                    'references' => $analysis['references'],
+                    'fee' => $analysis['fee'],
+                    'test_id' => $analysis['test_id'],
+                    'cancelled' => $analysis['cancelled'],
+                    'is_package' => $analysis['is_package'],
+                    // 'is_package_name' => $analysis['is_package_name'],
+                    'type_fee_id' => $analysis['type_fee_id']
+                ];
+                array_push($analysis_data, $analysisData);
+            }
+
+            //obviously encoding the 
+            $data = Json::encode(['request_data'=>$requestData,'sample_data'=>$sample_data,'analysis_data'=>$analysis_data,'agency_id'=>$agency_id],JSON_NUMERIC_CHECK);
+
+            //trying to contact the mothership as API :D oh GOD how long do i need to read these code
+            $apiUrl=$this->source.'/insertreferraldata';
+            $curl = new curl\Curl();
+            $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
+            $curl->setOption(CURLOPT_TIMEOUT, 180);
+            $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
+            $response = $curl->setRequestBody($data)
+            ->setHeaders([
+                'Content-Type' => 'application/json',
+                'Content-Length' => strlen($data),
+            ])->post($apiUrl);
+
+            //next in line sigh just decoding
+            $response = Json::decode($response); //returns response and referralID
+
+                //if response is false , information weren't saved and not notified
+                if($response){
+                    return $response;
+                }
+
+                return false;
+            
+        }else{
+            return false;
+        }
     }
 
     /**
@@ -256,7 +423,6 @@ class ReferralComponent extends Component {
 
         //only get the method_reference used by this request then call the listcmatch agency to return list of agency use and status if the referral can be submitted to the target rstl agency.
 
-        // return false;//temporarily returns false
         
         $request = exRequestreferral::findOne($requestId);
 
@@ -276,11 +442,6 @@ class ReferralComponent extends Component {
         //     ->where('tbl_sample.request_id =:requestId AND is_package =:packageName AND type_fee_id =:typeFee',[':requestId'=>$requestId,':packageName'=>1,':typeFee'=>2])
         //     ->groupBy(['package_id'])
         //     ->asArray()->all();
-    
-
-        // $testnameId = implode(',', array_map(function ($data) {
-        //     return $data['test_id'];
-        // }, $analysis));
 
         $methodrefId = implode(',', array_map(function ($data) {
             return $data['methodref_id'];
@@ -294,7 +455,6 @@ class ReferralComponent extends Component {
         // }, $package));
 
 
-
         //this should not trigger if there are no anlyses , packages or samples, throws err if no test found
         // $apiUrl=$this->source.'/listmatchagency?rstl_id='.$request->rstl_id.'&lab_id='.$request->lab_id.'&sampletype_id='.$sampletypeId.'&testname_id='.$testnameId.'&methodref_id='.$methodrefId.'&package_id='.$packageId;
 
@@ -306,7 +466,7 @@ class ReferralComponent extends Component {
         $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
         $data = $curl->get($apiUrl); //data now holds a list of rstls
     
-        $list_agency = $this->listAgency($data);
+        $list_agency = $this->listAgency(json_decode($data));
         return $list_agency;        
     }
     
@@ -439,13 +599,13 @@ class ReferralComponent extends Component {
     function listUnrespondedNofication($rstlId)
     {
         if($rstlId > 0) {
-            $apiUrl=$this->source.'/api/web/referral/notifications/countnotification?rstl_id='.$rstlId;
+            $apiUrl=$this->source.'/countnotification?rstl_id='.$rstlId;
             $curl = new curl\Curl();
             $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
             $curl->setOption(CURLOPT_TIMEOUT, 180);
             $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
             $list = $curl->get($apiUrl);
-            return $list;
+            return Json::decode($list);
         } else {
             return false;
         }
@@ -454,13 +614,13 @@ class ReferralComponent extends Component {
     function listUnseenBidNofication($rstlId)
     {
         if($rstlId > 0) {
-            $apiUrl=$this->source.'/api/web/referral/bidnotifications/countbidnotification?rstl_id='.$rstlId;
+            $apiUrl=$this->source.'/countbidnotification?rstl_id='.$rstlId;
             $curl = new curl\Curl();
             $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
             $curl->setOption(CURLOPT_TIMEOUT, 180);
             $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
             $list = $curl->get($apiUrl);
-            return $list;
+            return Json::decode($list);
         } else {
             return false;
         }
@@ -613,7 +773,7 @@ class ReferralComponent extends Component {
             $curl->setOption(CURLOPT_TIMEOUT, 180);
             $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
             $list = $curl->get($apiUrl);
-            return $list;
+            return json_decode($list);
         } else {
             return 'Not valid request!';
         }
@@ -851,15 +1011,15 @@ class ReferralComponent extends Component {
     function countAllNotification($rstlId)
     {
         if($rstlId > 0){
-            $bid =  json_decode($this->listUnseenBidNofication($rstlId),true);
-            $referral = json_decode($this->listUnrespondedNofication($rstlId),true);
+            $bid =  $this->listUnseenBidNofication($rstlId);
+            $referral = $this->listUnrespondedNofication($rstlId);
             $bid_notification = $bid['count_bidnotification'];
             $referral_notification = $referral['count_notification'];
             $allNotification = $bid_notification + $referral_notification;
 
             return $allNotification;
         } else {
-            return 'false';
+            return 'false'; //why false when u can return 0, anyway ... btc here
         }
     }
     //function to get agency bid details for update to local ulims

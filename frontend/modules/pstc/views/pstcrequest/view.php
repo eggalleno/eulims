@@ -253,9 +253,180 @@ $accepted = $request['accepted'];
                     //'before'=>null,
                     'after'=>false,
                     'before'=> ($request['accepted'] == 0) ? Html::button('<i class="glyphicon glyphicon-plus"></i> Add Sample', ['value' => Url::to(['/pstc/pstcrequest/createsample','request_id'=>$request['pstc_request_id']]),'title'=>'Add Sample', 'onclick'=>'addSample(this.value,this.title)', 'class' => 'btn btn-success','id' => 'modalBtn']) : '',
-                    'footer'=> ($countSample > 0 && empty($respond['request_ref_num']) && $request['accepted'] == 0) ? $btn_saveRequest : '',
+                    // 'footer'=> ($countSample > 0 && empty($respond['request_ref_num']) && $request['accepted'] == 0) ? $btn_saveRequest : '',
                 ],
                 'columns' => $sampleGridColumns,
+                'toolbar' => [
+                    'content'=> Html::a('<i class="glyphicon glyphicon-repeat"></i> Refresh Grid', [Url::to(['/pstc/pstcrequest/view','request_id'=>$request['pstc_request_id'],'pstc_id'=>$request['pstc_id']])], [
+                                'class' => 'btn btn-default', 
+                                'title' => 'Refresh Grid'
+                            ]),
+                ],
+            ]);
+        ?>
+
+<?php
+        $btn_saveRequest = ($request['is_referral'] == 0) ? Html::button('<span class="glyphicon glyphicon-save"></span> Save as Local Request', ['value' => Url::to(['/pstc/pstcrequest/request_local','request_id'=>$request['pstc_request_id'],'pstc_id'=>$request['pstc_id']]),'title'=>'Save as Local Request', 'onclick'=>'saveRequest(this.value,this.title)', 'class' => 'btn btn-primary','id' => 'modalBtn']) : Html::button('<span class="glyphicon glyphicon-save"></span> Save as Referral Request', ['value' => Url::to(['/pstc/pstcrequest/request_referral','request_id'=>$request['pstc_request_id'],'pstc_id'=>$request['pstc_id']]),'title'=>'Save as Referral Request', 'onclick'=>'saveRequest(this.value,this.title)', 'class' => 'btn btn-primary','id' => 'modalBtn']);
+        $analysisGridColumns = [
+         
+            [
+                'attribute'=>'testname',
+                'header'=>'Test/ Calibration Requested',
+                'contentOptions' => ['style' => 'width: 15%;word-wrap: break-word;white-space:pre-line;'],
+                'enableSorting' => false,
+            ],
+            [
+                'attribute'=>'method',
+                'header'=>'Test Method',
+                'enableSorting' => false,  
+                'contentOptions' => ['style' => 'width: 50%;word-wrap: break-word;white-space:pre-line;'],              
+            ],
+            [
+                'attribute'=>'quantity',
+                'header'=>'Quantity',
+                'hAlign'=>'center',
+                'enableSorting' => false,
+                'pageSummary' => '<span style="float:right";>SUBTOTAL<BR>DISCOUNT<BR><B>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;TOTAL</B></span>',       
+            ],
+            [
+                'attribute'=>'fee',
+                'header'=>'Unit Price',
+                'enableSorting' => false,
+                'hAlign'=>'right',
+                'value'=>function($model){
+                    return $model['fee'];
+                },
+                'contentOptions' => [
+                    'style'=>'max-width:80px; overflow: auto; white-space: normal; word-wrap: break-word;'
+                ],
+                'hAlign' => 'right', 
+                'vAlign' => 'left',
+                'format' => 'raw',
+                'width' => '7%',
+                  'pageSummary'=> function (){
+                        $url = \Yii::$app->request->url;
+                        $id = substr($url, 21);
+                        $requestquery = Request::find()->where(['request_id' => $id])->one();
+                        $discountquery = Discount::find()->where(['discount_id' => $requestquery->discount_id])->one();
+                        $samplesquery = Sample::find()->where(['request_id' => $id])->one();
+                        $rate =  $discountquery->rate;
+                        $sample_ids = '';
+                        $samples = Sample::find()->where(['request_id' => $id])->all();
+                        foreach ($samples as $sample){
+                            $sample_ids .= $sample->sample_id.",";
+                        }
+                        $sample_ids = substr($sample_ids, 0, strlen($sample_ids)-1);
+                       
+                        if ($samplesquery){
+                            $sql = "SELECT SUM(fee) as subtotal FROM tbl_analysis WHERE sample_id IN ($sample_ids) AND cancelled = 0";     
+                            
+                                 $Connection = Yii::$app->labdb;
+                                 $command = $Connection->createCommand($sql);
+                                 $row = $command->queryOne();
+                                 $subtotal = $row['subtotal'];
+                                 $discounted = ($subtotal * ($rate/100));
+                                 $total = $subtotal - $discounted;
+                                
+                                 // if ($total <= 0){
+                                 //     return  '<div id="subtotal">₱'.number_format($subtotal, 2).'</div><div id="discount">₱0.00</div><div id="total"><b>₱'.number_format($total, 2).'</b></div>';
+                                 // }else{
+                                     return  '<div id="subtotal">₱'.number_format($subtotal, 2).'</div><div id="discount">₱'.number_format($discounted, 2).'</div><div id="total"><b>₱'.number_format($total, 2).'</b></div>';
+                                 // }
+                        }else{
+                            return '';
+                        }     
+                  },
+            ],
+            // [
+            //     'header'=>'Status',
+            //     'hAlign'=>'center',
+            //     'format'=>'raw',
+            //     'value' => function($model) {
+                //   $tagging = Tagginganalysis::findOne(['cancelled_by' => $model->analysis_id]);             
+                //   if ($tagging){
+
+                //    if ($tagging->tagging_status_id==1) {
+                //         return Html::button('<span style="width:90px;height:20px"><b>ONGOING</span>', ['value'=>Url::to(['/lab/tagging/status','id'=>$model->analysis_id]),'onclick'=>'LoadModal(this.title, this.value, true, 600);', 'class' => 'btn btn-primary','title' => Yii::t('app', "Analysis Status")]);
+                //       }else if ($tagging->tagging_status_id==2) {
+                //         return Html::button('<span style="width:90px;height:20px"><b>COMPLETED</span>', ['value'=>Url::to(['/lab/tagging/status','id'=>$model->analysis_id]),'onclick'=>'LoadModal(this.title, this.value, true, 600);', 'class' => 'btn btn-success','title' => Yii::t('app', "Analysis Status")]);
+                //       }
+                //       else if ($tagging->tagging_status_id==3) {
+                //           return "<span class='badge btn-warning' style='width:90px;height:20px'><b>ASSIGNED</span>";
+                //       }
+                //       else if ($tagging->tagging_status_id==4) {
+                //           return "<span class='badge btn-danger' style='width:90px;height:20px'><b>CANCELLED</span>";
+                //       }
+                       
+                
+                //   }else{
+                //    return Html::button('<span"><b>PENDING</span>', ['value'=>Url::to(['/lab/tagging/status','id'=>$model->analysis_id]),'onclick'=>'LoadModal(this.title, this.value, true, 600);', 'class' => 'btn btn-default','title' => Yii::t('app', "Analysis Status")]);
+                // }
+
+                // if($model->cancelled){
+                //      return "<span class='badge btn-danger' style='width:90px;height:20px'>CANCELLED</span>";
+                // }
+
+                // $tagging = Tagging::findOne(['analysis_id' => $model->analysis_id]); 
+                // if ($tagging){
+
+                //     if ($tagging->tagging_status_id==1) {
+                //            return "<span class='badge btn-primary' style='width:90px;height:20px'>ONGOING</span>";
+                //        }else if ($tagging->tagging_status_id==2) {
+                //            return "<span class='badge btn-success' style='width:90px;height:20px'>COMPLETED</span>";
+                //        }
+                //        else if ($tagging->tagging_status_id==3) {
+                //            return "<span class='badge btn-warning' style='width:90px;height:20px'>ASSIGNED</span>";
+                //        }
+                //        else if ($tagging->tagging_status_id==4) {
+                //            return "<span class='badge btn-danger' style='width:90px;height:20px'>CANCELLED</span>";
+                //        }
+                        
+                 
+                //    }else{
+                //        return "<span class='badge btn-default' style='width:80px;height:20px'>PENDING</span>";
+                //    }
+                 
+            //     },
+            //     'enableSorting' => false,
+            //     'contentOptions' => ['style' => 'width:10px; white-space: normal;'],
+            // ],
+            [
+                'class' => 'kartik\grid\ActionColumn',
+                'contentOptions' => ['style' => 'width: 8.7%'],
+                'buttons'=>[
+                    // 'update'=>function ($url, $model) {
+                    //     return Html::button('<span class="glyphicon glyphicon-pencil"></span>', ['value'=>Url::to(['/lab/analysis/update','id'=>$model->analysis_id]), 'onclick'=>'LoadModal(this.title, this.value);', 'class' => 'btn btn-primary','title' => Yii::t('app', "Update Analysis <font color='Blue'></font>")]);
+                    // },
+                    // 'delete'=>function ($url, $model) {
+                    //     $urls = '/lab/analysis/delete?id='.$model->analysis_id;
+                    //     return Html::a('<span class="glyphicon glyphicon-trash"></span>', $urls,['data-confirm'=>"Are you sure you want to delete this record?<b></b>", 'data-method'=>'post', 'class'=>'btn btn-danger','title'=>'Delete Analysis','data-pjax'=>'0']);
+                    // },
+                ],
+            ],
+        ];
+
+            echo GridView::widget([
+                'id' => 'sample-grid',
+                //'dataProvider'=> $sampleDataProvider,
+                'dataProvider'=> $analysisDataProvider,
+                'pjax'=>true,
+                'pjaxSettings' => [
+                    'options' => [
+                        'enablePushState' => false,
+                    ]
+                ],
+                'responsive'=>true,
+                'striped'=>true,
+                'hover'=>true,
+                'panel' => [
+                    'heading'=>'<h3 class="panel-title">Analysis</h3>',
+                    'type'=>'primary',
+                    //'before'=>null,
+                    'after'=>false,
+                    'before'=> ($request['accepted'] == 0) ? Html::button('<i class="glyphicon glyphicon-plus"></i> Add Analysis', ['value' => Url::to(['/pstc/pstcrequest/createanalysis','request_id'=>$request['pstc_request_id'],'pstc_id'=>$request['pstc_id']]),'title'=>'Add Analysis', 'onclick'=>'addAnalysis(this.value,this.title)', 'class' => 'btn btn-success','id' => 'modalBtn']) : '',
+                    'footer'=> ($countAnalysis > 0 && empty($respond['request_ref_num']) && $request['accepted'] == 0) ? $btn_saveRequest : '',
+                ],
+                'columns' => $analysisGridColumns,
                 'toolbar' => [
                     'content'=> Html::a('<i class="glyphicon glyphicon-repeat"></i> Refresh Grid', [Url::to(['/pstc/pstcrequest/view','request_id'=>$request['pstc_request_id'],'pstc_id'=>$request['pstc_id']])], [
                                 'class' => 'btn btn-default', 
@@ -268,165 +439,11 @@ $accepted = $request['accepted'];
     </div>
     <!-- <div class="container">
         <?php
-            $analysisgridColumns = [
-                [
-                    'attribute'=>'sample_code',
-                    'header'=>'Sample Code',
-                    //'value' => function($data) use ($sample) {
-                    //    return !empty($sample) ? $sample['sample_code'] : null;
-                    //},
-                    'format' => 'raw',
-                    'enableSorting' => false,
-                    'contentOptions' => ['style' => 'width:10%; white-space: normal;'],
-                ],
-                [
-                    'attribute'=>'sample_name',
-                    'header'=>'Sample Name',
-                    'format' => 'raw',
-                    'enableSorting' => false,
-                    'value' => function($data) use ($sample) {
-                       
-                        // return $sample['samples'] ? 'wew' : '-';
-                    },
-                    'contentOptions' => ['style' => 'width:10%; white-space: normal;'],
-                ],
-                [
-                    //'attribute'=>'testnames.testName',
-                    'format' => 'raw',
-                    'header'=>'Test/ Calibration Requested',
-                    'contentOptions' => ['style' => 'width: 15%;word-wrap: break-word;white-space:pre-line;'],
-                    'enableSorting' => false,
-                    'value' => function($data) {
-                       if($data['is_package_name'] == 1){
-                            return $data['package_name'];
-                        } elseif($data['is_package_name'] == 0 && $data['is_package'] == 1){
-                            return "&nbsp;&nbsp;<span style='font-size:12px;'>".$data['testname']."</span>";
-                        } else {
-                            return $data['testname'];
-                        }
-                    },
-                    // 'value' => function($data) {
-                    //     if($data->is_package_name == 1){
-                    //         return $data->package_name;
-                    //     } elseif($data->is_package_name == 0 && $data->is_package == 1){
-                    //         return "&nbsp;&nbsp;<span style='font-size:12px;'>".(!empty($data->testnames) ? $data->testnames->testName : null)."</span>";
-                    //     } else {
-                    //         return !empty($data->testnames) ? $data->testnames->testName : null;
-                    //     }
-                    // },
-                ],
-                [
-                    //'attribute'=>'methodrefs.method',
-                    'format' => 'raw',
-                    'header'=>'Test Method',
-                    'enableSorting' => false,
-                    // 'value' => function($request) {
-                    //    return !empty($request->methodrefs) ? $request->methodrefs->method : null;
-                    // },
-                    'value' => function($data) {
-                        if($data['is_package_name'] == 1){
-                            return '-';
-                        } elseif($data['is_package_name'] == 0 && $data['is_package'] == 1){
-                            return "&nbsp;&nbsp;<span style='font-size:12px;'>".$data['method']."</span>";
-                        } else {
-                            return $data['method'];
-                        }
-                    },
-                    'contentOptions' => ['style' => 'width: 50%;word-wrap: break-word;white-space:pre-line;'],
-                    'pageSummary' => function() use ($countSample, $countAnalysis) {
-                        return ($countAnalysis > 0 && $countSample > 0) ? '<span style="float:right";>SUBTOTAL<BR>DISCOUNT<BR><B>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;TOTAL</B></span>' : '';
-                    },
-                ],
-                [
-                    'attribute'=>'fee',
-                    'header'=>'Unit Price',
-                    'enableSorting' => false,
-                    'hAlign'=>'right',
-                    'format' => 'raw',
-                    // 'value'=>function($request){
-                    //     return number_format($request->fee,2);
-                    // },
-                    'value'=>function($data){
-                        return ($data['is_package_name'] == 0 & $data['is_package'] == 1) ? '-' : number_format($data['fee'],2);
-                    },
-                    'contentOptions' => [
-                        'style'=>'max-width:80px; overflow: auto; white-space: normal; word-wrap: break-word;'
-                    ],
-                    'hAlign' => 'right', 
-                    'vAlign' => 'left',
-                    'width' => '7%',
-                    'format' => 'raw',
-                    'pageSummary'=> function () use ($subtotal,$discounted,$total,$countSample,$countAnalysis) {
-                        return ($countSample > 0 && $countAnalysis > 0) ? '<div id="subtotal">₱ '.number_format($subtotal, 2).'</div><div id="discount">₱ '.number_format($discounted, 2).'</div><div id="total"><b>₱ '.number_format($total, 2).'</b></div>' : '';
-                    },
-                ],
-                /* [
-                    'class' => 'kartik\grid\ActionColumn',
-                    'template' => '{update} {remove}',
-                    'dropdown' => false,
-                    'dropdownOptions' => ['class' => 'pull-right'],
-                    'headerOptions' => ['class' => 'kartik-sheet-style'],
-                    'buttons' => [
-                        'update' => function ($url, $data) use ($accepted,$requestId) {
-                            if($data['sample_code'] == "" && $data['active'] == 1 && $accepted == 0 && $data['is_package'] == 0 && $data['testcategory_id'] > 0) {
-                                return Html::button('<span class="glyphicon glyphicon-pencil"></span>', ['onclick' => 'updateAnalysis('.$data['pstc_analysis_id'].','.$requestId.',this.title)', 'class' => 'btn btn-primary','title' => 'Update Analysis']);
-                            } elseif($data['sample_code'] == "" && $data['active'] == 1 && $accepted == 0 && $data['is_package'] == 1 && $data['is_package_name'] == 1 && $data['testcategory_id'] > 0) {
-                                return Html::button('<span class="glyphicon glyphicon-pencil"></span>', ['value'=>Url::to(['/pstc/pstcanalysis/updatepackage','analysis_id'=>$data['pstc_analysis_id'],'sample_id'=>$data['pstc_sample_id'],'package_id'=>$data['package_id'],'request_id'=>$requestId]),'onclick'=>'updatePackage(this.value,this.title)', 'class' => 'btn btn-primary','title' => 'Update Package']);
-                            } elseif($data['sample_code'] == "" && $data['active'] == 1 && $accepted == 0 && $data['is_package'] == 0 && $data['testcategory_id'] == 0) {
-                                return Html::button('<span class="glyphicon glyphicon-pencil"></span>', ['onclick' => 'updateReferralAnalysis('.$data['pstc_analysis_id'].','.$requestId.',this.title)', 'class' => 'btn btn-primary','title' => 'Update Analysis Not Offered']);
-                            } else {
-                                return null;
-                            }
-                        },
-                        'remove' => function ($url, $data) use ($accepted,$requestId) {
-                            if($data['is_package_name'] == 0 && $data['is_package'] == 0) {
-                                return Html::a('<span class="glyphicon glyphicon-trash"></span>', '/pstc/pstcanalysis/delete?id='.$data['pstc_analysis_id'].'&request_id='.$requestId,['data-confirm'=>"Are you sure you want to delete this analysis?", 'data-method'=>'post', 'class'=>'btn btn-danger','title'=>'Remove Analysis','data-pjax'=>'0']);
-                            } elseif($data['is_package_name'] == 1 && $data['is_package'] == 1) {
-                                return Html::a('<span class="glyphicon glyphicon-trash"></span>','/pstc/pstcanalysis/deletepackage?sample_id='.$data['pstc_sample_id'].'&package_id='.$data['package_id'].'&request_id='.$requestId,['data-confirm'=>"This will delete all the analyses under this package. Click OK to proceed. <b></b>", 'data-method'=>'post', 'class'=>'btn btn-danger','title'=>'Remove Package','data-pjax'=>'0']);
-                            } else {
-                                return null;
-                            }
-                        },
-                    ],
-                ], */
-            ];
+            
 
             $btn_saveRequest = ($request['is_referral'] == 0) ? Html::button('<span class="glyphicon glyphicon-save"></span> Save as Local Request', ['value' => Url::to(['/pstc/pstcrequest/request_local','request_id'=>$request['pstc_request_id'],'pstc_id'=>$request['pstc_id']]),'title'=>'Save as Local Request', 'onclick'=>'saveRequest(this.value,this.title)', 'class' => 'btn btn-primary','id' => 'modalBtn']) : Html::button('<span class="glyphicon glyphicon-save"></span> Save as Referral Request', ['value' => Url::to(['/pstc/pstcrequest/request_referral','request_id'=>$request['pstc_request_id'],'pstc_id'=>$request['pstc_id']]),'title'=>'Save as Referral Request', 'onclick'=>'saveRequest(this.value,this.title)', 'class' => 'btn btn-primary','id' => 'modalBtn']);
 
-            echo GridView::widget([
-                'id' => 'analysis-grid',
-                'responsive'=>true,
-                'dataProvider'=> $analysisDataprovider,
-                'pjax'=>true,
-                'pjaxSettings' => [
-                    'options' => [
-                        'enablePushState' => false,
-                    ]
-                ],
-                'responsive'=>true,
-                'striped'=>true,
-                'hover'=>true,
-                'showPageSummary' => true,
-                'hover'=>true,
-                
-                'panel' => [
-                    'heading'=>'<h3 class="panel-title">Analysis</h3>',
-                    'type'=>'primary',
-                    // 'before'=> Html::button('<i class="glyphicon glyphicon-plus"></i> Add Analysis', ['value' => Url::to(['/pstc/pstcrequest/createanalysis','request_id'=>$request['pstc_request_id']]),'title'=>'Add Analysis', 'onclick'=>'addAnalysis(this.value,this.title)', 'class' => 'btn btn-success','id' => 'modalBtn']).' '.Html::button('<i class="glyphicon glyphicon-plus"></i> Add Package', ['value' => Url::to(['/pstc/pstcanalysis/package','request_id'=>$request['pstc_request_id']]),'title'=>'Add Package', 'onclick'=>'addAnalysis(this.value,this.title)', 'class' => 'btn btn-success','id' => 'modalBtn']).' '.Html::button('<i class="glyphicon glyphicon-plus"></i> Add Analysis Not Offered', ['value' => Url::to(['/pstc/pstcanalysis/add_not_offer','request_id'=>$request['pstc_request_id']]),'title'=>'Add Analysis Not Offered', 'onclick'=>'addAnalysis(this.value,this.title)', 'class' => 'btn btn-success','id' => 'modalBtn']),
-                    'after'=> false,
-                    //'footer'=>$actionButtonConfirm.$actionButtonSaveLocal,
-                    //'footer'=>null,
-                    //'footer'=> ($countSample > 0 && $countAnalysis > 0 && empty($respond['request_ref_num']) && $request['accepted'] == 0) ? $btn_saveRequest : '',
-                    'footer'=> ($countSample > 0 && empty($respond['request_ref_num']) && $request['accepted'] == 0) ? $btn_saveRequest : '',
-                ],
-                'columns' => $analysisgridColumns,
-                'toolbar' => [
-                    'content'=> Html::a('<i class="glyphicon glyphicon-repeat"></i> Refresh Grid', [Url::to(['/pstc/pstcrequest/view','request_id'=>$request['pstc_request_id']])], [
-                                'class' => 'btn btn-default', 
-                                'title' => 'Refresh Grid'
-                            ]),
-                ],
-            ]);
+          
         ?>
     </div> -->
     
@@ -520,39 +537,39 @@ $accepted = $request['accepted'];
             .load(url);
     }
 
-    function updateAnalysis(id,requestId,title){
-        $.ajax({
-            url: '/pstc/pstcanalysis/getdefaultpage?analysis_id='+id,
-            success: function (data) {
-                $('.image-loader').removeClass('img-loader');
-                var url = '/pstc/pstcanalysis/update?id='+id+'&request_id='+requestId+'&page='+data;
-                $('.modal-title').html(title);
-                $('#modalAnalysis').modal('show')
-                    .find('#modalContent')
-                    .load(url);
-            },
-            beforeSend: function (xhr) {
-                $('.image-loader').addClass('img-loader');
-            }
-        });
-    }
+    // function updateAnalysis(id,requestId,title){
+    //     $.ajax({
+    //         url: '/pstc/pstcanalysis/getdefaultpage?analysis_id='+id,
+    //         success: function (data) {
+    //             $('.image-loader').removeClass('img-loader');
+    //             var url = '/pstc/pstcanalysis/update?id='+id+'&request_id='+requestId+'&page='+data;
+    //             $('.modal-title').html(title);
+    //             $('#modalAnalysis').modal('show')
+    //                 .find('#modalContent')
+    //                 .load(url);
+    //         },
+    //         beforeSend: function (xhr) {
+    //             $('.image-loader').addClass('img-loader');
+    //         }
+    //     });
+    // }
 
-    function updateReferralAnalysis(id,requestId,title){
-        $.ajax({
-            url: '/pstc/pstcanalysis/getreferraldefaultpage?analysis_id='+id,
-            success: function (data) {
-                $('.image-loader').removeClass('img-loader');
-                var url = '/pstc/pstcanalysis/update_not_offer?id='+id+'&request_id='+requestId+'&page='+data;
-                $('.modal-title').html(title);
-                $('#modalAnalysis').modal('show')
-                    .find('#modalContent')
-                    .load(url);
-            },
-            beforeSend: function (xhr) {
-                $('.image-loader').addClass('img-loader');
-            }
-        });
-    }
+    // function updateReferralAnalysis(id,requestId,title){
+    //     $.ajax({
+    //         url: '/pstc/pstcanalysis/getreferraldefaultpage?analysis_id='+id,
+    //         success: function (data) {
+    //             $('.image-loader').removeClass('img-loader');
+    //             var url = '/pstc/pstcanalysis/update_not_offer?id='+id+'&request_id='+requestId+'&page='+data;
+    //             $('.modal-title').html(title);
+    //             $('#modalAnalysis').modal('show')
+    //                 .find('#modalContent')
+    //                 .load(url);
+    //         },
+    //         beforeSend: function (xhr) {
+    //             $('.image-loader').addClass('img-loader');
+    //         }
+    //     });
+    // }
 
     function updatePackage(url,title){
         $('.modal-title').html(title);

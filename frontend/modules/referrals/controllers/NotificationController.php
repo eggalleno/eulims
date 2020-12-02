@@ -119,9 +119,8 @@ class NotificationController extends Controller
         if(isset(Yii::$app->user->identity->profile->rstl_id)){
             $rstlId = Yii::$app->user->identity->profile->rstl_id;
             $refcomponent = new ReferralComponent();
-            $notification = json_decode($refcomponent->listUnrespondedNofication($rstlId),true);
-			$count_all_notifications = json_decode($refcomponent->countAllNotification($rstlId),true);
-            
+            $notification = $refcomponent->listUnrespondedNofication($rstlId);
+			$count_all_notifications = $refcomponent->countAllNotification($rstlId);
             if($notification == false){
                 return Json::encode(['num_notification'=>null,'all_notifications'=>null]);
             } else {

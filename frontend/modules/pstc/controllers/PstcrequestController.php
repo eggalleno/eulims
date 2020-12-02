@@ -3,8 +3,12 @@
 namespace frontend\modules\pstc\controllers;
 
 use Yii;
+use yii\data\ActiveDataProvider;    
 use common\models\referral\Pstcrequest;
 use common\models\referral\Pstcsample;
+use common\models\referral\Pstcanalysis;
+use common\models\referral\Packagelist;
+use common\models\referral\PackagelistSearch;
 use common\models\lab\Request;
 use common\models\lab\Sample;
 use common\models\lab\Analysis;
@@ -118,7 +122,7 @@ class PstcrequestController extends Controller
                 'pagination'=>false,
             ]);
 
-            $analysisDataprovider = new ArrayDataProvider([
+            $analysisDataProvider = new ArrayDataProvider([
                 'allModels' => $analysis,
                 'pagination'=>false,
             ]);
@@ -136,7 +140,7 @@ class PstcrequestController extends Controller
                 'customer' => $customer,
                 'sample' => $samples,
                 'sampleDataProvider' => $sampleDataProvider,
-                'analysisDataprovider'=> $analysisDataprovider,
+                'analysisDataProvider'=> $analysisDataProvider,
                 'attachmentDataprovider'=> $attachmentDataprovider,
                 'respond' => $respond,
                 'pstc' => $pstc,
@@ -243,6 +247,55 @@ class PstcrequestController extends Controller
         ]);
     }
 
+    public function actionCreateanalysis()
+    {
+        $request_id = (int) Yii::$app->request->get('request_id');
+        $rstlId = (int) Yii::$app->user->identity->profile->rstl_id;
+        $pstc_id = (int) Yii::$app->request->get('pstc_id');
+
+        $model = new Pstcanalysis;
+
+        if(isset($_POST['sampletype']))
+        {
+            $request_id = (int) $_POST['request_id'];
+            $samples = Yii::$app->request->post('base_samples');
+            foreach($samples as $sample){
+                $testarray = [
+                    'sample_id' => $sample,
+                    'method_id' => (int) $_POST['method_id'],
+                    'rstl_id' => $rstlId,
+                    'pstc_id' => (int) $_POST['pstc_id'],
+                    'testname' =>(int) $_POST['testname'],
+                ];
+
+                $function = new PstcComponent();
+                $data = json_decode($function->getAnalysiscreate($testarray),true);
+            }
+
+            if($data){
+                Yii::$app->session->setFlash('success', 'Test Name Added!');
+                return $this->redirect(['/pstc/pstcrequest/view','request_id'=>$request_id,'pstc_id'=>$data['pstc_id']]);
+            }else{
+                Yii::$app->session->setFlash('error', 'Failed!');
+                return $this->redirect(['/lab/request/view','request_id'=>$data['pstc_request_id'],'pstc_id' => $data['pstc_id']]);
+            }
+        }
+
+        $function = new PstcComponent();
+        $details = json_decode($function->getViewRequest($request_id,$rstlId,$pstc_id),true);
+        $samples = $details['sample_data'];
+        $lists = json_decode($function->listLab(),true);
+
+
+        return $this->renderAjax('createanalysis', [
+            'model' => $model,
+            'request_id' => $request_id,
+            'pstc_id' =>  $pstc_id,
+            'base_sample' => $samples,
+            'sampletypes'=> $lists['sampletypes'],
+            'sampletype' => []
+        ]);
+    }
     public function actionGetlisttemplate() {
         if(isset($_GET['template_id'])){
             $id = (int) $_GET['template_id'];
@@ -269,7 +322,7 @@ class PstcrequestController extends Controller
     {
         $pstc = Pstcrequest::findOne(Yii::$app->request->post('request_id'));
         $post= Yii::$app->request->post('eRequest');
-    
+
         $model = new Request;
         $model->request_datetime = $post['request_datetime'];
         $model->rstl_id = Yii::$app->user->identity->profile->rstl_id;
@@ -287,6 +340,7 @@ class PstcrequestController extends Controller
        
         if($model->save(false))
         {
+            
             foreach($pstc->samples as $sampol) 
             {
                 $sample = new Sample;
@@ -299,16 +353,34 @@ class PstcrequestController extends Controller
                 $sample->sample_month = date_format(date_create($model->request_datetime),'m');
                 $sample->sample_year = date_format(date_create($model->request_datetime),'Y');
                 
-                if($sample->save(false)){
+                if($sample->save(false))
+                {
+            
+                    $analysis = new Analysis;
+                    $analysis->request_id = $model->request_id;
+                    $analysis->sample_id = $sample->sample_id;
+                    $analysis->testname =$sampol->analysis->testname;
+                    $analysis->method =$sampol->analysis->method;
+                    $analysis->references =$sampol->analysis->reference;
+                    $analysis->fee = $sampol->analysis->fee;
+                    $analysis->quantity =1;
+                    $analysis->date_analysis = date('Y-m-d');
+                    $analysis->rstl_id = $model->rstl_id;
+                    $analysis->test_id = 0;
+                    $analysis->save(false);
+                    
+
                     $pstc->accepted = 1;
                     $pstc->save();
-
                     Yii::$app->session->setFlash('success', 'Request Saved to local!');
-                    return $this->redirect(['/pstc/pstcrequest/view','request_id'=>$pstc['pstc_request_id'],'pstc_id'=>$pstc['pstc_id']]);
+                    // return $this->redirect(['/pstc/pstcrequest/view','request_id'=>$pstc['pstc_request_id'],'pstc_id'=>$pstc['pstc_id']]);
+                    return $this->redirect(['/lab/request/view','id'=>$model->request_id]);
                 }else{
 
                 }
             }
+
+            
         }
     }
 
@@ -333,7 +405,7 @@ class PstcrequestController extends Controller
 
         if($rstlId > 0 && $pstcId > 0 && $requestId > 0) {
             $details = json_decode($function->getViewRequest($requestId,$rstlId,$pstcId),true);
-
+           
             $request = $details['request_data'];
             $samples = $details['sample_data'];
             $analyses = $details['analysis_data'];
@@ -349,7 +421,7 @@ class PstcrequestController extends Controller
                 'pagination'=>false,
             ]);
 
-            $analysisDataprovider = new ArrayDataProvider([
+            $analysisDataProvider = new ArrayDataProvider([
                 'allModels' => $analyses,
                 'pagination'=>false,
             ]);
@@ -605,7 +677,7 @@ class PstcrequestController extends Controller
                     'request' => $request,
                     'customer' => $customer,
                     'sampleDataProvider' => $sampleDataProvider,
-                    'analysisDataprovider'=> $analysisDataprovider,
+                    'analysisDataprovider'=> $analysisDataProvider,
                     'respond' => $respond,
                     'pstc' => $pstc,
                     'subtotal' => $subtotal,
@@ -643,6 +715,62 @@ class PstcrequestController extends Controller
         }
     }
 
+    public function actionListsampletype() {
+        $out = [];
+        if (isset($_POST['depdrop_parents'])) {
+            //$sampleids = end($_POST['depdrop_parents']);
+            $sampletypeId = end($_POST['depdrop_parents']);
+
+            //this line belows removes the purpose of the sampletype _testname table , gets all the testnamemethod join with testname under certain sampletype_id
+            // $list = Testnamemethod::find()->with('testname')->where(['sampletype_id'=>$sampletypeId])->asArray()->all();
+            
+            $function = new PstcComponent();
+            $list = json_decode($function->testnamemethods($sampletypeId),true);
+           
+            
+            $selected  = null;
+            if ($sampletypeId != null && count($list) > 0) {
+                $selected = '';
+                foreach ($list as $i) {
+                    if($i['testname']){
+                        $out[] = ['id' => $i['testname']['testname_id'], 'name' => $i['testname']['test_name']];
+                        if ($i == 0) {
+                            $selected = $testname['testname_id'];
+                        }
+                    }
+                }
+                \Yii::$app->response->data = Json::encode(['output'=>$out, 'selected'=>'']);
+                return;
+            }
+        }
+        echo Json::encode(['output' => '', 'selected'=>'']);
+    }
+
+    public function actionGettestnamemethod()
+	{
+      
+        $testname_id = $_GET['testname_id'];
+        $sampletype_id = $_GET['sampletype_id'];
+        $sample = $_GET['sample'];
+
+       
+        
+        $function = new PstcComponent();
+        $testnamemethod = json_decode($function->testnamemethod($testname_id,$sampletype_id),true);
+        
+        $testnamedataprovider = new ArrayDataProvider([
+                'allModels' => $testnamemethod,
+                'pagination' => [
+                    'pageSize' => false,
+                ],
+             
+        ]);
+   
+        return $this->renderAjax('_method', [
+           'testnamedataprovider' => $testnamedataprovider,
+        ]);
+	
+     }
     // ------------------------------------
     // Protected functions
     // ------------------------------------
@@ -698,6 +826,206 @@ class PstcrequestController extends Controller
             $data = ['id' => '', 'text' => 'No results found'];
         }
         return ['data' => $data];
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+    public function actionCreatepackage($id)
+    {
+        $model = new Packagelist();
+        $request_id = $_GET['id'];
+        $searchModel = new PackagelistSearch();
+        $session = Yii::$app->session;
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+
+        if ($model->load(Yii::$app->request->post())) {
+            $sample_ids= $_POST['sample_ids'];
+            $ids = explode(',', $sample_ids);  
+            $post= Yii::$app->request->post();       
+            }
+            $samplesQuery = Pstcsample::find()->where(['pstc_request_id' => $id]);
+            $sampleDataProvider = new ActiveDataProvider([
+                    'query' => $samplesQuery,
+                    'pagination' => [
+                        'pageSize' => false,
+                               ],             
+            ]);
+
+            $request = $this->findRequest($request_id);
+            $testcategory = $this->listTestcategory();
+         
+            $sampletype = [];
+            $test = [];
+
+         if ($model->load(Yii::$app->request->post())) {
+                 $sample_ids= $_POST['sample_ids'];
+                 $ids = explode(',', $sample_ids);  
+                 $post= Yii::$app->request->post();
+
+                   
+
+                 foreach ($ids as $sample_id){  
+
+                     $p = $post['Packagelist']['name'];
+                     $r = str_replace("," , "", $post['Packagelist']['rate']);
+
+        
+                     $analysis = new Analysis();
+                     $modelpackage =  Package::findOne(['id'=>$post['Packagelist']['name']]);
+
+                     $analysis->sample_id = $sample_id;
+                     $analysis->cancelled = 0;
+                     $analysis->pstcanalysis_id = $GLOBALS['rstl_id'];
+                     $analysis->request_id = $request_id;
+                     $analysis->rstl_id = $GLOBALS['rstl_id'];
+                     $analysis->test_id = 0;
+                     $analysis->user_id = 1;
+                     $analysis->type_fee_id = 2;
+                     $analysis->testcategory_id = 0;
+                     $analysis->is_package = 1;
+                     $analysis->method = "-";
+                     $analysis->fee = $r;
+                     $analysis->testname = $modelpackage->name;
+                     $analysis->references = "-";
+                     $analysis->quantity = 1;
+                     $analysis->sample_code = "sample";
+                     $analysis->date_analysis = '2018-06-14 7:35:0';   
+                     $analysis->save();
+
+                     $testname_id = $_POST['package_ids'];
+                     $test_ids = explode(',', $testname_id);  
+
+                     foreach ($test_ids as $t_id){
+
+                        $analysis_package = new Analysis();
+                        $testnamemethod =  Testnamemethod::findOne(['testname_method_id'=>$t_id]);
+                        $modeltest=  Testname::findOne(['testname_id'=>$testnamemethod->testname_id]);
+                        $methodreference =  Methodreference::findOne(['method_reference_id'=>$testnamemethod->method_id]);
+
+                        $modelmethod=  Methodreference::findOne(['testname_id'=>$t_id]);
+                        $analysis_package->sample_id = $sample_id;
+                        $analysis_package->cancelled = 0;
+                        $analysis_package->pstcanalysis_id = Yii::$app->user->identity->profile->rstl_id;
+                        $analysis_package->request_id = $request_id;
+                        $analysis_package->rstl_id = Yii::$app->user->identity->profile->rstl_id;
+                        $analysis_package->test_id = $t_id;
+                        $analysis_package->user_id = 1;
+                        $analysis_package->type_fee_id = 2;
+                        $analysis_package->testcategory_id = $methodreference->method_reference_id;
+                        $analysis_package->is_package = 1;
+                        $analysis_package->method = $methodreference->method;
+                       // $analysis->method = $modelmethod->method;
+                        $analysis_package->fee = 0;
+                        $analysis_package->testname = $modeltest->testName;
+                        $analysis_package->references = $methodreference->reference;
+                        $analysis_package->quantity = 1;
+                        $analysis_package->sample_code = "sample";
+                        $analysis_package->date_analysis = '2018-06-14 7:35:0';   
+                        $analysis_package->save(false);
+
+                      
+                    }      
+                 }                   
+                 Yii::$app->session->setFlash('success', 'Package Succesfull Added');
+                 return $this->redirect(['/lab/request/view', 'id' =>$request_id]);
+        } 
+        if (Yii::$app->request->isAjax) {
+
+            $analysismodel = new Analysis();
+            $analysismodel->rstl_id = $GLOBALS['rstl_id'];
+            $analysismodel->pstcanalysis_id = $GLOBALS['rstl_id'];
+            $analysismodel->request_id = $GLOBALS['rstl_id'];
+            $analysismodel->testname = $GLOBALS['rstl_id'];
+            $analysismodel->cancelled = 0;
+            $analysismodel->is_package = 1;
+            $analysismodel->sample_id = $GLOBALS['rstl_id'];
+            $analysismodel->sample_code = $GLOBALS['rstl_id'];
+            $analysismodel->date_analysis = '2018-06-14 7:35:0';
+
+            return $this->renderAjax('_packageform', [
+                'model' => $model,
+                'searchModel' => $searchModel,
+                'dataProvider' => $dataProvider,
+                'request_id'=>$request_id,
+                'sampleDataProvider' => $sampleDataProvider,
+                'testcategory' => $testcategory,
+                'test' => $test,
+                'sampletype'=>$sampletype
+            ]);
+        }else{
+            $model->rstl_id = $GLOBALS['rstl_id'];
+            return $this->render('_packageform', [
+                'model' => $model,
+                'request_id'=>$request_id,
+                'searchModel' => $searchModel,
+                'dataProvider' => $dataProvider,
+                'sampleDataProvider' => $sampleDataProvider,
+                'testcategory' => $testcategory,
+                'test' => $test,
+                'sampletype'=>$sampletype
+            ]);
+        }
+    }
+
+    public function actionListpackage()
+    {
+        $out = [];
+        if (isset($_POST['depdrop_parents'])) {
+            $id = end($_POST['depdrop_parents']);
+            //$list = Package::find()->andWhere(['sampletype_id'=>$id])->asArray()->all();
+
+            $list =  Package::find()
+            ->innerJoin('tbl_sampletype', 'tbl_sampletype.sampletype_id=tbl_package.sampletype_id')
+            ->Where(['tbl_package.sampletype_id'=>2])
+            ->asArray()
+            ->all();
+
+            $selected  = null;
+            if ($id != null && count($list) > 0) {
+                $selected = '';
+                foreach ($list as $i => $package) {
+                    $out[] = ['id' => $package['id'], 'name' => $package['name']];
+                    if ($i == 0) {
+                        $selected = $package['id'];
+                    }
+                }
+                
+                echo Json::encode(['output' => $out, 'selected'=>$selected]);
+                return;
+            }
+        }
+        echo Json::encode(['output' => '', 'selected'=>'']);
+    }
+
+    protected function findRequest($requestId)
+    {
+        if (($model =Pstcrequest::findOne($requestId)) !== null) {
+            return $model;
+        } else {
+            throw new NotFoundHttpException('The requested page does not exist.');
+        }
+    }
+
+    protected function listTestcategory()
+    {
+        $testcategory = ArrayHelper::map(
+           Sampletype::find()
+           ->leftJoin('tbl_lab_sampletype', 'tbl_lab_sampletype.sampletype_id=tbl_sampletype.sampletype_id')
+           ->all(), 'sampletype_id', 
+           function($testcategory, $defaultValue) {
+               return $testcategory->type;
+        });
+
+        return $testcategory;
     }
 
 }

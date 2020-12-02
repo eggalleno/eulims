@@ -92,6 +92,6 @@ class Testname extends \yii\db\ActiveRecord
      */
     public function getTestnameMethods()
     {
-        return $this->hasMany(TestnameMethod::className(), ['testname_id' => 'testname_id']);
+        return $this->hasMany(Testnamemethod::className(), ['testname_id' => 'testname_id']);
     }
 }

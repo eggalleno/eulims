@@ -58,11 +58,24 @@ class PackageController extends Controller
      */
     public function actionView($id)
     {
-        if(Yii::$app->request->isAjax){
+        // if(Yii::$app->request->isAjax){
+
+            $model = $this->findModel($id);
+
+
+            $testnames = Testnamemethod::find()->with(['method','testname'])->where(['testname_method_id'=> explode(',', $model->tests)])->all();
+            $tests= '';
+
+            foreach ($testnames as $testname) {
+                    $tests = $tests.$testname->testname->testName.": ".$testname->method->method;
+                    $tests = $tests. "<br/>";
+            }
+
             return $this->renderAjax('view', [
-                    'model' => $this->findModel($id),
+                    'model' => $model,
+                    'tests' => $tests
                 ]);
-        }
+        // }
     }
 
     /**

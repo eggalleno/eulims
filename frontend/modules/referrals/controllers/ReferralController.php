@@ -542,200 +542,59 @@ class ReferralController extends Controller
 
         throw new NotFoundHttpException('The requested page does not exist.');
     }
-    //send notification
+    //send notification //btc has been here
     public function actionNotify()
     {
         $sample_data = [];
         $analysis_data = [];
         if(Yii::$app->request->get('request_id')){
             $requestId = (int) Yii::$app->request->get('request_id');
+            $agency_id = (int) Yii::$app->request->get('agency_id');
         } else {
             Yii::$app->session->setFlash('error', "Request ID not valid!");
             //delay for 2 seconds, before executing next line of code
             sleep(2);
             return $this->redirect(['/lab/request']);
         }
-        $request = exRequestreferral::find()->where(['request_id'=>$requestId,'request_type_id'=>2])->asArray()->one();
-       //$request = exRequestreferral::find()->joinWith(['samples.analyses'])->where(['tbl_request.request_id'=>$requestId,'request_type_id'=>2])->asArray()->all();
-        $ref_request = Referralrequest::find()->where('request_id =:requestId',[':requestId'=>$requestId])->one();
-        //$sample = $this->findSample($requestId);
+        
         $samples = Sample::find()->where(['request_id'=>$requestId])->asArray()->all();
-        //$analysis = $this->findAnalysis($requestId);
-        //$analysis = Analysis::find()->joinWith('sample')->where(['tbl_sample.request_id'=>$requestId])->asArray()->all();
-        $analyses = Analysis::find()->where(['request_id'=>$requestId])->asArray()->all();
-
-        $agency_id = (int) Yii::$app->request->get('agency_id');
+        //refactored the code here to the referralcomponents on function notifyReferral
 
         if($agency_id > 0){
-            if(count($request) > 0 && count($ref_request) > 0 && count($samples) > 0 && count($analyses) > 0)
-            {
-                //check if each sample contains at least one analysis
                 $checkWithAnalysis = $this->checkWithAnalysis($requestId);
                 if(count($samples) != $checkWithAnalysis){
                     return "<div class='alert alert-danger'><span class='glyphicon glyphicon-exclamation-sign' style='font-size:18px;'></span>&nbsp;Notification Failed: Make sure each sample contains at least one analysis.</div>";
-                } else {
-                    $connection= Yii::$app->labdb;
-                    $connection->createCommand('SET FOREIGN_KEY_CHECKS=0')->execute();
-                    $transaction = $connection->beginTransaction();
+                }else {
 
-                    $requestData = [
-                        'request_id' => $request['request_id'],
-                        //'request_ref_num' => $request->request_ref_num,
-                        'request_datetime' => $request['request_datetime'],
-                        'rstl_id' => $request['rstl_id'],
-                        'lab_id' => $request['lab_id'],
-                        'customer_id' => $request['customer_id'],
-                        'payment_type_id' => $request['payment_type_id'],
-                        'modeofrelease_ids' => $request['modeofrelease_ids'],
-                        'discount_id' => $request['discount_id'],
-                        'discount' => $request['discount'],
-                        'purpose_id' => $request['purpose_id'],
-                        'total' => $request['total'],
-                        'report_due' => $request['report_due'], //initial estimated due date sent by the receiving lab
-                        'conforme' => $request['conforme'],
-                        'receivedBy' => $request['receivedBy'],
-                        'status_id' => $request['status_id'],
-                        'request_type_id' => $request['request_type_id'],
-                        'created_at' => $request['created_at'],
-                        'sample_received_date' => $ref_request['sample_received_date'],
-                        'user_id_receiving' => Yii::$app->user->identity->profile->user_id,
-                        'bid'=>0
-                    ];
+                    $refcomponent = new ReferralComponent;
+                    $response = $refcomponent->syncReferral($requestId,$agency_id); //return boolean
 
-                    foreach ($samples as $sample) {
-                        $sampleData = [
-                            'sample_id' => $sample['sample_id'],
-                            'rstl_id' => $sample['rstl_id'],
-                        //    'package_id' => $sample['package_id'],
-                        //    'package_rate' => $sample['package_rate'],
-                            'sampletype_id' => $sample['sampletype_id'],
-                            'sample_code' => $sample['sample_code'],
-                            'samplename' => $sample['samplename'],
-                            'description' => $sample['description'],
-                            'customer_description' => $sample['customer_description'],
-                            'sampling_date' => $sample['sampling_date'],
-                            'remarks' => $sample['remarks'],
-                            'request_id' => $sample['request_id'],
-                            'sample_month' => $sample['sample_month'],
-                            'sample_year' => $sample['sample_year'],
-                            'active' => $sample['active'],
-                            'completed' => $sample['completed']
-                        ];
-                        array_push($sample_data, $sampleData);
-                    }
+                    if($response['response']==1){
 
-                    foreach ($analyses as $analysis) {
-                        $analysisData = [
-                            'analysis_id' => $analysis['analysis_id'],
-                            'date_analysis' => $analysis['date_analysis'],
-                            'rstl_id' => $analysis['rstl_id'],
-                            'request_id' => $analysis['request_id'],
-                            'sample_id' => $analysis['sample_id'],
-                            'sample_code' => $analysis['sample_code'],
-                            'package_id' => $analysis['package_id'],
-                            'testname' => $analysis['testname'],
-                            'method' => $analysis['method'],
-                            'methodref_id' => $analysis['methodref_id'],
-                            'references' => $analysis['references'],
-                            'fee' => $analysis['fee'],
-                            'test_id' => $analysis['test_id'],
-                            'cancelled' => $analysis['cancelled'],
-                            'is_package' => $analysis['is_package'],
-                            'is_package_name' => $analysis['is_package_name'],
-                            'type_fee_id' => $analysis['type_fee_id']
-                        ];
-                        array_push($analysis_data, $analysisData);
-                    }
+                        //put the code here to notify the referred agency
+                        //response got index response and referral_id
+                        $notifyresponse = $refcomponent->notifyAgency($response['referral_id'],$agency_id);
+                        
+                        if($notifyresponse){
+                             return "<div class='alert alert-success'><span class='glyphicon glyphicon-exclamation-sign' style='font-size:18px;'></span>&nbsp;Referral Successfully Synced! and Agency Notified</div>";
 
-                    $data = Json::encode(['request_data'=>$requestData,'sample_data'=>$sample_data,'analysis_data'=>$analysis_data,'agency_id'=>$agency_id],JSON_NUMERIC_CHECK);
+                            sleep(2);
+                            return $this->redirect(['/lab/request']);
+                         }
 
-                    $referralUrl='https://eulimsapi.onelab.ph/api/web/referral/referrals/insertreferraldata';
-                    //$referralUrl='http://localhost/eulimsapi.onelab.ph/api/web/referral/referrals/insertreferraldata';
-                   
-                    $curl = new curl\Curl();
-                    $referralreturn = $curl->setRequestBody($data)
-                    ->setHeaders([
-                        'Content-Type' => 'application/json',
-                        'Content-Length' => strlen($data),
-                    ])->post($referralUrl);
+                        return "<div class='alert alert-warning'><span class='glyphicon glyphicon-exclamation-sign' style='font-size:18px;'></span>&nbsp;Referral Successfully Synced! but failed to notify. <br/> Please Notify Them Again.</div>";
 
-                    $referralResponse = Json::decode($referralreturn);
-                    switch ($referralResponse['response']) {
-                        case 0:
-                            $transaction->rollBack();
-                            return "<div class='alert alert-danger'><span class='glyphicon glyphicon-exclamation-sign' style='font-size:18px;'></span>&nbsp;Failed to save referral details.</div>";
-                            break;
-                        case 1 :
-                            //return "Referral details saved.";
-                            goto notify;
-                            break;
-                        case 2:
-                            $transaction->rollBack();
-                            return "<div class='alert alert-danger'><span class='glyphicon glyphicon-exclamation-sign' style='font-size:18px;'></span>&nbsp;No data to be saved.</div>";
-                            break;
-                        case 3:
-                            //return "Referral details already existing.";
-                            goto notify;
-                            break;
-                        //function to send notification
-                        notify: {
-                            $mi = !empty(Yii::$app->user->identity->profile->middleinitial) ? " ".substr(Yii::$app->user->identity->profile->middleinitial, 0, 1).". " : " "; 
+                    }elseif($response['response']==0){
+                        //referral is already exisiting in the server, now we try to notify only
+                        $notifyresponse = $refcomponent->notifyAgency($response['referral_id'],$agency_id);
+                        if($notifyresponse)
+                             return "<div class='alert alert-success'><span class='glyphicon glyphicon-exclamation-sign' style='font-size:18px;'></span>&nbsp;Referral already Synced! and Agency is Notified!</div>";
 
-                            $senderName = Yii::$app->user->identity->profile->firstname.$mi.Yii::$app->user->identity->profile->lastname;
-
-                            $details = [
-                                'referral_id' => $referralResponse['referral_id'],
-                                'sender_id' => Yii::$app->user->identity->profile->rstl_id,
-                                'recipient_id' => $agency_id,
-                                'sender_user_id' => Yii::$app->user->identity->profile->user_id,
-                                'sender_name' => $senderName,
-                                'remarks' => "Notification sent"
-                            ];
-                            $notificationData = Json::encode(['notice_details'=>$details],JSON_NUMERIC_CHECK);
-
-                            $notificationUrl ='https://eulimsapi.onelab.ph/api/web/referral/notifications/notify';
-                            //$notificationUrl ='http://localhost/eulimsapi.onelab.ph/api/web/referral/notifications/notify';
-
-                            $curlNoti = new curl\Curl();
-                            $notificationResponse = $curlNoti->setRequestBody($notificationData)
-                            ->setHeaders([
-                                'Content-Type' => 'application/json',
-                                'Content-Length' => strlen($notificationData),
-                            ])->post($notificationUrl);
-
-                            if($notificationResponse > 0){
-                                if($ref_request->notified == 0){
-                                    //echo 'Notification sent.';
-                                    $modelref_request = Referralrequest::find()->where(['request_id'=>$requestId])->one();
-                                    $modelref_request->notified = 1;
-                                    if($modelref_request->save()){
-                                        $transaction->commit();
-                                        Yii::$app->session->setFlash('success', "Notification sent");
-                                        //delay for 2 seconds, before executing next line of code
-                                        sleep(2);
-                                        return $this->redirect(['/lab/request/view', 'id' => $requestId]);
-                                    } else {
-                                        $transaction->rollBack();
-                                        return "<div class='alert alert-danger'><span class='glyphicon glyphicon-exclamation-sign' style='font-size:18px;'></span>&nbsp;Notification Failed: Error occured when sending!</div>";
-                                    }
-                                } else {
-                                    $transaction->commit();
-                                    //return 'Notification sent.';
-                                    Yii::$app->session->setFlash('success', "Notification sent");
-                                    //delay for 2 seconds, before executing next line of code
-                                    sleep(2);
-                                    return $this->redirect(['/lab/request/view', 'id' => $requestId]);
-                                }
-                            } else {
-                                $transaction->rollBack();
-                                return "<div class='alert alert-danger'><span class='glyphicon glyphicon-exclamation-sign' style='font-size:18px;'></span>&nbsp;Server Error: Notification failed!</div>";
-                            }
-                        }
+                        return "<div class='alert alert-danger'><span class='glyphicon glyphicon-exclamation-sign' style='font-size:18px;'></span>&nbsp;Referral already Synced! , But failed to notify the target agency</div>";
+                    }else{
+                        return "<div class='alert alert-danger'><span class='glyphicon glyphicon-exclamation-sign' style='font-size:18px;'></span>&nbsp;Syncing Failed! , Failed to communicate with the server.</div>";
                     }
                 }
-            } else {
-                return "<div class='alert alert-danger'><span class='glyphicon glyphicon-exclamation-sign' style='font-size:18px;'></span>&nbsp;No data to be posted!</div>";
-            }
         } else {
             return "<div class='alert alert-danger'><span class='glyphicon glyphicon-exclamation-sign' style='font-size:18px;'></span>&nbsp;No agency to be notified!</div>";
         }

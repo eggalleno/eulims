@@ -12,9 +12,11 @@ use yii\web\JsExpression;
         'options' => [
             'chart' => [
                 'type' => 'pie',
+                'height' => '900px'
             ],
             'title' => [
                 'text' => 'Customers by Business Nature ' ,
+                'style'=>['fontSize'=>'30px']
             ],
             'credits' => false,
             'labels' => [
@@ -36,10 +38,11 @@ use yii\web\JsExpression;
                     'size' => '100%',
                     'showInLegend' => true,
                     'dataLabels' => [
-                        'enabled' => true,
+                        'enabled' => false,
                     ],
                 ],
             ],
+            'legend'=> ['itemStyle'=>['fontSize'=>'25px']]
         ]
     ]);
 ?>
