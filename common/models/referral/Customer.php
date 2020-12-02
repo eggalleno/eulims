@@ -1,5 +1,5 @@
 <?php
-namespace common\models\lab;
+namespace common\models\referral;
 use common\models\address\Barangay;
 use yii\db\ActiveRecord;
 use Yii;

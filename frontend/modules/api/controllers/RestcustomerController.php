@@ -553,19 +553,19 @@ class RestcustomerController extends \yii\rest\Controller
     }
 
     public function actionGetcustomerquotation(){
-        $query = Yii::$app->labdb->createCommand("SELECT b.testname_id, b.testName, d.labname, a.lab_id
+        $query = Yii::$app->referraldb->createCommand("SELECT b.testname_id, b.test_name, d.labname, a.lab_id
                                                   FROM tbl_testname_method AS a
                                                   INNER JOIN tbl_testname AS b ON a.testname_id = b.testname_id
                                                   INNER JOIN tbl_lab AS d ON a.lab_id = d.lab_id
-                                                  GROUP BY b.testname_id, b.testName, d.labname, a.lab_id
-                                                  ORDER BY a.lab_id, b.testName") ->queryAll();
+                                                  GROUP BY b.testname_id, b.test_name, d.labname, a.lab_id
+                                                  ORDER BY a.lab_id, b.test_name") ->queryAll();
         $arrayTestname =array();
         foreach ($query as $eachRow)
         {
             $recData=array();
 
             $recData['testname_id'] = $eachRow['testname_id'];
-            $recData['testName'] = $eachRow['testName'];
+            $recData['test_name'] = $eachRow['test_name'];
             $recData['labname'] = $eachRow['labname'];
             $recData['lab_id'] = $eachRow['lab_id'];
             array_push($arrayTestname,$recData);
@@ -617,6 +617,25 @@ class RestcustomerController extends \yii\rest\Controller
     public function actionLaboratorylist(){
         $model = Lab::find()->orderby(['lab_id'=>SORT_ASC])->all();
         return $this->asJson($model);
+    }
+    
+    public function actionGetquotation($id){
+        $model = Quotation::find()->where(['customer_id'=>$id])->orderby(['create_time'=>SORT_DESC])->all();
+         return $this->asJson($model);
+    /*$data =  unserialize($model->content);
+
+    var_dump($data);*/
+    //echo $data;
+    /*$newarray = [];
+    foreach ($data as $datum) {
+        $datum->method = 1;
+        $datum->fee = 100;
+        $newarray[] = $datum;
+    }*/
+
+/*    $model->content = serialize($newarray);    
+    $model->save();*/
+
     }
 
     //this function will return list of sampletype using the the labid , btc

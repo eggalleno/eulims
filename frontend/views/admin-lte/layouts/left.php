@@ -50,17 +50,17 @@ if(Yii::$app->user->isGuest){
 	// $unseen = $unseen_bid_notification['bid_notification'] > 0 ? $unseen_bid_notification['bid_notification'] : '';
   
     //notification will run if the user is already logged in
-	$this->registerJs("
-		setInterval(function(e){
-			get_unresponded_notifications();
-		}, 30000);
-	");
+	// $this->registerJs("
+	// 	setInterval(function(e){
+	// 		get_unresponded_notifications();
+	// 	}, 30000);
+	// ");
 	
-	$this->registerJs("
-		setInterval(function(e){
-			get_unseen_bidnotifications();
-		}, 30000);
-	");
+	// $this->registerJs("
+	// 	setInterval(function(e){
+	// 		get_unseen_bidnotifications();
+	// 	}, 30000);
+	// ");
 }
 ?>
 <aside class="main-sidebar">

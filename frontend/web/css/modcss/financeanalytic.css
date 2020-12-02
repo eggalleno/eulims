@@ -15,8 +15,8 @@
 }
 .highcharts-data-table caption {
     padding: 1em 0;
-    font-size: 1.2em;
-    color: #555;
+    font-size: 40px;
+    color: #000;
 }
 .highcharts-data-table th {
   font-weight: 600;
@@ -67,4 +67,8 @@
 .bg-entities{
   background-color: #618685  !important;
   color: #fff
+}
+
+.highcharts-legend-item{
+  font-size: 40px !important;
 }
