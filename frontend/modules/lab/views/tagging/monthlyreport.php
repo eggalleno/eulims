@@ -141,7 +141,7 @@ echo "<h1>Monthly Report for <b>".$month." ".$year."</b></h1>";
                 'value' => function($model) {
                     $ids="";
                     $amount =0;
-                    $samplesquery = Sample::find()->where(['request_id' => $model->request_id])->all();
+                    $samplesquery = Sample::find()->where(['request_id' => $model->request_id, 'active' => 1])->all();
                     foreach($samplesquery as $samples){
                         $ids .= $samples['sample_id'].",";
                         if($samples->analyses){
@@ -205,7 +205,7 @@ echo "<h1>Monthly Report for <b>".$month." ".$year."</b></h1>";
 
                     $ids="";
                     $amount =0;
-                    $samplesquery = Sample::find()->where(['request_id' => $model->request_id])->all();
+                    $samplesquery = Sample::find()->where(['request_id' => $model->request_id, 'active' => 1])->all();
                     foreach($samplesquery as $samples){
                         $ids .= $samples['sample_id'].",";
                         if($samples->analyses){
