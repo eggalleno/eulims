@@ -24,7 +24,7 @@ use  yii\web\Session;
  */
 class InfoController extends Controller
 {
-	public $source = 'http://eulims.onelab.ph/api/message/';
+	public $source = 'https://eulims.onelab.ph/api/message/';
     /**
      * @inheritdoc
      */
@@ -240,7 +240,7 @@ class InfoController extends Controller
 	public function actionLogin(){
 		$model = new LoginForm();
 		if ($model->load(Yii::$app->request->post())){
-			
+			return;
 			
 		}else{
 			return $this->render('login', [
@@ -411,6 +411,37 @@ class InfoController extends Controller
 		}
 	}
 	
-	
+	public function actionSearchcontact()
+    {
+		if(isset($_SESSION['usertoken'])){
+			
+
+			$userid= $_SESSION['userid'];
+			$token= $_SESSION['usertoken'];
+			$my_var = \Yii::$app->request->post();
+			$txtsearch=$my_var['txtsearch'];
+			
+			$authorization = "Authorization: Bearer ".$token; 
+			$apiUrl=$this->source.'searchcontact?txtsearch='.$txtsearch;
+			/*$params = [
+				'userid' => $my_var['recipientid']
+			]; */
+			$curl = new curl\Curl();
+			//$curl->setRequestBody(json_encode($params));
+			$curl->setOption(CURLOPT_HTTPHEADER, ['Content-Type: application/json' , $authorization]);
+			$curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
+			$curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
+			$curl->setOption(CURLOPT_TIMEOUT, 180);
+			$list = $curl->post($apiUrl);
+		
+			return $list;
+		}	
+		else{
+			$model = new LoginForm();
+			return $this->render('login', [
+			'model' => $model
+			]);
+		}
+	}
 	
 }
