@@ -137,10 +137,12 @@ class RequestController extends Controller
                 'query' => $analysisQuery,
                 'pagination' => false,
             ]);
+
             //gets the customer on the API //updated to new api //btc
-            $customer = json_decode($refcomponent->getCustomerOne($reqModel->customer_id),true);
+            $customer = $refcomponent->getCustomerOne($reqModel->customer_id);
+
             //gets all the matching agency ??? hard to maintain, needs inovative idea here //btc 
-            $agency = json_decode($refcomponent->listMatchAgency($id),true);
+            $agency = $refcomponent->listMatchAgency($id);
 
             //gets the attachement details ??? //btc
 			//set third parameter to 1 for attachment type deposit slip
@@ -151,9 +153,9 @@ class RequestController extends Controller
             $or = json_decode($refcomponent->getAttachment($reqModel->referral_id,Yii::$app->user->identity->profile->rstl_id,2),true);
 
             //get the referred Agency details //btc
-            //updated to new api with false return temporarily //btc TODOOOOOOOOOOOOOO
-            $referred_agency = json_decode($refcomponent->getReferredAgency($reqModel->referral_id,Yii::$app->user->identity->profile->rstl_id),true);
-   
+            //updated to new api //btc TODOOOOOOOOOOOOOO
+            $referred_agency = $refcomponent->getReferredAgency($reqModel->referral_id,Yii::$app->user->identity->profile->rstl_id);
+
             $as_receiving = !empty($referred_agency['receiving_agency']) && $referred_agency > 0 ? $referred_agency['receiving_agency']['name'] : null;
             $as_testing = !empty($referred_agency['testing_agency']) && $referred_agency > 0 ? $referred_agency['testing_agency']['name'] : null;
             //updated to new api with false return temporarily //btc TODOOOOOOOOOOOOO
@@ -906,6 +908,7 @@ class RequestController extends Controller
             $curl = new curl\Curl();
             $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
             $curl->setOption(CURLOPT_TIMEOUT, 180);
+            $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
             $show = $curl->get($apiUrl);
             return $apiUrl;
     }

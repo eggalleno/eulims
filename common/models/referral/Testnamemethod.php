@@ -86,4 +86,9 @@ class Testnamemethod extends \yii\db\ActiveRecord
     {
         return $this->hasOne(Lab::className(), ['lab_id' => 'lab_id']);
     }
+
+     public function getSampletype()
+    {
+        return $this->hasOne(Sampletype::className(), ['sampletype_id' => 'sampletype_id']);
+    }
 }
