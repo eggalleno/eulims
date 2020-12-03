@@ -251,6 +251,14 @@ class MessageController extends \yii\rest\Controller
         );
     }
 	
+	 public function actionSearchcontact($txtsearch)
+    {
+        $my_var = Profile::find()->where(['like', 'fullname', $txtsearch])->all();
+        return $this->asJson(
+            $my_var
+        );
+    }
+	
 	public function actionPossiblerecipients($userid){
         $my_var = Profile::find()->where(['!=', 'user_id', $userid])->all();
 		return $my_var;

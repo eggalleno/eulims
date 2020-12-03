@@ -25,6 +25,7 @@ use linslin\yii2\curl;
 class PstcComponent extends Component {
 
     public $source = 'http://eulims.test/api/restpstc/';
+    // public $source = 'https://eulims.dost9.ph/api/restpstc/';
     public $authorization = 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiIsImp0aSI6IjRmMWcyM2ExMmFhIn0.eyJpc3MiOiJodHRwOlwvXC9leGFtcGxlLmNvbSIsImF1ZCI6Imh0dHA6XC9cL2V4YW1wbGUub3JnIiwianRpIjoiNGYxZzIzYTEyYWEiLCJpYXQiOjE2MDE5NTY5MTUsImV4cCI6MTAyNDE5NTY5MTUsInVpZCI6NTB9.lMIUidFxtg9jXF9VLFJuKghHzqgVlu2S7s5OrZMUHoQ';
     //public $source = 'http://localhost/eulimsapi.onelab.ph';
     
@@ -98,6 +99,25 @@ class PstcComponent extends Component {
         $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
         return $data = $curl->post($apiUrl);
         
+    }
+    
+    function getAnalysiscreate($data)
+	{
+        $apiUrl=$this->source.'analysis';
+        $params = [
+            'rstl_id' => $data['rstl_id'],
+            'pstc_id' => $data['pstc_id'],
+            'sample_id' => $data['sample_id'],
+            'method_id' =>$data['method_id'],
+            'testname' => $data['testname'],
+        ];
+        $curl = new curl\Curl();
+        $curl->setRequestBody(json_encode($params));
+        $curl->setOption(CURLOPT_HTTPHEADER, ['Content-Type: application/json' , $this->authorization]);
+        $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
+        $curl->setOption(CURLOPT_TIMEOUT, 180);
+        $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
+        return $data = $curl->post($apiUrl);
 	}
 	
     //for viewing single pstc request
@@ -219,6 +239,43 @@ class PstcComponent extends Component {
         $curl->setOption(CURLOPT_TIMEOUT, 180);
         $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
         $lists = $curl->get($GLOBALS['local_api_url']."restpstc/listlab");
+
+        return $lists;
+    }
+
+    function testnamemethods($id)
+    {
+        $curl = new curl\Curl();
+        $curl->setOption(CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+        $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
+        $curl->setOption(CURLOPT_TIMEOUT, 180);
+        $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
+        $lists = $curl->get($GLOBALS['local_api_url']."restpstc/testnamemethods?id=".$id);
+
+        return $lists;
+    }
+
+    function sampletest($id)
+    {
+        $curl = new curl\Curl();
+        $curl->setOption(CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+        $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
+        $curl->setOption(CURLOPT_TIMEOUT, 180);
+        $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
+        $lists = $curl->get($GLOBALS['local_api_url']."restpstc/sampletest?id=".$id);
+
+        return $lists;
+    }
+
+
+    function testnamemethod($testname_id,$sampletype_id)
+    {
+        $curl = new curl\Curl();
+        $curl->setOption(CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+        $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
+        $curl->setOption(CURLOPT_TIMEOUT, 180);
+        $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
+        $lists = $curl->get($GLOBALS['local_api_url']."restpstc/testnamemethod?testname_id=".$testname_id."&sampletype_id=".$sampletype_id);
 
         return $lists;
     }

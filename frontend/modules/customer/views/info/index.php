@@ -61,7 +61,7 @@ if(Yii::$app->user->can('allow-create-op')){
 
                 // 'customer_id',
                 // 'rstl_id',
-           //     'customer_code',
+                'customer_code',
                 'customer_name',
                 // 'head',
                 //'tel',
