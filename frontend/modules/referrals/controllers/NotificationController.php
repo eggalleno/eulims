@@ -39,17 +39,10 @@ class NotificationController extends Controller
      */
     public function actionIndex()
     {
-        /*$searchModel = new NotificationSearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
-
-        return $this->render('index', [
-            'searchModel' => $searchModel,
-            'dataProvider' => $dataProvider,
-        ]);*/
         if(isset(Yii::$app->user->identity->profile->rstl_id)){
             $rstlId = Yii::$app->user->identity->profile->rstl_id;
             $refcomponent = new ReferralComponent();
-            $notification = json_decode($refcomponent->getNotificationAll($rstlId),true);
+            $notification = $refcomponent->getNotificationAll($rstlId);
             $count = $notification['count_notification'];
         } else {
             //return 'Session time out!';
@@ -66,7 +59,7 @@ class NotificationController extends Controller
                     case 1:
                         $agencyName = $this->getAgency($data['sender_id']);
                         $referral = $this->getReferral($data['referral_id']);
-                        $checkOwner = json_decode($refcomponent->checkOwner($data['referral_id'],$rstlId),true);
+                        $checkOwner = $refcomponent->checkOwner($data['referral_id'],$rstlId);
                         $arr_data = ['notice_sent'=>"<b>".$data['sender_name']."</b> of <b>".$agencyName."</b> notified a referral request.",'notice_id'=>$data['notification_id'],'notification_date'=>$data['notification_date'],'referral_id'=>$data['referral_id'],'owner'=>$checkOwner,'local_request_id'=>$referral['local_request_id'],'responded'=>$data['responded']];
                     break;
                     case 2:
@@ -89,13 +82,10 @@ class NotificationController extends Controller
         }
 
         $notificationDataProvider = new ArrayDataProvider([
-            //'key'=>'notification_id',
-            //'allModels' => $notification['notification'],
             'allModels' => $list,
             'pagination' => [
                 'pageSize' => 10,
             ],
-            //'pagination'=>false,
         ]);
 
 
@@ -138,7 +128,7 @@ class NotificationController extends Controller
         if(isset(Yii::$app->user->identity->profile->rstl_id)){
             $rstlId = Yii::$app->user->identity->profile->rstl_id;
             $refcomponent = new ReferralComponent();
-            $notification = json_decode($refcomponent->listUnrespondedNofication($rstlId),true);
+            $notification = $refcomponent->listUnrespondedNofication($rstlId);
         } else {
             //return 'Session time out!';
             return $this->redirect(['/site/login']);
@@ -154,19 +144,19 @@ class NotificationController extends Controller
                     case 1:
                         $agencyName = $this->getAgency($data['sender_id']);
                         $referral = $this->getReferral($data['referral_id']);
-                        $checkOwner = json_decode($refcomponent->checkOwner($data['referral_id'],$rstlId),true);
+                        $checkOwner = $refcomponent->checkOwner($data['referral_id'],$rstlId);
                         $arr_data = ['notice_sent'=>"<b>".$data['sender_name']."</b> of <b>".$agencyName."</b> notified a referral request.",'notice_id'=>$data['notification_id'],'notification_date'=>$data['notification_date'],'referral_id'=>$data['referral_id'],'owner'=>$checkOwner,'local_request_id'=>$referral['local_request_id'],'responded'=>$data['responded']];
                     break;
                     case 2:
                         $agencyName = $this->getAgency($data['sender_id']);
                         $referral = $this->getReferral($data['referral_id']);
-                        $checkOwner = json_decode($refcomponent->checkOwner($data['referral_id'],$rstlId),true);
+                        $checkOwner = $refcomponent->checkOwner($data['referral_id'],$rstlId);
                         $arr_data = ['notice_sent'=>"<b>".$data['sender_name']."</b> of <b>".$agencyName."</b> confirmed the referral notification.",'notice_id'=>$data['notification_id'],'notification_date'=>$data['notification_date'],'referral_id'=>$data['referral_id'],'owner'=>$checkOwner,'local_request_id'=>$referral['local_request_id'],'responded'=>$data['responded']];
                     break;
                     case 3:
                         $agencyName = $this->getAgency($data['sender_id']);
                         $referral = $this->getReferral($data['referral_id']);
-                        $checkOwner = json_decode($refcomponent->checkOwner($data['referral_id'],$rstlId),true);
+                        $checkOwner = $refcomponent->checkOwner($data['referral_id'],$rstlId);
                         $arr_data = ['notice_sent'=>"<b>".$data['sender_name']."</b> of <b>".$agencyName."</b> sent a referral request with referral code <b style='color:#000099;'>".$referral['referralcode']."</b>",'notice_id'=>$data['notification_id'],'notification_date'=>$data['notification_date'],'referral_id'=>$data['referral_id'],'owner'=>$checkOwner,'local_request_id'=>$referral['local_request_id'],'responded'=>$data['responded']];
                     break;
                 }
@@ -194,7 +184,7 @@ class NotificationController extends Controller
     private function getAgency($agencyId)
     {   
         $refcomponent = new ReferralComponent();
-        $agency = json_decode($refcomponent->listAgency($agencyId),true);
+        $agency = $refcomponent->listAgency($agencyId);
 
         if($agency != null){
             return $agency[0]['name'];
@@ -207,7 +197,7 @@ class NotificationController extends Controller
     {
         $refcomponent = new ReferralComponent();
         $rstlId = (int) Yii::$app->user->identity->profile->rstl_id;
-        $referral = json_decode($refcomponent->getReferralOne($referralId,$rstlId),true);
+        $referral = $refcomponent->getReferralOne($referralId,$rstlId);
 
         if($referral ==  0){
             return null;

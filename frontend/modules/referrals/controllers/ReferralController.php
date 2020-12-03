@@ -29,6 +29,9 @@ use common\models\referral\Statuslogs;
 use common\models\referral\Referraltrackreceiving;
 use common\models\referral\Referraltracktesting;
 use frontend\modules\referrals\template\Printreferral;
+use common\models\lab\Lab;
+use common\models\system\Rstl;
+use yii\db\Query;
 
 /**
  * ReferralController implements the CRUD actions for Referral model.
@@ -138,11 +141,11 @@ class ReferralController extends Controller
         if($rstlId > 0 && $noticeId > 0)
         {
             $refcomponent = new ReferralComponent();
-            $referralDetails = json_decode($refcomponent->getReferraldetails($referralId,$rstlId),true);
-            //$noticeDetails = json_decode($this->getNotificationDetails($noticeId,$rstlId),true);
-            $noticeDetails = json_decode($refcomponent->getNotificationOne($noticeId,$rstlId),true);
-            
-            if($referralDetails != 0 && $noticeDetails != 0)
+            $referralDetails = $refcomponent->getReferraldetails($referralId,$rstlId);
+
+            $noticeDetails = $refcomponent->getNotificationOne($noticeId,$rstlId);
+
+            if($referralDetails && $noticeDetails)
             {
                 $model = new Request(); //for declaration required in Detailview
 
@@ -150,10 +153,9 @@ class ReferralController extends Controller
                 $samples = $referralDetails['sample_data'];
                 $analyses = $referralDetails['analysis_data'];
                 $customer = $referralDetails['customer_data'];
-
-                //set third parameter to 1 for attachment type deposit slip
+                //set third parameter to 1 for attachment type deposit slip //this one returns false temporarily
                 $deposit = json_decode($refcomponent->getAttachment($referralId,Yii::$app->user->identity->profile->rstl_id,1),true);
-                //set third parameter to 2 for attachment type or
+                //set third parameter to 2 for attachment type or //this one returns false temporarily
                 $or = json_decode($refcomponent->getAttachment($referralId,Yii::$app->user->identity->profile->rstl_id,2),true);
                 $referred_agency = json_decode($refcomponent->getReferredAgency($referralId,Yii::$app->user->identity->profile->rstl_id),true);
 
@@ -576,6 +578,13 @@ class ReferralController extends Controller
                         $notifyresponse = $refcomponent->notifyAgency($response['referral_id'],$agency_id);
                         
                         if($notifyresponse){
+
+                            $refreq =  Referralrequest::find()->where(['request_id'=>$requestId])->one();
+                            if($refreq){
+                                $refreq->notified=1;
+                                $refreq->save(false);
+                            }
+
                              return "<div class='alert alert-success'><span class='glyphicon glyphicon-exclamation-sign' style='font-size:18px;'></span>&nbsp;Referral Successfully Synced! and Agency Notified</div>";
 
                             sleep(2);
@@ -587,8 +596,14 @@ class ReferralController extends Controller
                     }elseif($response['response']==0){
                         //referral is already exisiting in the server, now we try to notify only
                         $notifyresponse = $refcomponent->notifyAgency($response['referral_id'],$agency_id);
-                        if($notifyresponse)
-                             return "<div class='alert alert-success'><span class='glyphicon glyphicon-exclamation-sign' style='font-size:18px;'></span>&nbsp;Referral already Synced! and Agency is Notified!</div>";
+                        if($notifyresponse){
+                            $refreq =  Referralrequest::find()->where(['request_id'=>$requestId])->one();
+                            if($refreq){
+                                $refreq->notified=1;
+                                $refreq->save(false);
+                            }
+                            return "<div class='alert alert-success'><span class='glyphicon glyphicon-exclamation-sign' style='font-size:18px;'></span>&nbsp;Referral already Synced! and Agency is Notified!</div>";
+                        }
 
                         return "<div class='alert alert-danger'><span class='glyphicon glyphicon-exclamation-sign' style='font-size:18px;'></span>&nbsp;Referral already Synced! , But failed to notify the target agency</div>";
                     }else{
@@ -631,17 +646,11 @@ class ReferralController extends Controller
                     ];
                     $notificationData = Json::encode(['notice_details'=>$details],JSON_NUMERIC_CHECK);
 
-                    $notificationUrl ='https://eulimsapi.onelab.ph/api/web/referral/notifications/confirm';
-                    //$notificationUrl ='http://localhost/eulimsapi.onelab.ph/api/web/referral/notifications/confirm';
 
-                    $curlNoti = new curl\Curl();
-                    $notificationResponse = $curlNoti->setRequestBody($notificationData)
-                    ->setHeaders([
-                        'Content-Type' => 'application/json',
-                        'Content-Length' => strlen($notificationData),
-                    ])->post($notificationUrl);
+                    $refcomponent=new ReferralComponent();
+                    $notificationResponse = $refcomponent->setestimatedue($notificationData);
 
-                    if($notificationResponse > 0){
+                    if($notificationResponse){
                         $transaction->commit();
                         Yii::$app->session->setFlash('success', "Confirmation sent");
                         return $this->redirect(['/referrals/notification']);
@@ -675,15 +684,19 @@ class ReferralController extends Controller
             return $this->redirect(['/lab/request']);
         }
 
+        // i dont think this transaction is neccessarry, when the aim is only reading data???
         $connection= Yii::$app->labdb;
         $connection->createCommand('SET FOREIGN_KEY_CHECKS=0')->execute();
         $transaction = $connection->beginTransaction();
 
         $agency_id = (int) Yii::$app->request->get('agency_id');
-
+        //exrequest is an extended class of the request
         $modelRequest = exRequestreferral::find()->where(['request_id'=>$requestId,'request_type_id'=>2])->one();
+        //referralrequest is the referral reference of the request , it got its own table
         $ref_request = Referralrequest::find()->where('request_id =:requestId AND notified =:notified',[':requestId'=>$requestId,':notified'=>1])->one();
+        //of course the samples
         $samples = Sample::find()->where(['request_id'=>$requestId])->asArray()->all();
+        //and the analysis
         $analysesCount = Analysis::find()->where(['request_id'=>$requestId])->count();
 
         $rstlId = (int) Yii::$app->user->identity->profile->rstl_id;
@@ -700,44 +713,47 @@ class ReferralController extends Controller
                 } else {
                     $generateCode = $this->generateCode($rstlId,$requestId,$labId,$year);
                     if($generateCode == 1){
+                        //requerying the request after generating its request Code
                         $request = exRequestreferral::find()->where(['request_id'=>$requestId,'request_type_id'=>2])->one();
 
-                        if(Yii::$app->request->get('bidding') == 1){
-                            $requestData = [
-                                'request_id' => $request->request_id,
-                                'request_ref_num' => $request->request_ref_num,
-                                'request_datetime' => $request->request_datetime,
-                                'rstl_id' => $request->rstl_id,
-                                'lab_id' => $request->lab_id,
-                                'customer_id' => $request->customer_id,
-                                'payment_type_id' => $request->payment_type_id,
-                                'modeofrelease_ids' => $request->modeofrelease_ids,
-                                'discount_id' => $request->discount_id,
-                                'discount' => $request->discount,
-                                'purpose_id' => $request->purpose_id,
-                                //'total' => $request->total,
-                                'total' => 0,
-                                //'report_due' => $request->report_due, //report due is updated base on the estimated due date set by the agency
-                                'conforme' => $request->conforme,
-                                'receivedBy' => $request->receivedBy,
-                                'request_type_id' => $request->request_type_id,
-                                'sample_received_date' => $ref_request->sample_received_date,
-                                'user_id_receiving' => Yii::$app->user->identity->profile->user_id
-                            ];
+                        if(Yii::$app->request->get('bidding') == 1){ //no bidding yet
+                            //this is just temporary
+                            $data = [];
+                            // $requestData = [
+                            //     'request_id' => $request->request_id,
+                            //     'request_ref_num' => $request->request_ref_num,
+                            //     'request_datetime' => $request->request_datetime,
+                            //     'rstl_id' => $request->rstl_id,
+                            //     'lab_id' => $request->lab_id,
+                            //     'customer_id' => $request->customer_id,
+                            //     'payment_type_id' => $request->payment_type_id,
+                            //     'modeofrelease_ids' => $request->modeofrelease_ids,
+                            //     'discount_id' => $request->discount_id,
+                            //     'discount' => $request->discount,
+                            //     'purpose_id' => $request->purpose_id,
+                            //     //'total' => $request->total,
+                            //     'total' => 0,
+                            //     //'report_due' => $request->report_due, //report due is updated base on the estimated due date set by the agency
+                            //     'conforme' => $request->conforme,
+                            //     'receivedBy' => $request->receivedBy,
+                            //     'request_type_id' => $request->request_type_id,
+                            //     'sample_received_date' => $ref_request->sample_received_date,
+                            //     'user_id_receiving' => Yii::$app->user->identity->profile->user_id
+                            // ];
 
-                            foreach ($samples as $sample) {
-                                $sampleData = [
-                                    'sample_id' => $sample['sample_id'],
-                                    'request_id' => $sample['request_id'],
-                                    'sample_code' => $sample['sample_code'],
-                                    'sample_month' => $sample['sample_month'],
-                                    'sample_year' => $sample['sample_year']
-                                ];
-                                array_push($sample_data, $sampleData);
-                            }
-                            $data = Json::encode(['request_data'=>$requestData,'sample_data'=>$sample_data,'agency_id'=>$agency_id],JSON_NUMERIC_CHECK);
+                            // foreach ($samples as $sample) {
+                            //     $sampleData = [
+                            //         'sample_id' => $sample['sample_id'],
+                            //         'request_id' => $sample['request_id'],
+                            //         'sample_code' => $sample['sample_code'],
+                            //         'sample_month' => $sample['sample_month'],
+                            //         'sample_year' => $sample['sample_year']
+                            //     ];
+                            //     array_push($sample_data, $sampleData);
+                            // }
+                            // $data = Json::encode(['request_data'=>$requestData,'sample_data'=>$sample_data,'agency_id'=>$agency_id],JSON_NUMERIC_CHECK);
 
-                            $referralUrl='https://eulimsapi.onelab.ph/api/web/referral/referrals/sendbidreferral';
+                            // $referralUrl='https://eulimsapi.onelab.ph/api/web/referral/referrals/sendbidreferral';
                             //$referralUrl='http://localhost/eulimsapi.onelab.ph/api/web/referral/referrals/sendbidreferral';
                         } else {
                             $requestData = [
@@ -772,20 +788,12 @@ class ReferralController extends Controller
                                 array_push($sample_data, $sampleData);
                             }
                             $data = Json::encode(['request_data'=>$requestData,'sample_data'=>$sample_data,'agency_id'=>$agency_id],JSON_NUMERIC_CHECK);
-
-                            $referralUrl='https://eulimsapi.onelab.ph/api/web/referral/referrals/sendreferral';
-                            //$referralUrl='http://localhost/eulimsapi.onelab.ph/api/web/referral/referrals/sendreferral';
                         }
-                       
-                        $curl = new curl\Curl();
-                        $referralreturn = $curl->setRequestBody($data)
-                        ->setHeaders([
-                            'Content-Type' => 'application/json',
-                            'Content-Length' => strlen($data),
-                        ])->post($referralUrl);
-
-                        $referralResponse = json_decode($referralreturn,true);
-                        
+                        var_dump($data); exit;
+                        //new function in the referral component that contacts 'sendreferral' action in the api
+                        $refcomponent=new ReferralComponent();
+                        $referralResponse = $refcomponent->sendReferral($data);
+                        var_dump($referralResponse); exit;
                         switch ($referralResponse['response']) {
                             case 0:
                                 $transaction->rollBack();
@@ -964,7 +972,6 @@ class ReferralController extends Controller
                                         'Content-Type' => 'application/json',
                                         'Content-Length' => strlen($pstc_request_details),
                                     ])->post($pstcUrl);
-
                                 }
 
                                 if($notificationResponse > 0 && $pstcResponse > 0) {
@@ -1403,18 +1410,37 @@ class ReferralController extends Controller
     }
     //generate reference code and sample code
     protected function generateCode($rstlId,$requestId,$labId,$year){
-        $return=0;
-        $func=new Functions();
-        $proc="spGetNextGeneratedRequestCode(:rstlId,:labId)";
-        $params=[
-            ':rstlId'=>$rstlId,
-            ':labId'=>$labId
-        ];
+
+        /*** code salvage from EGG in generating the request code*/
+
+        $lastnum=(new Query)
+            ->select('MAX(number) AS lastnumber')
+            ->from('eulims_lab.tbl_requestcode')
+            ->where(['lab_id' => $labId, 'year'=> $year])
+            ->one();
+        $monthyear=date('mY',strtotime(date('Y-m-d')));
+        $rstl= Rstl::find()->where(['rstl_id'=>$rstlId])->one();
+        $code=$rstl->code;
+        
+        $lab= Lab::find()->where(['lab_id'=>$labId])->one();
+        $labcode=$lab->labcode;
+        
+        $str_trans_num=0;
+          if($lastnum != ''){
+            $str_trans_num=$lastnum["lastnumber"] + 1;
+            $str_trans_num=str_pad($str_trans_num, 4, "0", STR_PAD_LEFT);
+              
+          }
+          else{
+              $str_trans_num='0001';
+          }
+
+        $referenceNumber=$code."-".$monthyear."-".$labcode."-".$str_trans_num;
+        $requestIncrement=$str_trans_num;
+        /*******************/
+
         $connection= Yii::$app->labdb;
         $transaction =$connection->beginTransaction();
-        $row = $func->ExecuteStoredProcedureOne($proc, $params, $connection);
-        $referenceNumber=$row['GeneratedRequestCode'];
-        $requestIncrement=$row['RequestIncrement'];
         //Update the tbl_requestcode
         $requestcode= Requestcode::find()->where([
             'rstl_id'=>(int) $rstlId,

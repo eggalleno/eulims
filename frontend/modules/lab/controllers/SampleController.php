@@ -614,7 +614,7 @@ class SampleController extends Controller
         $list = $refcomponent->getSampletype($labId);
         $data = [];
         if($list)
-            $data = ArrayHelper::map(json_decode($list), 'sampletype_id', 'type');
+            $data = ArrayHelper::map($list, 'sampletype_id', 'type');
         return $data;
     }
 }

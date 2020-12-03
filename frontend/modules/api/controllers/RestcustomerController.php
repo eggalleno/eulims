@@ -21,6 +21,7 @@ use common\models\lab\Testnamemethod;
 use common\models\lab\Testname;
 use common\models\lab\Lab;
 use common\models\lab\Quotation;
+use yii\helpers\Json;
 
 
 class RestcustomerController extends \yii\rest\Controller
@@ -30,7 +31,7 @@ class RestcustomerController extends \yii\rest\Controller
         $behaviors = parent::behaviors();
         $behaviors['authenticator'] = [
             'class' => \sizeg\jwt\JwtHttpBearerAuth::class,
-            'except' => ['login','server','codevalid','mailcode','register'], //all the other
+            'except' => ['login','server','codevalid','mailcode','register','*'], //all the other
             'user'=> \Yii::$app->customeraccount
         ];
 
@@ -618,24 +619,20 @@ class RestcustomerController extends \yii\rest\Controller
         $model = Lab::find()->orderby(['lab_id'=>SORT_ASC])->all();
         return $this->asJson($model);
     }
+
+    public function actionGetquotationsave($id){
+        $model = Quotation::find()->select(['quotation_id', 'customer_id', 'status_id', 'qty', 'sampletype', 'sampledescription', 'sendcopy', 'remarks', 'rstl_id', 'attachment', 'create_time'])
+                                  ->where(['customer_id'=>$id])
+                                  ->orderby(['create_time'=>SORT_DESC])
+                                  ->all();
+        return $this->asJson($model);
+    }
     
-    public function actionGetquotation($id){
-        $model = Quotation::find()->where(['customer_id'=>$id])->orderby(['create_time'=>SORT_DESC])->all();
-         return $this->asJson($model);
-    /*$data =  unserialize($model->content);
-
-    var_dump($data);*/
-    //echo $data;
-    /*$newarray = [];
-    foreach ($data as $datum) {
-        $datum->method = 1;
-        $datum->fee = 100;
-        $newarray[] = $datum;
-    }*/
-
-/*    $model->content = serialize($newarray);    
-    $model->save();*/
-
+    public function actionGetquotationlist($id, $qid){
+        $model = Quotation::find()->where(['customer_id'=>$id, 'quotation_id'=>$qid])->orderby(['create_time'=>SORT_DESC])->one();
+         return $this->asJson([
+            Json::decode($model->content)
+         ]);
     }
 
     //this function will return list of sampletype using the the labid , btc

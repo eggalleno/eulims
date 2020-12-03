@@ -7,8 +7,12 @@ use yii\data\ActiveDataProvider;
 use common\models\referral\Pstcrequest;
 use common\models\referral\Pstcsample;
 use common\models\referral\Pstcanalysis;
-use common\models\referral\Packagelist;
-use common\models\referral\PackagelistSearch;
+use common\models\lab\Package;
+use common\models\lab\Testnamemethod;
+use common\models\lab\Methodreference;
+use common\models\lab\Testname;
+use common\models\lab\Packagelist;
+use common\models\lab\PackagelistSearch;
 use common\models\lab\Request;
 use common\models\lab\Sample;
 use common\models\lab\Analysis;
@@ -45,18 +49,6 @@ use yii\helpers\Json;
  */
 class PstcrequestController extends Controller
 {
-  
-    public function behaviors()
-    {
-        return [
-            'verbs' => [
-                'class' => VerbFilter::className(),
-                'actions' => [
-                    'delete' => ['POST'],
-                ],
-            ],
-        ];
-    }
   
     public function actionIndex()
     {
@@ -274,10 +266,10 @@ class PstcrequestController extends Controller
 
             if($data){
                 Yii::$app->session->setFlash('success', 'Test Name Added!');
-                return $this->redirect(['/pstc/pstcrequest/view','request_id'=>$request_id,'pstc_id'=>$data['pstc_id']]);
+                return $this->redirect(['/pstc/pstcrequest/view','request_id'=>$request_id,'pstc_id'=>$_POST['pstc_id']]);
             }else{
                 Yii::$app->session->setFlash('error', 'Failed!');
-                return $this->redirect(['/lab/request/view','request_id'=>$data['pstc_request_id'],'pstc_id' => $data['pstc_id']]);
+                return $this->redirect(['/lab/request/view','request_id'=>$data['pstc_request_id'],'pstc_id' => $_POST['pstc_id']]);
             }
         }
 
@@ -337,6 +329,7 @@ class PstcrequestController extends Controller
         $model->receivedBy= $post['receivedBy'];
         $model->request_type_id = 3;
         $model->report_due = $post['report_due'];
+        $model->referral_id = $pstc['pstc_request_id'];
        
         if($model->save(false))
         {
@@ -355,26 +348,27 @@ class PstcrequestController extends Controller
                 
                 if($sample->save(false))
                 {
-            
-                    $analysis = new Analysis;
-                    $analysis->request_id = $model->request_id;
-                    $analysis->sample_id = $sample->sample_id;
-                    $analysis->testname =$sampol->analysis->testname;
-                    $analysis->method =$sampol->analysis->method;
-                    $analysis->references =$sampol->analysis->reference;
-                    $analysis->fee = $sampol->analysis->fee;
-                    $analysis->quantity =1;
-                    $analysis->date_analysis = date('Y-m-d');
-                    $analysis->rstl_id = $model->rstl_id;
-                    $analysis->test_id = 0;
-                    $analysis->save(false);
+                    foreach($sampol->analysis as $an){
+                        $analysis = new Analysis;
+                        $analysis->request_id = $model->request_id;
+                        $analysis->sample_id = $sample->sample_id;
+                        $analysis->testname =$an->testname;
+                        $analysis->method =$an->method;
+                        $analysis->references =$an->reference;
+                        $analysis->fee = $an->fee;
+                        $analysis->quantity =1;
+                        $analysis->date_analysis = date('Y-m-d');
+                        $analysis->rstl_id = $model->rstl_id;
+                        $analysis->test_id = 0;
+                        $analysis->save(false);
+                    }
                     
-
                     $pstc->accepted = 1;
                     $pstc->save();
                     Yii::$app->session->setFlash('success', 'Request Saved to local!');
                     // return $this->redirect(['/pstc/pstcrequest/view','request_id'=>$pstc['pstc_request_id'],'pstc_id'=>$pstc['pstc_id']]);
                     return $this->redirect(['/lab/request/view','id'=>$model->request_id]);
+
                 }else{
 
                 }
@@ -746,6 +740,26 @@ class PstcrequestController extends Controller
         echo Json::encode(['output' => '', 'selected'=>'']);
     }
 
+    public function actionDelete($id)
+    {
+        $model = $this->findModel($id);
+        $session = Yii::$app->session;    
+            if($model->delete()) {
+                location.reload();
+            } else {
+                return $model->error();
+            }
+        
+    }
+
+    protected function findModel($id)
+    {
+        if (($model = Pstcanalysis::findOne($id)) !== null) {
+            return $model;
+        }
+        throw new NotFoundHttpException('The requested page does not exist.');
+    }
+
     public function actionGettestnamemethod()
 	{
       
@@ -879,26 +893,27 @@ class PstcrequestController extends Controller
                      $r = str_replace("," , "", $post['Packagelist']['rate']);
 
         
-                     $analysis = new Analysis();
+                     $analysis = new Pstcanalysis();
                      $modelpackage =  Package::findOne(['id'=>$post['Packagelist']['name']]);
 
-                     $analysis->sample_id = $sample_id;
-                     $analysis->cancelled = 0;
-                     $analysis->pstcanalysis_id = $GLOBALS['rstl_id'];
-                     $analysis->request_id = $request_id;
+                     $analysis->pstc_sample_id = $sample_id;
                      $analysis->rstl_id = $GLOBALS['rstl_id'];
-                     $analysis->test_id = 0;
-                     $analysis->user_id = 1;
-                     $analysis->type_fee_id = 2;
-                     $analysis->testcategory_id = 0;
-                     $analysis->is_package = 1;
-                     $analysis->method = "-";
-                     $analysis->fee = $r;
+                     $analysis->pstc_id = 113;
+                     $analysis->testname_id = 0;
                      $analysis->testname = $modelpackage->name;
-                     $analysis->references = "-";
+                     $analysis->package_id = $modelpackage->id;
+                     $analysis->package_name = $modelpackage->name;
+                     $analysis->method_id = 0;
+                     $analysis->method = "-";
+                     $analysis->reference = "-";
+                     $analysis->fee = $r;
                      $analysis->quantity = 1;
-                     $analysis->sample_code = "sample";
-                     $analysis->date_analysis = '2018-06-14 7:35:0';   
+                     $analysis->is_package = 1;
+                     $analysis->testId_old = 0;
+                     $analysis->package_old = 0;
+                     $analysis->deleted_old = 0;
+                     $analysis->taggingId_old = 0;
+                     $analysis->user_id = 0;
                      $analysis->save();
 
                      $testname_id = $_POST['package_ids'];
@@ -906,30 +921,29 @@ class PstcrequestController extends Controller
 
                      foreach ($test_ids as $t_id){
 
-                        $analysis_package = new Analysis();
+                        $analysis_package = new Pstcanalysis();
                         $testnamemethod =  Testnamemethod::findOne(['testname_method_id'=>$t_id]);
                         $modeltest=  Testname::findOne(['testname_id'=>$testnamemethod->testname_id]);
                         $methodreference =  Methodreference::findOne(['method_reference_id'=>$testnamemethod->method_id]);
 
                         $modelmethod=  Methodreference::findOne(['testname_id'=>$t_id]);
-                        $analysis_package->sample_id = $sample_id;
-                        $analysis_package->cancelled = 0;
-                        $analysis_package->pstcanalysis_id = Yii::$app->user->identity->profile->rstl_id;
-                        $analysis_package->request_id = $request_id;
-                        $analysis_package->rstl_id = Yii::$app->user->identity->profile->rstl_id;
-                        $analysis_package->test_id = $t_id;
-                        $analysis_package->user_id = 1;
-                        $analysis_package->type_fee_id = 2;
-                        $analysis_package->testcategory_id = $methodreference->method_reference_id;
-                        $analysis_package->is_package = 1;
-                        $analysis_package->method = $methodreference->method;
-                       // $analysis->method = $modelmethod->method;
-                        $analysis_package->fee = 0;
+                        
+                        $analysis_package->pstc_sample_id = $sample_id;
+                        $analysis_package->rstl_id = $GLOBALS['rstl_id'];
+                        $analysis_package->pstc_id = 113;
+                        $analysis_package->testname_id = $t_id;
                         $analysis_package->testname = $modeltest->testName;
-                        $analysis_package->references = $methodreference->reference;
+                        $analysis_package->method_id = $methodreference->method_reference_id;
+                        $analysis_package->method = $methodreference->method;
+                        $analysis_package->reference = $methodreference->reference;
+                        $analysis_package->fee = 0;
                         $analysis_package->quantity = 1;
-                        $analysis_package->sample_code = "sample";
-                        $analysis_package->date_analysis = '2018-06-14 7:35:0';   
+                        $analysis_package->is_package = 1;
+                        $analysis_package->testId_old = 0;
+                        $analysis_package->package_old = 0;
+                        $analysis_package->deleted_old = 0;
+                        $analysis_package->taggingId_old = 0;
+                        $analysis_package->user_id = 0;
                         $analysis_package->save(false);
 
                       
@@ -1005,6 +1019,49 @@ class PstcrequestController extends Controller
         }
         echo Json::encode(['output' => '', 'selected'=>'']);
     }
+
+    public function actionGetpackage() {
+
+        if ($_GET['packagelist_id']){
+            if(isset($_GET['packagelist_id'])){
+                $id = (int) $_GET['packagelist_id'];
+                $modelpackagelist =  Package::findOne($id);
+                $tet = $modelpackagelist->tests;
+    
+                    if($modelpackagelist){
+                        $rate = number_format($modelpackagelist->rate,2);
+                        $space = explode(',', $tet);
+    
+                        $tests = "";
+                        $testsNameMethods = Testnamemethod::find()->where(['in', 'testname_method_id',$space])->all();
+                            foreach($testsNameMethods as $method){
+                                $tests = $tests." ".$method->testname->testName;
+                            }
+    
+                    } else {
+                        $rate = "";
+                        $tests = "";
+                        
+                    }
+                } else {
+                    $rate = "Error getting rate";
+                    $tests = "Error getting tests";
+                }
+                
+                return Json::encode([
+                    'rate'=>$rate,
+                    'tests'=>$tests,
+                    'ids'=>$tet,
+                ]);
+            }else{
+                $x = 0;
+            return Json::encode([
+                'rate'=>$x,
+                'tests'=>'None',
+                'ids'=>$x,
+            ]);
+            }
+        }
 
     protected function findRequest($requestId)
     {

@@ -50,9 +50,8 @@ class Pstcrequest extends \yii\db\ActiveRecord
     {
         return [
             [['rstl_id', 'pstc_id', 'customer_id', 'submitted_by', 'received_by', 'user_id', 'created_at'], 'required'],
-            [['rstl_id', 'pstc_id', 'customer_id', 'discount_id', 'user_id', 'status_id', 'accepted', 'local_request_id', 'is_referral'], 'integer'],
-            [['discount_rate'], 'number'],
-            [['sample_received_date', 'requestDate_old', 'created_at', 'updated_at'], 'safe'],
+            [['rstl_id', 'pstc_id', 'customer_id', 'user_id', 'status_id', 'accepted', 'is_referral'], 'integer'],
+            [['duedate','created_at', 'updated_at'], 'safe'],
             [['submitted_by', 'received_by'], 'string', 'max' => 100],
         ];
     }
@@ -67,17 +66,13 @@ class Pstcrequest extends \yii\db\ActiveRecord
             'rstl_id' => 'Rstl ID',
             'pstc_id' => 'Pstc ID',
             'customer_id' => 'Customer ID',
-            'discount_id' => 'Discount ID',
-            'discount_rate' => 'Discount Rate',
             'submitted_by' => 'Submitted By',
             'received_by' => 'Received By',
             'user_id' => 'User ID',
             'status_id' => 'Status ID',
             'accepted' => 'Accepted',
-            'local_request_id' => 'Local Request ID',
-            'sample_received_date' => 'Sample Received Date',
             'is_referral' => 'Is Referral',
-            'requestDate_old' => 'Request Date Old',
+            'duedate' => 'Due Date',
             'created_at' => 'Created At',
             'updated_at' => 'Updated At',
         ];

@@ -23,6 +23,41 @@ use yii\helpers\ArrayHelper;
 class RestpstcController extends \yii\rest\Controller
 {
 
+    public function behaviors()
+	{
+		$behaviors = parent::behaviors();
+		
+		$behaviors['authenticator'] = [
+			'class' => \sizeg\jwt\JwtHttpBearerAuth::class,
+		];
+		// remove authentication filter
+		$auth = $behaviors['authenticator'];
+		unset($behaviors['authenticator']);
+		
+		// add CORS filter
+
+		$behaviors['corsFilter'] = [
+			'class' => \common\filters\Cors::className(),
+			'cors'  => [
+				// restrict access to domains:
+				'Origin'                           => ['*'],
+				'Access-Control-Request-Method'    => ['POST', 'GET', 'OPTIONS'],
+				'Access-Control-Allow-Credentials' => true,
+				'Access-Control-Max-Age'           => 3600,                 // Cache (seconds)
+				'Access-Control-Allow-Headers' => ['authorization','X-Requested-With','content-type', 'some_custom_header','Access-Control-Allow-Origin']
+				
+				// 'Access-Control-Allow-Headers' => ['Origin','X-Requested-With','content-type', 'Access-Control-Request-Headers','Access-Control-Request-Method','Accept','Access-Control-Allow-Headers']
+			],
+		];
+		
+		// re-add authentication filter
+		$behaviors['authenticator'] = $auth;
+		// avoid authentication on CORS-pre-flight requests (HTTP OPTIONS method)
+		$behaviors['authenticator']['except'] = ['request','requestview','listlab','testnamemethods','testnamemethod'];
+
+		return $behaviors;
+	}
+
     // ------------------------------------
     // Function for Requests. (Create, Read, Update, Delete)
     // ------------------------------------
@@ -42,6 +77,20 @@ class RestpstcController extends \yii\rest\Controller
         }else{
             throw new \yii\web\HttpException(400, 'Please specify RSTL ID. :)');
         }
+    }
+
+    public function actionUpdateref() //Create or Update pstc request
+    {
+        $id = (int) Yii::$app->request->post('id');
+        $reference = Yii::$app->request->post('reference');
+        $due = Yii::$app->request->post('due');
+
+        $data = Pstcrequest::find()->where(['pstc_request_id' => $id])->one() ;
+        $data->request_ref_num = $reference;
+        $data->duedate= $due;
+        $data->save(false);
+
+        return $data;
     }
 
     public function actionRequestcreate() //Create or Update pstc request
@@ -85,11 +134,13 @@ class RestpstcController extends \yii\rest\Controller
                 foreach($request->samples as $sample)
                 {   
                     if(count($sample->analysis) > 0){
-                        $analysis[] = $sample->analysis;
-                        $subtotal =  $subtotal + $sample->analysis->fee;
+                        foreach($sample->analysis as $an){
+                            $analysis[] = $an;
+                            $subtotal =  $subtotal + $an->fee;
+                        }
                     }
                 }
-                $discount = $subtotal * ($request->discount_rate/100);
+                $discount = $subtotal * (0/100);
                 $total = $subtotal - $discount;
             }
             
