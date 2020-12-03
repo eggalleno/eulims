@@ -28,7 +28,7 @@ use common\components\ReferralComponent;
 //use linslin\yii2\curl\Curl;
 use kartik\mpdf\Pdf;
 use frontend\modules\finance\components\epayment\ePayment;
-
+use common\components\PstcComponent;
 use common\models\finance\Op;
 use common\models\system\Rstl;
 use linslin\yii2\curl;
@@ -495,6 +495,20 @@ class RequestController extends Controller
         $Requestcode->year=$year;
         $Requestcode->cancelled=0;
         $Requestcode->save(false);
+
+
+        //update ref in pstc table
+        if($Req->request_type_id == 3){ // IF PSTC REQUEST
+            $testarray = [
+                'id' => $Req->referral_id,
+                'reference' => $ReferenceNumber,
+                'due' => $Req->report_due
+            ];
+
+            $function = new PstcComponent();
+            $data = json_decode($function->getUpdateref($testarray),true);
+        }
+
         //Update tbl_request table
         $Request= Request::find()->where(['request_id'=>$request_id])->one($Connection);
         $Request->request_ref_num=$ReferenceNumber;

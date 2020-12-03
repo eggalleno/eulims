@@ -13,11 +13,11 @@ use kartik\tabs\TabsX;
 /* @var $this yii\web\View */
 /* @var $request common\models\referral\Pstcrequest */
 
-$this->title = empty($respond['request_ref_num']) ? $request['pstc_request_id'] : $respond['request_ref_num'];
+$this->title = empty($request['request_ref_num']) ? $request['pstc_request_id'] : $request['request_ref_num'];
 $this->params['breadcrumbs'][] = ['label' => 'Pstcrequests', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 
-$reference_num = !empty($respond['request_ref_num']) ? $respond['request_ref_num'] : '<i class="text-danger font-italic">Pending request</i>';
+$reference_num = !empty($request['request_ref_num']) ? $request['request_ref_num'] : '<i class="text-danger font-italic">Pending request</i>';
 
 if(!empty($respond['request_ref_num'])){//With Reference
     $disableButton="false";
@@ -27,7 +27,6 @@ if(!empty($respond['request_ref_num'])){//With Reference
 
 $accepted = $request['accepted'];
 $requestId = $request['pstc_request_id'];
-$accepted = $request['accepted'];
 ?>
 <div class="pstcrequest-view">
     <div class="image-loader" style="display: none;"></div>
@@ -91,7 +90,7 @@ $accepted = $request['accepted'];
                         [
                             'label'=>'Estimated Due Date',
                             'format'=>'raw',
-                            'value'=> !empty($respond['estimated_due_date'])  ? date('F j, Y', strtotime($respond['estimated_due_date'])) : "<i class='text-danger font-italic'>Pending request</i>",
+                            'value'=> !empty($request['duedate'])  ? date('F j, Y', strtotime($request['duedate'])) : "<i class='text-danger font-italic'>Pending request</i>",
                             'valueColOptions'=>['style'=>'width:30%'], 
                             'displayOnly'=>true
                         ],
@@ -304,105 +303,12 @@ $accepted = $request['accepted'];
                 'format' => 'raw',
                 'width' => '7%',
                   'pageSummary'=> function (){
-                        $url = \Yii::$app->request->url;
-                        $id = substr($url, 21);
-                        $requestquery = Request::find()->where(['request_id' => $id])->one();
-                        $discountquery = Discount::find()->where(['discount_id' => $requestquery->discount_id])->one();
-                        $samplesquery = Sample::find()->where(['request_id' => $id])->one();
-                        $rate =  $discountquery->rate;
-                        $sample_ids = '';
-                        $samples = Sample::find()->where(['request_id' => $id])->all();
-                        foreach ($samples as $sample){
-                            $sample_ids .= $sample->sample_id.",";
-                        }
-                        $sample_ids = substr($sample_ids, 0, strlen($sample_ids)-1);
                        
-                        if ($samplesquery){
-                            $sql = "SELECT SUM(fee) as subtotal FROM tbl_analysis WHERE sample_id IN ($sample_ids) AND cancelled = 0";     
-                            
-                                 $Connection = Yii::$app->labdb;
-                                 $command = $Connection->createCommand($sql);
-                                 $row = $command->queryOne();
-                                 $subtotal = $row['subtotal'];
-                                 $discounted = ($subtotal * ($rate/100));
-                                 $total = $subtotal - $discounted;
-                                
-                                 // if ($total <= 0){
-                                 //     return  '<div id="subtotal">₱'.number_format($subtotal, 2).'</div><div id="discount">₱0.00</div><div id="total"><b>₱'.number_format($total, 2).'</b></div>';
-                                 // }else{
-                                     return  '<div id="subtotal">₱'.number_format($subtotal, 2).'</div><div id="discount">₱'.number_format($discounted, 2).'</div><div id="total"><b>₱'.number_format($total, 2).'</b></div>';
-                                 // }
-                        }else{
-                            return '';
-                        }     
+                        return  '<div id="subtotal">₱1</div><div id="discount">₱1</div><div id="total"><b>₱1</b></div>';
+                      
                   },
             ],
-            // [
-            //     'header'=>'Status',
-            //     'hAlign'=>'center',
-            //     'format'=>'raw',
-            //     'value' => function($model) {
-                //   $tagging = Tagginganalysis::findOne(['cancelled_by' => $model->analysis_id]);             
-                //   if ($tagging){
-
-                //    if ($tagging->tagging_status_id==1) {
-                //         return Html::button('<span style="width:90px;height:20px"><b>ONGOING</span>', ['value'=>Url::to(['/lab/tagging/status','id'=>$model->analysis_id]),'onclick'=>'LoadModal(this.title, this.value, true, 600);', 'class' => 'btn btn-primary','title' => Yii::t('app', "Analysis Status")]);
-                //       }else if ($tagging->tagging_status_id==2) {
-                //         return Html::button('<span style="width:90px;height:20px"><b>COMPLETED</span>', ['value'=>Url::to(['/lab/tagging/status','id'=>$model->analysis_id]),'onclick'=>'LoadModal(this.title, this.value, true, 600);', 'class' => 'btn btn-success','title' => Yii::t('app', "Analysis Status")]);
-                //       }
-                //       else if ($tagging->tagging_status_id==3) {
-                //           return "<span class='badge btn-warning' style='width:90px;height:20px'><b>ASSIGNED</span>";
-                //       }
-                //       else if ($tagging->tagging_status_id==4) {
-                //           return "<span class='badge btn-danger' style='width:90px;height:20px'><b>CANCELLED</span>";
-                //       }
-                       
-                
-                //   }else{
-                //    return Html::button('<span"><b>PENDING</span>', ['value'=>Url::to(['/lab/tagging/status','id'=>$model->analysis_id]),'onclick'=>'LoadModal(this.title, this.value, true, 600);', 'class' => 'btn btn-default','title' => Yii::t('app', "Analysis Status")]);
-                // }
-
-                // if($model->cancelled){
-                //      return "<span class='badge btn-danger' style='width:90px;height:20px'>CANCELLED</span>";
-                // }
-
-                // $tagging = Tagging::findOne(['analysis_id' => $model->analysis_id]); 
-                // if ($tagging){
-
-                //     if ($tagging->tagging_status_id==1) {
-                //            return "<span class='badge btn-primary' style='width:90px;height:20px'>ONGOING</span>";
-                //        }else if ($tagging->tagging_status_id==2) {
-                //            return "<span class='badge btn-success' style='width:90px;height:20px'>COMPLETED</span>";
-                //        }
-                //        else if ($tagging->tagging_status_id==3) {
-                //            return "<span class='badge btn-warning' style='width:90px;height:20px'>ASSIGNED</span>";
-                //        }
-                //        else if ($tagging->tagging_status_id==4) {
-                //            return "<span class='badge btn-danger' style='width:90px;height:20px'>CANCELLED</span>";
-                //        }
-                        
-                 
-                //    }else{
-                //        return "<span class='badge btn-default' style='width:80px;height:20px'>PENDING</span>";
-                //    }
-                 
-            //     },
-            //     'enableSorting' => false,
-            //     'contentOptions' => ['style' => 'width:10px; white-space: normal;'],
-            // ],
-            [
-                'class' => 'kartik\grid\ActionColumn',
-                'contentOptions' => ['style' => 'width: 8.7%'],
-                'buttons'=>[
-                    // 'update'=>function ($url, $model) {
-                    //     return Html::button('<span class="glyphicon glyphicon-pencil"></span>', ['value'=>Url::to(['/lab/analysis/update','id'=>$model->analysis_id]), 'onclick'=>'LoadModal(this.title, this.value);', 'class' => 'btn btn-primary','title' => Yii::t('app', "Update Analysis <font color='Blue'></font>")]);
-                    // },
-                    // 'delete'=>function ($url, $model) {
-                    //     $urls = '/lab/analysis/delete?id='.$model->analysis_id;
-                    //     return Html::a('<span class="glyphicon glyphicon-trash"></span>', $urls,['data-confirm'=>"Are you sure you want to delete this record?<b></b>", 'data-method'=>'post', 'class'=>'btn btn-danger','title'=>'Delete Analysis','data-pjax'=>'0']);
-                    // },
-                ],
-            ],
+          
         ];
 
             echo GridView::widget([
@@ -423,7 +329,7 @@ $accepted = $request['accepted'];
                     'type'=>'primary',
                     //'before'=>null,
                     'after'=>false,
-                    'before'=> ($request['accepted'] == 0) ? Html::button('<i class="glyphicon glyphicon-plus"></i> Add Analysis', ['value' => Url::to(['/pstc/pstcrequest/createanalysis','request_id'=>$request['pstc_request_id'],'pstc_id'=>$request['pstc_id']]),'title'=>'Add Analysis', 'onclick'=>'addAnalysis(this.value,this.title)', 'class' => 'btn btn-success','id' => 'modalBtn']) : '',
+                    'before'=> ($request['accepted'] == 0) ? Html::button('<i class="glyphicon glyphicon-plus"></i> Add Analysis', ['value' => Url::to(['/pstc/pstcrequest/createanalysis','request_id'=>$request['pstc_request_id'],'pstc_id'=>$request['pstc_id']]),'title'=>'Add Analysis', 'onclick'=>'addAnalysis(this.value,this.title)', 'class' => 'btn btn-success','id' => 'modalBtn']) ." ".Html::button('<i class="glyphicon glyphicon-plus"></i> Add Package', ['value' => Url::to(['/pstc/pstcrequest/createpackage','id'=>$request['pstc_request_id']]),'title'=>'Add Package', 'onclick'=> 'addAnalysis(this.value,this.title)', 'class' => 'btn btn-success','id' => 'btn_add_package']) : '',
                     'footer'=> ($countAnalysis > 0 && empty($respond['request_ref_num']) && $request['accepted'] == 0) ? $btn_saveRequest : '',
                 ],
                 'columns' => $analysisGridColumns,
@@ -440,7 +346,7 @@ $accepted = $request['accepted'];
     <!-- <div class="container">
         <?php
             
-
+            
             $btn_saveRequest = ($request['is_referral'] == 0) ? Html::button('<span class="glyphicon glyphicon-save"></span> Save as Local Request', ['value' => Url::to(['/pstc/pstcrequest/request_local','request_id'=>$request['pstc_request_id'],'pstc_id'=>$request['pstc_id']]),'title'=>'Save as Local Request', 'onclick'=>'saveRequest(this.value,this.title)', 'class' => 'btn btn-primary','id' => 'modalBtn']) : Html::button('<span class="glyphicon glyphicon-save"></span> Save as Referral Request', ['value' => Url::to(['/pstc/pstcrequest/request_referral','request_id'=>$request['pstc_request_id'],'pstc_id'=>$request['pstc_id']]),'title'=>'Save as Referral Request', 'onclick'=>'saveRequest(this.value,this.title)', 'class' => 'btn btn-primary','id' => 'modalBtn']);
 
           
@@ -449,7 +355,7 @@ $accepted = $request['accepted'];
     
     <?php 
     
-    if(!empty($respond['request_ref_num']) && $request['accepted'] == 1 && $request['local_request_id'] > 0): ?>
+    if(!empty($respond['request_ref_num']) && $request['accepted'] == 1): ?>
     <div class="container">
         <div class="panel panel-primary">
         <div class="panel-body">
@@ -580,7 +486,7 @@ $accepted = $request['accepted'];
 
     function uploadRequest(title) {
         var _replace = "<div style='text-align:center;'><img src='/images/img-loader64.gif' alt=''></div>";
-        var url = "<?= Url::to(['/pstc/pstcattachment/upload','local_request_id'=>$request['local_request_id']]) ?>";
+        var url = "<?= Url::to(['/pstc/pstcattachment/upload']) ?>";
         $('#modalContent').html(_replace);
         $('.modal-title').html(title);
         $('#modal').modal('show')

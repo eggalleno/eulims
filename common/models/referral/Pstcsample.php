@@ -96,7 +96,7 @@ class Pstcsample extends \yii\db\ActiveRecord
     */
     public function getAnalysis()
     {
-        return $this->hasOne(Pstcanalysis::className(), ['pstc_sample_id' => 'pstc_sample_id']);
+        return $this->hasMany(Pstcanalysis::className(), ['pstc_sample_id' => 'pstc_sample_id']);
     }
 	
 	/**
