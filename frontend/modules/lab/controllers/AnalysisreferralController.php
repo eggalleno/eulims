@@ -106,7 +106,7 @@ class AnalysisreferralController extends Controller
         $labId = $request->lab_id;
         $rstlId = Yii::$app->user->identity->profile->rstl_id;
 
-        $testname = $this->listsampletypereferrals($requestId);
+        $testname = []; //$this->listsampletypereferrals($requestId);
 
         if(Yii::$app->request->get('test_id')>0){
             $testnameId = Yii::$app->request->get('test_id');
@@ -134,7 +134,6 @@ class AnalysisreferralController extends Controller
                 $methodrefId = $postData['methodref_id'];
                 $test = $component->getTestnameOne($testId);
                 $method = $component->getMethodrefOne($methodrefId);
-
                 $analysis = new Analysisextend();
                 $analysis->rstl_id = (int) $rstlId;
                 $analysis->date_analysis = date('Y-m-d');
@@ -411,7 +410,7 @@ class AnalysisreferralController extends Controller
         $list = $refcomponent->getTestnamesbysampletypeidsonly($sampletypeId);
         $data = [];
         if($list)
-            $data = ArrayHelper::map(json_decode($list), 'testname_id', 'test_name');
+            $data = ArrayHelper::map($list, 'testname_id', 'test_name');
         return $data;
     }
     
@@ -449,6 +448,7 @@ class AnalysisreferralController extends Controller
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
         if(Yii::$app->request->get('sample_id'))
         {
+            $lab_id= Yii::$app->request->get('labId');
             $sampleId = explode(",",Yii::$app->request->get('sample_id'));
             $sample = (new Query)
                 ->select('sampletype_id')
@@ -465,13 +465,15 @@ class AnalysisreferralController extends Controller
 
             //added this line here to het all the testnames by sampletype ids
             $refcomponent = new ReferralComponent();
-            $lists = $refcomponent->getTestnamesbysampletypeidsonly($sampletypeId);
+            $lists = $refcomponent->getTestnamesbysampletypeidsonly($sampletypeId,$lab_id);
 
             if(count($lists)>0)
             {
-                foreach(json_decode($lists) as $list) {
-                    $data[] = ['id' => $list->testname_id, 'text' => $list->test_name];
+                foreach($lists as $list) {
+
+                    $data[] = ['id' => $list['testname_id'], 'text' => $list['test_name']];
                 }
+                
             } else {
                 $data = [['id' => '', 'text' => 'No results found']];
             }
@@ -493,12 +495,12 @@ class AnalysisreferralController extends Controller
         //code below is responsible for getting the testmethod reference , fee
         if (Yii::$app->request->get('test_id')>0){
             $testnameId = (int) Yii::$app->request->get('test_id');
-            $methods = json_decode($this->listReferralmethodref($testnameId),true);
+            $methods = $this->listReferralmethodref($testnameId);
         }
         else {
                 $methods = [];
         }
-
+        // var_dump($methods); exit;
         if (Yii::$app->request->isAjax) {
             $methodrefDataProvider = new ArrayDataProvider([
                 'allModels' => $methods,

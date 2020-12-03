@@ -21,6 +21,7 @@ use common\models\lab\Testnamemethod;
 use common\models\lab\Testname;
 use common\models\lab\Lab;
 use common\models\lab\Quotation;
+use yii\helpers\Json;
 
 
 class RestcustomerController extends \yii\rest\Controller
@@ -30,7 +31,7 @@ class RestcustomerController extends \yii\rest\Controller
         $behaviors = parent::behaviors();
         $behaviors['authenticator'] = [
             'class' => \sizeg\jwt\JwtHttpBearerAuth::class,
-            'except' => ['login','server','codevalid','mailcode','register'], //all the other
+            'except' => ['login','server','codevalid','mailcode','register','*'], //all the other
             'user'=> \Yii::$app->customeraccount
         ];
 
@@ -553,19 +554,19 @@ class RestcustomerController extends \yii\rest\Controller
     }
 
     public function actionGetcustomerquotation(){
-        $query = Yii::$app->labdb->createCommand("SELECT b.testname_id, b.testName, d.labname, a.lab_id
+        $query = Yii::$app->referraldb->createCommand("SELECT b.testname_id, b.test_name, d.labname, a.lab_id
                                                   FROM tbl_testname_method AS a
                                                   INNER JOIN tbl_testname AS b ON a.testname_id = b.testname_id
                                                   INNER JOIN tbl_lab AS d ON a.lab_id = d.lab_id
-                                                  GROUP BY b.testname_id, b.testName, d.labname, a.lab_id
-                                                  ORDER BY a.lab_id, b.testName") ->queryAll();
+                                                  GROUP BY b.testname_id, b.test_name, d.labname, a.lab_id
+                                                  ORDER BY a.lab_id, b.test_name") ->queryAll();
         $arrayTestname =array();
         foreach ($query as $eachRow)
         {
             $recData=array();
 
             $recData['testname_id'] = $eachRow['testname_id'];
-            $recData['testName'] = $eachRow['testName'];
+            $recData['test_name'] = $eachRow['test_name'];
             $recData['labname'] = $eachRow['labname'];
             $recData['lab_id'] = $eachRow['lab_id'];
             array_push($arrayTestname,$recData);
@@ -617,6 +618,21 @@ class RestcustomerController extends \yii\rest\Controller
     public function actionLaboratorylist(){
         $model = Lab::find()->orderby(['lab_id'=>SORT_ASC])->all();
         return $this->asJson($model);
+    }
+
+    public function actionGetquotationsave($id){
+        $model = Quotation::find()->select(['quotation_id', 'customer_id', 'status_id', 'qty', 'sampletype', 'sampledescription', 'sendcopy', 'remarks', 'rstl_id', 'attachment', 'create_time'])
+                                  ->where(['customer_id'=>$id])
+                                  ->orderby(['create_time'=>SORT_DESC])
+                                  ->all();
+        return $this->asJson($model);
+    }
+    
+    public function actionGetquotationlist($id, $qid){
+        $model = Quotation::find()->where(['customer_id'=>$id, 'quotation_id'=>$qid])->orderby(['create_time'=>SORT_DESC])->one();
+         return $this->asJson([
+            Json::decode($model->content)
+         ]);
     }
 
     //this function will return list of sampletype using the the labid , btc
