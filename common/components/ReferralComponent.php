@@ -248,7 +248,20 @@ class ReferralComponent extends Component {
         }
     }
 
+    function sendReferral($data){
+        $apiUrl=$this->source.'/sendreferral';
+        $curl = new curl\Curl();
+        $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
+        $curl->setOption(CURLOPT_TIMEOUT, 180);
+        $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
+        $response = $curl->setRequestBody($data)
+        ->setHeaders([
+            'Content-Type' => 'application/json',
+            'Content-Length' => strlen($data),
+        ])->post($apiUrl);
 
+        return Json::decode($response);
+    }
 
      function getAgencybyMethodrefOne($methodrefId){
         if($methodrefId > 0){
@@ -296,7 +309,7 @@ class ReferralComponent extends Component {
             $curl->setOption(CURLOPT_TIMEOUT, 180);
             $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
             $list = $curl->get($apiUrl);
-            return $list;
+            return Json::decode($list);
         } else {
             return "Not valid customer";
         }
@@ -311,7 +324,7 @@ class ReferralComponent extends Component {
             $curl->setOption(CURLOPT_TIMEOUT, 180);
             $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
             $list = $curl->get($apiUrl);
-            return $list;
+            return Json::decode($list);
         } else {
             return "Not valid lab";
         }
@@ -332,15 +345,15 @@ class ReferralComponent extends Component {
     }
 
     //btc use in the referral view button add analysis
-    function getTestnamesbysampletypeidsonly($sampletypeId){
+    function getTestnamesbysampletypeidsonly($sampletypeId,$lab_id){
         if($sampletypeId > 0){
-            $apiUrl=$this->source.'/testnamebysampletypeids?sampletype_ids='.$sampletypeId;
+            $apiUrl=$this->source.'/testnamebysampletypeids?sampletype_ids='.$sampletypeId.'&lab_id='.$lab_id;
             $curl = new curl\Curl();
             $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
             $curl->setOption(CURLOPT_TIMEOUT, 180);
             $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
             $list = $curl->get($apiUrl);
-            return $list;
+            return Json::decode($list);
         } else {
             return "Not valid lab or sampletype";
         }
@@ -370,7 +383,7 @@ class ReferralComponent extends Component {
         $curl->setOption(CURLOPT_TIMEOUT, 120);
         $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
         $data = $curl->get($apiUrl);
-        return $data;
+        return Json::decode($data);
     }
 
     //get referral laboratory list
@@ -434,7 +447,7 @@ class ReferralComponent extends Component {
 
         //if there are no tests then dont proceed
         if(!$analysis)
-            return false;
+            return [];
 
         //also check the package if the testmethodrefs are done
         // $package = Analysis::find()
@@ -465,7 +478,7 @@ class ReferralComponent extends Component {
         $curl->setOption(CURLOPT_TIMEOUT, 180);
         $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
         $data = $curl->get($apiUrl); //data now holds a list of rstls
-    
+
         $list_agency = $this->listAgency(json_decode($data));
         return $list_agency;        
     }
@@ -481,7 +494,7 @@ class ReferralComponent extends Component {
             $curl->setOption(CURLOPT_TIMEOUT, 180);
             $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
             $list = $curl->get($apiUrl);
-            return $list;
+            return Json::decode($list);
         } else {
             return null;
         }
@@ -489,6 +502,7 @@ class ReferralComponent extends Component {
     //check if notified //btc was here XD
     function checkNotify($requestId,$agencyId)
     {
+
         if($requestId > 0 && $agencyId > 0) {
             $apiUrl=$this->source.'/checknotify?request_id='.$requestId.'&agency_id='.$agencyId;
             $curl = new curl\Curl();
@@ -518,8 +532,9 @@ class ReferralComponent extends Component {
     //check if confirmed //btc has been here
     function checkConfirm($requestId,$rstlId,$testingAgencyId)
     {
+        return true;
         if($requestId > 0 && $rstlId > 0 && $testingAgencyId > 0) {
-            $apiUrl=$this->source.'/api/web/referral/notifications/checkconfirm?request_id='.$requestId.'&receiving_id='.$rstlId.'&testing_id='.$testingAgencyId;
+            $apiUrl=$this->source.'/checkconfirm?request_id='.$requestId.'&receiving_id='.$rstlId.'&testing_id='.$testingAgencyId;
             $curl = new curl\Curl();
             $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
             $curl->setOption(CURLOPT_TIMEOUT, 180);
@@ -689,16 +704,13 @@ class ReferralComponent extends Component {
     function getReferraldetails($referralId,$rstlId)
     {
         if($referralId > 0 && $rstlId > 0) {
-            //api pointing to the new referral system
-            $apiUrl=$this->source.'/api/web/referral/referrals/viewdetail?referral_id='.$referralId.'&rstl_id='.$rstlId;
-            //api pointing to the old referral system
-            $apiUrl=$this->source.'/lab/api/view/model/referrals/id/'.$referralId;
+            $apiUrl=$this->source.'/viewdetail?referral_id='.$referralId.'&rstl_id='.$rstlId;
             $curl = new curl\Curl();
             $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
             $curl->setOption(CURLOPT_TIMEOUT, 180);
             $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
             $list = $curl->get($apiUrl);
-            return $list;
+            return Json::decode($list);
         } else {
             return 'Not valid request!';
         }
@@ -722,13 +734,13 @@ class ReferralComponent extends Component {
     function getNotificationAll($rstlId)
     {
         if($rstlId > 0) {
-            $apiUrl=$this->source.'/api/web/referral/notifications/listall?rstl_id='.$rstlId;
+            $apiUrl=$this->source.'/listall?rstl_id='.$rstlId;
             $curl = new curl\Curl();
             $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
             $curl->setOption(CURLOPT_TIMEOUT, 180);
             $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
             $list = $curl->get($apiUrl);
-            return $list;
+            return Json::decode($list);
         } else {
             return 'Not valid request!';
         }
@@ -748,20 +760,16 @@ class ReferralComponent extends Component {
             return 'Not valid request!';
         }
     }
-    //get notification
-    function getNotificationOne($notificationId,$rstlId)
+    //get notification //btc was here
+    function getNotificationOne($noticeId,$rstlId)
     {
-        if($rstlId > 0 && $notificationId > 0) {
-            $apiUrl=$this->source.'/api/web/referral/notifications/notification_one?notification_id='.$notificationId.'&rstl_id='.$rstlId;
+            $apiUrl=$this->source.'/notification_one?notificationId='.$noticeId.'&rstlId='.$rstlId;
             $curl = new curl\Curl();
             $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
             $curl->setOption(CURLOPT_TIMEOUT, 180);
             $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
             $list = $curl->get($apiUrl);
-            return $list;
-        } else {
-            return 'Not valid request!';
-        }
+            return Json::decode($list);
     }
     //get estimated due date
     function getDuedate($requestId,$rstlId,$senderId)
@@ -782,13 +790,13 @@ class ReferralComponent extends Component {
     function checkOwner($referralId,$rstlId)
     {
         if($rstlId > 0 && $referralId > 0) {
-            $apiUrl=$this->source.'/api/web/referral/referrals/checkowner?referral_id='.$referralId.'&sender_id='.$rstlId;
+            $apiUrl=$this->source.'/checkowner?referral_id='.$referralId.'&sender_id='.$rstlId;
             $curl = new curl\Curl();
             $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
             $curl->setOption(CURLOPT_TIMEOUT, 180);
             $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
             $list = $curl->get($apiUrl);
-            return $list;
+            return Json::decode($list);
         } else {
             return 'Not valid request!';
         }
@@ -797,13 +805,13 @@ class ReferralComponent extends Component {
     function getReferralOne($referralId,$rstlId)
     {
         if($referralId > 0){
-            $apiUrl=$this->source.'/api/web/referral/referrals/referral_one?referral_id='.$referralId.'&rstl_id='.$rstlId;
+            $apiUrl=$this->source.'/referral_one?referral_id='.$referralId.'&rstl_id='.$rstlId;
             $curl = new curl\Curl();
             $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
             $curl->setOption(CURLOPT_TIMEOUT, 180);
             $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
             $list = $curl->get($apiUrl);
-            return $list;
+            return Json::decode($list);
         } else {
             return 'Invalid referral!';
         }
@@ -854,7 +862,6 @@ class ReferralComponent extends Component {
         }
     }
     function getReferredAgency($referralId,$rstlId){
-        return false;
         if($referralId > 0 && $rstlId > 0) {
             $apiUrl=$this->source.'/referred_agency?referral_id='.$referralId.'&rstl_id='.$rstlId;
             $curl = new curl\Curl();
@@ -864,7 +871,7 @@ class ReferralComponent extends Component {
             $list = $curl->get($apiUrl);
             return $list;
         } else {
-            return 'false';
+            return false;
         }
     }
     function getReferralAll($rstlId){
@@ -1182,6 +1189,21 @@ class ReferralComponent extends Component {
         } else {
             return 'false';
         }
+    }
+
+    function setestimatedue($notificationData){
+        $apiUrl=$this->source.'/confirm';
+        $curl = new curl\Curl();
+        $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
+        $curl->setOption(CURLOPT_TIMEOUT, 180);
+        $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
+        $response = $curl->setRequestBody($notificationData)
+        ->setHeaders([
+            'Content-Type' => 'application/json',
+            'Content-Length' => strlen($notificationData),
+        ])->post($apiUrl);
+
+        return $response;
     }
 
     function GenerateSampleCode($request_id){
