@@ -240,7 +240,7 @@ class InfoController extends Controller
 	public function actionLogin(){
 		$model = new LoginForm();
 		if ($model->load(Yii::$app->request->post())){
-			return;
+			//return;
 			
 		}else{
 			return $this->render('login', [
