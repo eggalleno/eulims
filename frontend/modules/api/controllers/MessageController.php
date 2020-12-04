@@ -459,11 +459,14 @@ class MessageController extends \yii\rest\Controller
                     if($newmodel->save()){
                         $newmodel->customer_code = $newmodel->rstl_id."-".$newmodel->customer_id;
 						$newmodel->save(false);
+						return $this->asJson(
+							$newmodel
+						);
 					}
-					
 					return $this->asJson(
-						$newmodel
+						'error'
 					);
+					
                 }
         
     }
