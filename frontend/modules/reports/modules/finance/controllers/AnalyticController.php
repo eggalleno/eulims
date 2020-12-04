@@ -193,34 +193,32 @@ class AnalyticController extends \yii\web\Controller
 			->joinWith(['samples'])
     		->groupBy(['sampletype_id'])
     		->orderBy('sampletype_id ASC')
-    		->distinct()
     		->all();
-    		
+
     		$series = [];
     		foreach ($reqs as $req) {
     			$st= Sampletype::findOne($req->conforme);
+      
+                $inner_reqs = Sample::find()
+                ->select(['tbl_sample.sample_id','sampletype_id','tbl_sample.request_id','total'=>'count(analysis_id)','conforme'=>'testname'])
+                ->where(['active'=>'1','sampletype_id'=>$req->conforme])
+                ->joinWith(['request'=>function($query)use($yearmonth,$lab_id){
+                    return $query->select(['request_id','request_ref_num','request_datetime'])->andWhere(['DATE_FORMAT(`request_datetime`, "%Y-%m")' => $yearmonth,'lab_id'=>$lab_id])->andWhere(['>','status_id',0]);
+                }])
+                 ->joinWith(['analyses'=>function($query){
+                     return $query->select(['sample_id','testname'])->andWhere(['<>','references','-'])->andWhere(['cancelled'=>'0']);
+                    }])
+                 ->groupBy(['testname'])
+                 ->orderBy('testname ASC')
+                ->asArray()
+                ->all();
 
-
-    			$inner_reqs =  Request::find()
-	    		->select(['total'=>'count(analysis_id)','conforme'=>'testname'])
-	    		->where(['DATE_FORMAT(`request_datetime`, "%Y-%m")' => $yearmonth,'lab_id'=>$lab_id,'tbl_sample.sampletype_id'=>$req->conforme,])
-	    		->andWhere(['>','status_id',0])
-				->joinWith(['samples'=>function($query){
-					return $query->andWhere(['active'=>'1']);
-				}])
-				->joinWith(['analyses'=>function($query){
-					return $query->andWhere(['<>','references','-'])->andWhere(['cancelled'=>'0']);
-				}])
-	    		->groupBy(['testname'])
-	    		->orderBy('testname ASC')
-	    		->all();
 	    		$data=[];
 	    		foreach ($inner_reqs as $inner_req) {
-	    			$data[]=['name'=>$inner_req->conforme,'value'=>(int)$inner_req->total];
+	    			$data[]=['name'=>$inner_req['conforme'],'value'=>(int)$inner_req['total']];
 	    		}
     			$series[]=['name'=>$st->type,'data'=>$data];
     		}
-
 
     	} catch (Exception $e) {
 			return $e;
