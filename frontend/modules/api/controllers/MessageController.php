@@ -10,7 +10,7 @@ use common\models\system\User;
 use common\models\auth\AuthAssignment;
 use common\models\system\Rstl;
 
-use common\models\lab\Customer;
+use common\models\referral\Customer;
 use yii\helpers\Json;
 
 use common\models\message\Chat;
