@@ -126,7 +126,7 @@ if(isset($_SESSION['usertoken'])){
     <?php
 }else{
 	$flag=0;
-	echo Html::button('<h5>Login</h5>', ['value'=>'/chat/info/login', 'class' => 'open-button','title' => Yii::t('app', "Login"),'id'=>'btnOP','onclick'=>'LoadModal(this.title, this.value);'])
+	echo Html::button('<h5>Login</h5>', ['value'=>'/chat/info/login', 'class' => 'open-button','title' => Yii::t('app', "Login"),'id'=>'btnOP','onclick'=>'LoadModal(this.title, this.value,"100px","300px");'])
 	?>
 	
 	 
