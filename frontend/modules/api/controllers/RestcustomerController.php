@@ -630,8 +630,23 @@ class RestcustomerController extends \yii\rest\Controller
     
     public function actionGetquotationlist($id, $qid){
         $model = Quotation::find()->where(['customer_id'=>$id, 'quotation_id'=>$qid])->orderby(['create_time'=>SORT_DESC])->one();
-         return $this->asJson([
-            Json::decode($model->content)
+
+
+         // return $this->asJson([
+         //    Json::decode($model->content)
+         // ]);
+        $james = Json::decode($model->content);
+        $newarr = [];
+        foreach ($james as $jame) {
+            //query
+            $testn = \common\models\referral\Testname::findOne($jame['test']);
+            if($testn)
+                $newarr[] = ['test'=> $testn->test_name, 'method'=>$jame['method']];
+            else
+                $newarr[] = ['test'=> $jame['test'], 'method'=>$jame['method']];
+        }
+        return $this->asJson([
+            $newarr
          ]);
     }
 
