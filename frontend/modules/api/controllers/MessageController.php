@@ -430,12 +430,12 @@ class MessageController extends \yii\rest\Controller
 
     public function actionSynccustomer(){ 
 
-                $toreturn = false;
+                
                 $model = Customer::find()->where(['email'=>Yii::$app->request->post('email')])->one();
 
                 if(count($model) > 0){
                     // email already exist proceed to confirmation
-                    $toreturn=2; //this mean that the record's email already exist and that the client accessing the API will know what to do -> compare the records for confirmation
+                    return 2; //this mean that the record's email already exist and that the client accessing the API will know what to do -> compare the records for confirmation
                 }else{
                    
                     $newmodel = new Customer;
@@ -458,14 +458,12 @@ class MessageController extends \yii\rest\Controller
                     $newmodel->is_deleted = Yii::$app->request->post('is_deleted');
                     if($newmodel->save()){
                         $newmodel->customer_code = $newmodel->rstl_id."-".$newmodel->customer_id;
-                        $newmodel->save(false);
-                        $toreturn = $newmodel->customer_code;
+						$newmodel->save(false);
+						return $this->asJson(
+							$newmodel
+						);
                     }
                 }
-                
-                return $this->asJson(
-                    $toreturn
-                );
         
     }
 

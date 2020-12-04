@@ -71,7 +71,7 @@ class InfoController extends Controller
                  [
                     'data' => json::encode($customers),
                  ])
-             ->post($GLOBALS['api_url']."sync_customer");
+             ->post($GLOBALS['newapi_url']."sync_customer");
 
              echo $response;
         }
@@ -111,7 +111,7 @@ class InfoController extends Controller
             $response = $curl->post($apiUrl);
 
 
-            // var_dump($response); exit;
+            var_dump($response); exit;
             if($response==2){
                 //update the record's 
                 $data->sync_status = 2;
@@ -142,7 +142,7 @@ class InfoController extends Controller
 
         $model = Customer::findOne($id);
         $curl = new curl\Curl();
-
+        
         try {
             $curl->setOption(CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
             $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
@@ -151,8 +151,7 @@ class InfoController extends Controller
             $response = $curl->setGetParams([
                 'email' => $model->email,
              ])
-             ->get($GLOBALS['api_url']."message/confirm");
-
+             ->get($GLOBALS['newapi_url']."message/confirm");
             if ($curl->errorCode === null) {
                return $this->renderAjax('_view', [
                     'model' => $response,
