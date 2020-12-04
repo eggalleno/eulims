@@ -220,7 +220,6 @@ class AnalyticController extends \yii\web\Controller
     			$series[]=['name'=>$st->type,'data'=>$data];
             }
             
-            var_dump($series); exit();
 
     	} catch (Exception $e) {
 			return $e;

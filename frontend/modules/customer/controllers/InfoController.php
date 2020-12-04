@@ -101,7 +101,7 @@ class InfoController extends Controller
         ];
         try {
             // $authorization = "Authorization: Bearer ".$token; 
-            $apiUrl=$GLOBALS['api_url']."message/synccustomer";
+            $apiUrl=$GLOBALS['newapi_url']."message/synccustomer";
             $curl = new curl\Curl();
             $curl->setRequestBody(json_encode($params));
             $curl->setOption(CURLOPT_HTTPHEADER, ['Content-Type: application/json']);

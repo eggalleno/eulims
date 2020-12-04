@@ -798,8 +798,8 @@ SCRIPT;
         
         if($product->qty_reorder >= $product->getTotalqty()){
             $checkvar = Reorder::find()->where(['product_id'=>$id])->one();
-            //if($checkvar)
-             //   return false; //dont proceed to add into reorder table
+            if($checkvar)
+               return false; //dont proceed to add into reorder table
 
             //add the product to the reorder points table
             $reorder = new Reorder();
