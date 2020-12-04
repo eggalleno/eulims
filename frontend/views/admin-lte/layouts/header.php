@@ -81,7 +81,8 @@ $this->registerJsFile("/js/intro.js", [
 ], 'js-intro');
 
 $session = Yii::$app->session;
-$source = 'http://eulims.onelab.ph/api/message/'; //API LINK
+	
+$source = $GLOBALS['newapi_url'].'message/'; //API LINK
 $sourcetoken="";
 $flag="";
 $contacts="";
@@ -349,6 +350,7 @@ if(isset($_SESSION['usertoken'])){
 				<button type="button" class="btntab" id="btngroup"><i class="fa fa-group"></i></button>
 				 
 			</div>
+			
 			<div class="scroll-style1" id="popchatbody">
 			
 			</div>
@@ -498,7 +500,7 @@ function sendmessage() {
 	   $('#chattype').text("1");//Message type
 	   sendchat(textchat);
    }
-   
+    
    if (document.getElementById("UploadFile").files.length === 0 ){ //For file attachment
 		//alert("Please select a file to upload");
    }
@@ -577,7 +579,9 @@ window.setInterval(function(){
 	  mes(id,type); 
    } 
    countunread();
-   
+   $(document).on('focus','.msg',function(){
+	  alert('is typing'); 
+   });
   
 }, 5000);
 
@@ -606,6 +610,14 @@ function contacts(){ //Personnal Messages
 	if(flag == "1"){
 		var y;
 		 y = "<h4>List of Contacts </h4>";
+		 //y= "<input autocomplete='off' placeholder='Search' spellcheck='false' type='text' aria-label='Search' value=''>";
+		 y =  y+ "<div>";
+		 y = y + "<input type='text' id='txtsearch' placeholder='Search' style='width:90%;'>";
+		 y = y + "<button id='btnsearch' name='btnsearch' onclick='search();'>";
+         y = y + "<i class='fa fa-search'></i>";
+         y = y + "</button>";
+         y = y + "</div>";
+		 y = y + "</br>";
 		<?php 
 		if($contacts){
 			foreach ($contacts as $data)
@@ -643,6 +655,12 @@ function groupcontacts(){ //Group Messages
 	var y;
 	//document.getElementById('popuser').style.display='block';
 	 y = "<h4>List of Contacts </h4>";
+	 y =  y+ "<div>";
+	 y = y + "<input type='text' id='txtsearchgroup' placeholder='Search' style='width:90%;'>";
+	 y = y + "<button id='btnsearchgroup' name='btnsearchgroup' onclick='searchgroup();'>";
+	 y = y + "<i class='fa fa-search'></i>";
+	 y = y + "</button>";
+	 y = y + "</div>";
 	<?php 
 		if($group){
 		foreach ($group as $data)
@@ -775,4 +793,45 @@ function countunread() {
 	
 }
 
+function search() {
+	var txtsearch=$('#txtsearch').val();
+	
+	$.ajax({
+		url: "/chat/info/searchcontact", //API LINK FROM THE CENTRAL
+		type: 'POST',
+		dataType: "JSON", 
+		data: {
+			txtsearch: txtsearch
+		},
+		success: function(response) {
+		//console.log(response[0].fullname);
+		//console.log(response);
+			var y;
+			 y = "<h4>List of Contacts </h4>";
+			 y =  y+ "<div>";
+			 y = y + "<input type='text' id='txtsearch' placeholder='Search' style='width:90%;'>";
+			 y = y + "<button id='btnsearch' name='btnsearch' onclick='search();'>";
+			 y = y + "<i class='fa fa-search'></i>";
+			 y = y + "</button>";
+			 y = y + "</div>";
+			 y = y + "</br>";
+			 
+			for(x=0;x<response.length;x++){
+				y=y + "<a class='thismessage' onclick='mes("+response[x].user_id+",1)'>";
+				y= y + "<div class='first'><img src='/uploads/user/photo/user.png' alt='/uploads/user/photo/user.png' width='42' height='42'>&nbsp;<b>"+response[x].fullname+"</div>";
+				y= y + "</a>";
+			} 
+			
+			$('#popchatbody').html(y);  	
+		},
+		error: function(xhr, status, error) {
+			//alert(error);
+			location.reload();
+		}
+	});
+}
+
+function searchgroup() {
+var txtsearchgroup=$('#txtsearchgroup').val();
+}
  </script>

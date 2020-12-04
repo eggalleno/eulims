@@ -299,7 +299,7 @@ if(Yii::$app->controller->action->id === 'update'){
             select.find('option').remove().end();
             if(radioSample > 0) {
                 $.ajax({
-                    url: '".Url::toRoute("analysisreferral/getreferraltestname?sample_id='+radioSample+'")."',
+                    url: '".Url::toRoute("analysisreferral/getreferraltestname?sample_id='+radioSample+'&labId='+".$labId)."',
                     success: function (data) {
                         var select2options = ".Json::encode($options).";
                         select2options.data = data.data;
@@ -353,7 +353,7 @@ if(Yii::$app->controller->action->id === 'update'){
             select.find('option').remove().end();
             if(key_id.length > 0) {
                 $.ajax({
-                    url: '".Url::toRoute("analysisreferral/getreferraltestname?sample_id='+key_id+'")."',
+                    url: '".Url::toRoute("analysisreferral/getreferraltestname?sample_id='+key_id+'&labId=".$labId)."',
                     success: function (data) {
                         var select2options = ".Json::encode($options).";
                         select2options.data = data.data;

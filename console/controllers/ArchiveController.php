@@ -8,6 +8,7 @@ use \yii\console\Controller;
 use common\models\services\Archive;
 use common\models\finance\Op;
 use common\models\lab\Request;
+use common\components\Notification;
 /**
  * This is an example...
 
@@ -44,7 +45,7 @@ class ArchiveController extends Controller
             $req_no = $request['request_ref_num'];
             $req_date = $request['request_datetime'];
             $req_status = $request['status_id'];
-            $check = Archive::find()->where(['request_no' => $req_no])->limit(1)->all();
+            $check = Archive::find()->where(['request_no' => $req_no])->limit(50)->all();
             
             if(count($check) < 1){
                 $content = []; $samples = []; 
@@ -120,8 +121,13 @@ class ArchiveController extends Controller
                 $status->is_migrated = 1;
                 $status->save(false);
             }
+
         }
 
+        $notif= new Notification();
+        $mes= "Archive Migration Completed.";
+        $res=$notif->sendSMS("", "", '09557650803', 'Archive Cronjob', $mes, "eULIMS", 'Archive Migration', 'Index');
+        echo $res;
     }
    
 

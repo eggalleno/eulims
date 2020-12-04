@@ -63,6 +63,26 @@ class PstcComponent extends Component {
         }
     }
     
+    function getUpdateref($data)
+	{
+        $apiUrl=$this->source.'updateref';
+        $params = [
+            'id' => $data['id'],
+            'reference' => $data['reference'],
+            'due' => $data['due']
+        ];
+
+        $curl = new curl\Curl();
+        $curl->setRequestBody(json_encode($params));
+        $curl->setOption(CURLOPT_HTTPHEADER, ['Content-Type: application/json' , $this->authorization]);
+        $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
+        $curl->setOption(CURLOPT_TIMEOUT, 180);
+        $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
+        return $data = $curl->post($apiUrl);
+        
+    }
+    
+
     function getRequestcreate($data)
 	{
         $apiUrl=$this->source.'requestcreate';

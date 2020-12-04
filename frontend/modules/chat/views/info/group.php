@@ -79,6 +79,7 @@ $this->registerJs($js);
 
  <script type="text/javascript">
     $("#creategroup").click(function(){
+		
         //Reference the Table.
         var grid = document.getElementById("data-table");
  
@@ -95,6 +96,7 @@ $this->registerJs($js);
         }
         //$("#chatgroup-userids").val(userids); 
 	   var x = userids.toString();
+
 	   var groupname= $("#chatgroup-group_name").val();
 	   var token=<?php echo json_encode($_SESSION['usertoken'])?>;
 	   var sender_userid= <?php echo json_encode($_SESSION['userid'])?>;
