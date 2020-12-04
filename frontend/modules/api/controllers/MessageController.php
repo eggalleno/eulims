@@ -107,15 +107,13 @@ class MessageController extends \yii\rest\Controller
     
                    
                     $profile = Profile::find()->where(['user_id'=>$users->user_id])->one();
-                    $role = AuthAssignment::find()->where(['user_id'=>$users->user_id])->one();
         
                     return $this->asJson([
                         'token' => (string)$token,
                         'user'=> (['email'=>$users->email,
                                     'firstName'=>$profile->firstname,
                                     'middleInitial' => $profile->middleinitial,
-                                    'lastname' => $profile->lastname,
-                                    'type' => $role->item_name,]),
+                                    'lastname' => $profile->lastname]),
 						'userid'=> $profile->user_id,	
 						'success' => true
                     ]);
