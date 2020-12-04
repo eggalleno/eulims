@@ -174,9 +174,7 @@ class Customer extends \yii\db\ActiveRecord
          if ($insert) {
              $this->customer_code= $this->rstl_id."-".$this->customer_id;
              $this->save();
-             $func = new Functions();
-            $func->addlsync("Customer",$this->customer_id);
          }
          parent::afterSave($insert, $changedAttributes);
-    }
+    } 
 }

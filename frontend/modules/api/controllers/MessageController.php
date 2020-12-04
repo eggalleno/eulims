@@ -457,8 +457,6 @@ class MessageController extends \yii\rest\Controller
                     $newmodel->is_updated = Yii::$app->request->post('is_updated');
                     $newmodel->is_deleted = Yii::$app->request->post('is_deleted');
                     if($newmodel->save(false)){
-                        $newmodel->customer_code = $newmodel->rstl_id."-".$newmodel->customer_id;
-						$newmodel->save(false);
 						return $this->asJson(
 							$newmodel
 						);
