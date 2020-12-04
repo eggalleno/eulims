@@ -22,44 +22,13 @@ $this->params['breadcrumbs'][] = $this->title;
 
                 <?= $form->field($model, 'password')->passwordInput() ?>
 
-                <div class="form-group">
-                     <button id="submit"> Send </button>
+				<div class="form-group">
+                    <?= Html::submitButton('Login', ['class' => 'btn btn-primary', 'name' => 'login-button']) ?>
                 </div>
-
             <?php ActiveForm::end(); ?>
         </div>
     </div>
 </div>
 <script type="text/javascript">
-  $("#submit").click(function(){   
-  //alert("Hello");
-	var email = $("#loginform-email").val(); 
-	var password = $("#loginform-password").val(); 
-	//alert(email);
-	$.ajax({
-		url: "https://eulims.onelab.ph/api/message/login", //API LINK FROM THE CENTRAL
-		type: 'POST',
-		dataType: "JSON",
-		data: {
-			email: email,
-			password: password
-		},
-		success: function(response) {
-			var token=response.token;
-			var userid=response.userid;
-			$.post({
-            url: '/chat/info/settoken?token='+token+'&userid='+userid, // your controller action
-      
-				success: function(data) {
-				   location.reload();
-				}
-            }); 
-		},
-		error: function(xhr, status, error) {
-			alert(error);
-		}
-	}); 
-	
-   
-});
+  
 </script>

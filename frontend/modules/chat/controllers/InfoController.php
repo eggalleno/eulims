@@ -181,13 +181,13 @@ class InfoController extends Controller
         }
     }
 	
-	public function actionSettoken($token,$userid)
+	public function Settoken($token,$userid)
     {
 		$session = Yii::$app->session;
 		
 		$session->set('usertoken', $token);
 		$session->set('userid', $userid);
-		return;
+		//return;
 	}	
     /*public function beforeAction($action) 
 	{ 
@@ -240,14 +240,43 @@ class InfoController extends Controller
 	public function actionLogin(){
 		$model = new LoginForm();
 		if ($model->load(Yii::$app->request->post())){
-			//return;
+			$email=$model->email;
+			$password= $model->password;
+			
+			$params = [
+				'email' => $email,
+				'password' => $password
+			];
+
+			
+				// $authorization = "Authorization: Bearer ".$token; 
+				$apiUrl=$GLOBALS['newapi_url']."message/login";
+				$curl = new curl\Curl();
+				$curl->setRequestBody(json_encode($params));
+				$curl->setOption(CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+				$curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
+				$curl->setOption(CURLOPT_TIMEOUT, 180);
+				$curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
+			    $response = $curl->post($apiUrl);
+				$decode=Json::decode($response);
+			    $res=$decode['success'];
+				if($res == 'true'){
+					$token=$decode['token'];
+					$userid=$decode['userid'];
+					$this->Settoken($token,$userid);
+					 Yii::$app->session->setFlash('success', 'Successfully logged in!');
+				} else{
+					 Yii::$app->session->setFlash('error', 'Logged in failed!');
+				}
+				//exit;
+				return $this->redirect(['/lab/request']);
 			
 		}else{
 			return $this->render('login', [
 			'model' => $model
 			]);
 		}	
-	}
+	} 
 	
 	public function actionSetmessage(){
 		if(isset($_SESSION['usertoken'])){
