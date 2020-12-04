@@ -266,7 +266,7 @@ class InfoController extends Controller
 					$this->Settoken($token,$userid);
 					 Yii::$app->session->setFlash('success', 'Successfully logged in!');
 				} else{
-					 Yii::$app->session->setFlash('error', 'Logged in failed!');
+					 Yii::$app->session->setFlash('error', 'Login failed!');
 				}
 				//exit;
 				return $this->redirect(['/lab/request']);

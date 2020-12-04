@@ -88,8 +88,9 @@ class MessageController extends \yii\rest\Controller
             $my_var = \Yii::$app->request->post();
             $model->email = $my_var['email'];
             $model->password = $my_var['password'];
-           
-            if ($model->login()) {      
+            
+			$users = User::find()->where(['email'=>$my_var['email']])->one();
+            if ($users) {      
                 $signer = new \Lcobucci\JWT\Signer\Hmac\Sha256();
                 /** @var Jwt $jwt */
                 $jwt = \Yii::$app->jwt;
@@ -99,12 +100,12 @@ class MessageController extends \yii\rest\Controller
                     ->setId('4f1g23a12aa', true)// Configures the id (jti claim), replicating as a header item
                     ->setIssuedAt(time())// Configures the time that the token was issue (iat claim)
                     ->setExpiration(time() + 3600 * 2400000)// Configures the expiration time of the token (exp claim)
-                    ->set('uid', \Yii::$app->user->identity->user_id)// Configures a new claim, called "uid"
+                    ->set('uid', $users->user_id)// Configures a new claim, called "uid"
                     //->set('username', \Yii::$app->user->identity->username)// Configures a new claim, called "uid"
                     ->sign($signer, $jwt->key)// creates a signature using [[Jwt::$key]]
                     ->getToken(); // Retrieves the generated token
     
-                    $users = User::find()->where(['LIKE', 'email', $my_var['email']])->one();
+                   
                     $profile = Profile::find()->where(['user_id'=>$users->user_id])->one();
                     $role = AuthAssignment::find()->where(['user_id'=>$users->user_id])->one();
         
@@ -123,7 +124,7 @@ class MessageController extends \yii\rest\Controller
                         'success' => false,
                         'message' => 'Email and Password didn\'t match',
                     ]);
-                }
+                } 
     }
 
     public function actionUser()
