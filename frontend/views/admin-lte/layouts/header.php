@@ -434,7 +434,7 @@ function mes(id,type) {
 						if(messagetype == 1){
 							x = x+"<p class='message-content'>"+response.chat[y].chat_data+"</p>";	
 						}else{
-							x= x+ "<a href='http://eulims.onelab.ph/uploads/message/"+response.chat[y].chat_data+"' download>"+response.chat[y].chat_data+"</a>";
+							x= x+ "<a href='https://eulims.onelab.ph/uploads/message/"+response.chat[y].chat_data+"' download>"+response.chat[y].chat_data+"</a>";
 						}
 						
 						x = x+"<div class='message-timestamp-left'>"+dt+"</div>";
@@ -447,7 +447,7 @@ function mes(id,type) {
 						if(messagetype == 1){
 							x = x+"<p class='message-content'>"+response.chat[y].chat_data+"</p>";	
 						}else{
-							x= x+ "<a href='http://eulims.onelab.ph/uploads/message/"+response.chat[y].chat_data+"' download>"+response.chat[y].chat_data+"</a>";
+							x= x+ "<a href='https://eulims.onelab.ph/uploads/message/"+response.chat[y].chat_data+"' download>"+response.chat[y].chat_data+"</a>";
 						}
 						x = x+"<div class='message-timestamp-right'>"+dt+"</div>";
 						x = x+"</div>";
@@ -516,7 +516,7 @@ function sendmessage() {
 		var formData = new FormData($('form')[0]);
 		
 		$.ajax({
-			url: "http://eulims.onelab.ph/api/message/savefile", //API LINK FROM THE CENTRAL
+			url: "https://eulims.onelab.ph/api/message/savefile", //API LINK FROM THE CENTRAL
 			type: 'POST',
 			dataType: "JSON",
 			beforeSend: function (xhr) {
