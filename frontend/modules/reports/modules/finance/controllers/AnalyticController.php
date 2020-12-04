@@ -218,7 +218,9 @@ class AnalyticController extends \yii\web\Controller
 	    			$data[]=['name'=>$inner_req['conforme'],'value'=>(int)$inner_req['total']];
 	    		}
     			$series[]=['name'=>$st->type,'data'=>$data];
-    		}
+            }
+            
+            var_dump($series); exit();
 
     	} catch (Exception $e) {
 			return $e;
