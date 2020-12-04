@@ -24,8 +24,8 @@ use linslin\yii2\curl;
  */
 class PstcComponent extends Component {
 
-    //public $source = 'http://eulims.test/api/restpstc/';
-    public $source = 'https://eulims.dost9.ph/api/restpstc/';
+    // public $source = 'http://eulims.test/api/restpstc/';
+    public $source = 'https://eulims.onelab.ph/api/restpstc/';
     public $authorization = 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiIsImp0aSI6IjRmMWcyM2ExMmFhIn0.eyJpc3MiOiJodHRwOlwvXC9leGFtcGxlLmNvbSIsImF1ZCI6Imh0dHA6XC9cL2V4YW1wbGUub3JnIiwianRpIjoiNGYxZzIzYTEyYWEiLCJpYXQiOjE2MDE5NTY5MTUsImV4cCI6MTAyNDE5NTY5MTUsInVpZCI6NTB9.lMIUidFxtg9jXF9VLFJuKghHzqgVlu2S7s5OrZMUHoQ';
     //public $source = 'http://localhost/eulimsapi.onelab.ph';
     
