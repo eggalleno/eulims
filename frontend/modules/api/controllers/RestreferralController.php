@@ -443,7 +443,7 @@ class RestreferralController extends \yii\rest\Controller
                 #referral is already existing
                 //therefore passing it to the referralID variable
                 $referralId = $checkReferral;
-                $return = 0;
+                $return = 2;
                 return ['response'=>$return,'referral_id'=>$referralId];
             } else{
                 if(count($request)>0){
@@ -512,6 +512,7 @@ class RestreferralController extends \yii\rest\Controller
                                         $modelAnalysis->analysis_fee = $analysis['fee'];
                                         $modelAnalysis->cancelled = $analysis['cancelled'];
                                         $modelAnalysis->status = 1;
+                                        $modelAnalysis->cancelled = 0;
                                         $modelAnalysis->is_package = $analysis['is_package'];
                                         $modelAnalysis->type_fee_id = $analysis['type_fee_id'];
                                         $modelAnalysis->created_at = date('Y-m-d H:i:s');
@@ -546,7 +547,7 @@ class RestreferralController extends \yii\rest\Controller
                 
             }
 
-            // return ['referral'=>$referralSave,'sample'=>$sampleSave,'analysis'=>$analysisSave];
+            // return ['referral'=>$referralSave,'sample'=>$sampleSave,'analysis'=>$analysisSave]; use to debug , gives off the reason 
 
             //after all of the procedure above, determines waether to send notification or not
             if($referralSave == 1 && $sampleSave == 1 && $analysisSave == 1){
@@ -800,6 +801,7 @@ class RestreferralController extends \yii\rest\Controller
         $referralId = "";
         $estimatedDue = "";
         if(count(\Yii::$app->request->post()) > 0){
+
             $connection= \Yii::$app->referraldb;
             $connection->createCommand('SET FOREIGN_KEY_CHECKS=0')->execute();
             $transaction = $connection->beginTransaction();
@@ -811,7 +813,7 @@ class RestreferralController extends \yii\rest\Controller
             $checkReferral = $this->checkReferral($request['request_id'],$request['rstl_id']);
             
             if($checkReferral == 0){
-                //$referralId = $checkReferral;
+                //referral not found
                 $return = 2;
             } else {
                 try {
@@ -820,10 +822,9 @@ class RestreferralController extends \yii\rest\Controller
                         $referral = Referral::find()->where('local_request_id =:requestId AND receiving_agency_id =:receivingId',[':requestId'=>$request['request_id'],':receivingId'=>$request['rstl_id']])->one();
                         
                         $notification = $this->getNotificationDetails($referral->referral_id,$request['rstl_id'],\Yii::$app->request->post('agency_id'));
-                        
                         $referral->referral_code = $request['request_ref_num'];
                         $referral->referral_date_time = $request['request_datetime'];
-                        $referral->testing_agency_id = (int) Yii::$app->request->post('agency_id');
+                        $referral->testing_agency_id = (int) \Yii::$app->request->post('agency_id');
                         $referral->sample_received_date = $request['sample_received_date'];
                         $referral->customer_id = $request['customer_id'];
                         $referral->payment_type_id = $request['payment_type_id'];
@@ -839,7 +840,6 @@ class RestreferralController extends \yii\rest\Controller
                         $referral->testing_user_id = $notification['sender_user_id'];
                         $referral->cro_testing = $notification['sender_name'];
                         $referral->update_time = date('Y-m-d H:i:s');
-                        
                         if($referral->save(false))
                         {
                             if(count($samples) > 0)
@@ -865,7 +865,8 @@ class RestreferralController extends \yii\rest\Controller
                             $referralSave = 1;
                             $referralId = $referral->referral_id;
                             $estimatedDue = $referral->report_due;
-                        } else {
+                        }
+                        else {
                             $transaction->rollBack();
                             $referralSave = 0;
                         }

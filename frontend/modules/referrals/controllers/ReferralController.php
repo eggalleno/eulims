@@ -575,7 +575,7 @@ class ReferralController extends Controller
 
                         //put the code here to notify the referred agency
                         //response got index response and referral_id
-                        $notifyresponse = $refcomponent->notifyAgency($response['referral_id'],$agency_id);
+                        $notifyresponse = $refcomponent->notifyAgency($response['referral_id'],$agency_id,"Notification Sent");
                         
                         if($notifyresponse){
 
@@ -593,9 +593,9 @@ class ReferralController extends Controller
 
                         return "<div class='alert alert-warning'><span class='glyphicon glyphicon-exclamation-sign' style='font-size:18px;'></span>&nbsp;Referral Successfully Synced! but failed to notify. <br/> Please Notify Them Again.</div>";
 
-                    }elseif($response['response']==0){
+                    }elseif($response['response']==2){
                         //referral is already exisiting in the server, now we try to notify only
-                        $notifyresponse = $refcomponent->notifyAgency($response['referral_id'],$agency_id);
+                            $notifyresponse = $refcomponent->notifyAgency($response['referral_id'],$agency_id,"Notification Sent");
                         if($notifyresponse){
                             $refreq =  Referralrequest::find()->where(['request_id'=>$requestId])->one();
                             if($refreq){
@@ -789,11 +789,10 @@ class ReferralController extends Controller
                             }
                             $data = Json::encode(['request_data'=>$requestData,'sample_data'=>$sample_data,'agency_id'=>$agency_id],JSON_NUMERIC_CHECK);
                         }
-                        var_dump($data); exit;
+
                         //new function in the referral component that contacts 'sendreferral' action in the api
                         $refcomponent=new ReferralComponent();
                         $referralResponse = $refcomponent->sendReferral($data);
-                        var_dump($referralResponse); exit;
                         switch ($referralResponse['response']) {
                             case 0:
                                 $transaction->rollBack();
@@ -844,16 +843,6 @@ class ReferralController extends Controller
                                         return "<div class='alert alert-danger'><span class='glyphicon glyphicon-exclamation-sign' style='font-size:18px;'></span>&nbsp;Failed to update local data!</div>";
                                     }
                                 }
-
-                                /*if($requestUpdate->save(false) && $referral_request_update->save() && $analysisSave == 1){
-                                    goto send;
-                                } else {
-                                    $transaction->rollBack();
-                                    return "<div class='alert alert-danger'><span class='glyphicon glyphicon-exclamation-sign' style='font-size:18px;'></span>&nbsp;Failed to update local data!</div>";
-                                }*/
-                                //Statuslog "Received"
-                               
-                                
                                 break;
                             case 2:
                                 $transaction->rollBack();
@@ -862,153 +851,135 @@ class ReferralController extends Controller
 
                             //function to send notification
                             send: {
-                                $mi = !empty(Yii::$app->user->identity->profile->middleinitial) ? " ".substr(Yii::$app->user->identity->profile->middleinitial, 0, 1).". " : " "; 
+                                //sends notification that the referral has been sent
+                                $transaction->commit();//new changes i move the commit here because the columns needed for the pstc is not existing anymore
+                                $notifyresponse = $refcomponent->notifyAgency($referralResponse['referral_id'],$agency_id,"Referral Sent");
 
-                                $senderName = Yii::$app->user->identity->profile->firstname.$mi.Yii::$app->user->identity->profile->lastname;
-
-                                $details = [
-                                    'referral_id' => $referralResponse['referral_id'],
-                                    'sender_id' => Yii::$app->user->identity->profile->rstl_id,
-                                    'recipient_id' => $agency_id,
-                                    'sender_user_id' => Yii::$app->user->identity->profile->user_id,
-                                    'sender_name' => $senderName,
-                                    'remarks' => "Referral sent"
-                                ];
-                                $notificationData = Json::encode(['notice_details'=>$details],JSON_NUMERIC_CHECK);
-
-                                if(Yii::$app->request->get('bidding') == 1){
-                                    $notificationUrl ='https://eulimsapi.onelab.ph/api/web/referral/notifications/sendbid';
-                                    //$notificationUrl ='http://localhost/eulimsapi.onelab.ph/api/web/referral/notifications/sendbid';
-                                } else {
-                                    //$notificationUrl ='http://localhost/eulimsapi.onelab.ph/api/web/referral/notifications/send';
-                                    $notificationUrl ='https://eulimsapi.onelab.ph/api/web/referral/notifications/send';
+                                //new line , i move the notification greetings here
+                                if($notifyresponse){
+                                    return "<div class='alert alert-success'><span class='glyphicon glyphicon-exclamation-sign' style='font-size:18px;'></span>&nbsp;Referral Sent and the Agency is Notified!</div>";
                                 }
 
-                                $curlNoti = new curl\Curl();
-                                $notificationResponse = $curlNoti->setRequestBody($notificationData)
-                                ->setHeaders([
-                                    'Content-Type' => 'application/json',
-                                    'Content-Length' => strlen($notificationData),
-                                ])->post($notificationUrl);
+                                return "<div class='alert alert-warning'><span class='glyphicon glyphicon-exclamation-sign' style='font-size:18px;'></span>&nbsp;Referral Sent but failed to notify!</div>";
 
-                                $pstc_request = exRequestreferral::find()->where(['request_id'=>$requestId,'request_type_id'=>2])->one();
+                                // $pstc_request = exRequestreferral::find()->where(['request_id'=>$requestId,'request_type_id'=>2])->one();
 
-                                $pstcResponse = 1;
+                                // $pstcResponse = 1;
 
-                                if(!empty($pstc_request->pstc_id)) {
+                                // if(!empty($pstc_request->pstc_id)) {
 
-                                    $pstc_sample_data = [];
-                                    $pstc_analysis_data = [];
+                                //     $pstc_sample_data = [];
+                                //     $pstc_analysis_data = [];
 
-                                    $local_samples = Sample::find()->where(['request_id'=>$requestId])->asArray()->all();
-                                    $local_request = Request::findOne($requestId);
-                                    $local_analyses = Analysis::find()->where(['request_id'=>$requestId])->asArray()->all();
+                                //     $local_samples = Sample::find()->where(['request_id'=>$requestId])->asArray()->all();
+                                //     $local_request = Request::findOne($requestId);
+                                //     $local_analyses = Analysis::find()->where(['request_id'=>$requestId])->asArray()->all();
 
-                                    $pstc_requestData = [
-                                        'pstc_request_id' => $local_request->pstc_request_id,
-                                        'request_ref_num' => $local_request->request_ref_num,
-                                        'rstl_id' => $local_request->rstl_id,
-                                        'pstc_id' => $local_request->pstc_id,
-                                        'customer_id' => $local_request->customer_id,
-                                        'local_request_id' => $local_request->request_id,
-                                        'request_date_created' => $local_request->request_datetime,
-                                        'estimated_due_date' => $local_request->report_due,
-                                        'lab_id' => $local_request->lab_id,
-                                        'discount_id' => (int) $local_request->discount_id,
-                                        'discount_rate' => $local_request->discount,
-                                    ];
+                                //     $pstc_requestData = [
+                                //         'pstc_request_id' => $local_request->pstc_request_id,
+                                //         'request_ref_num' => $local_request->request_ref_num,
+                                //         'rstl_id' => $local_request->rstl_id,
+                                //         'pstc_id' => $local_request->pstc_id,
+                                //         'customer_id' => $local_request->customer_id,
+                                //         'local_request_id' => $local_request->request_id,
+                                //         'request_date_created' => $local_request->request_datetime,
+                                //         'estimated_due_date' => $local_request->report_due,
+                                //         'lab_id' => $local_request->lab_id,
+                                //         'discount_id' => (int) $local_request->discount_id,
+                                //         'discount_rate' => $local_request->discount,
+                                //     ];
 
-                                    foreach ($local_samples as $s_data) {
-                                        $pstc_sampleData = [
-                                            'pstc_sample_id' => $s_data['pstcsample_id'],
-                                            'sample_code' => $s_data['sample_code'],
-                                            'sample_month' => $s_data['sample_month'],
-                                            'sample_year' => $s_data['sample_year'],
-                                            'rstl_id' => $local_request->rstl_id,
-                                            'sample_description' => $s_data['description'],
-                                            'customer_description' => $s_data['customer_description'],
-                                            'sample_name' => $s_data['samplename'],
-                                            'local_sample_id' => $s_data['sample_id'],
-                                            'local_request_id' => $s_data['request_id'],
-                                            'sampletype_id' => $s_data['sampletype_id'],
-                                            'testcategory_id' => $s_data['testcategory_id'],
-                                            'sampling_date' => $s_data['sampling_date'],
-                                        ];
-                                        array_push($pstc_sample_data, $pstc_sampleData);
-                                    }
+                                //     foreach ($local_samples as $s_data) {
+                                //         $pstc_sampleData = [
+                                //             'pstc_sample_id' => $s_data['pstcsample_id'],
+                                //             'sample_code' => $s_data['sample_code'],
+                                //             'sample_month' => $s_data['sample_month'],
+                                //             'sample_year' => $s_data['sample_year'],
+                                //             'rstl_id' => $local_request->rstl_id,
+                                //             'sample_description' => $s_data['description'],
+                                //             'customer_description' => $s_data['customer_description'],
+                                //             'sample_name' => $s_data['samplename'],
+                                //             'local_sample_id' => $s_data['sample_id'],
+                                //             'local_request_id' => $s_data['request_id'],
+                                //             'sampletype_id' => $s_data['sampletype_id'],
+                                //             'testcategory_id' => $s_data['testcategory_id'],
+                                //             'sampling_date' => $s_data['sampling_date'],
+                                //         ];
+                                //         array_push($pstc_sample_data, $pstc_sampleData);
+                                //     }
 
-                                    foreach ($local_analyses as $a_data) {
-                                        $pstc_analysisData = [
-                                            'pstc_analysis_id' => $a_data['pstcanalysis_id'],
-                                            'sampletype_id' => $a_data['sample_type_id'],
-                                            'testcategory_id' => $a_data['testcategory_id'],
-                                            'local_analysis_id' => $a_data['analysis_id'],
-                                            'local_sample_id' => $a_data['sample_id'],
-                                            'package_id' => $a_data['package_id'],
-                                            'package_name' => $a_data['package_name'],
-                                            'testname' => $a_data['testname'],
-                                            'testname_id' => $a_data['test_id'],
-                                            'method_id' => $a_data['methodref_id'],
-                                            'method' => $a_data['method'],
-                                            'reference' => $a_data['references'],
-                                            'fee' => $a_data['fee'],
-                                            'is_package' => $a_data['is_package'],
-                                            'is_package_name' => $a_data['is_package_name'],
-                                            'rstl_id' => $local_request->rstl_id,
-                                            'type_fee_id' => $a_data['type_fee_id'],
-                                            'local_user_id' => (int) Yii::$app->user->identity->profile->user_id,
-                                            'local_request_id' => $a_data['request_id'],
-                                        ];
-                                        array_push($pstc_analysis_data, $pstc_analysisData);
-                                    }
+                                //     foreach ($local_analyses as $a_data) {
+                                //         $pstc_analysisData = [
+                                //             'pstc_analysis_id' => $a_data['pstcanalysis_id'],
+                                //             'sampletype_id' => $a_data['sample_type_id'],
+                                //             'testcategory_id' => $a_data['testcategory_id'],
+                                //             'local_analysis_id' => $a_data['analysis_id'],
+                                //             'local_sample_id' => $a_data['sample_id'],
+                                //             'package_id' => $a_data['package_id'],
+                                //             'package_name' => $a_data['package_name'],
+                                //             'testname' => $a_data['testname'],
+                                //             'testname_id' => $a_data['test_id'],
+                                //             'method_id' => $a_data['methodref_id'],
+                                //             'method' => $a_data['method'],
+                                //             'reference' => $a_data['references'],
+                                //             'fee' => $a_data['fee'],
+                                //             'is_package' => $a_data['is_package'],
+                                //             'is_package_name' => $a_data['is_package_name'],
+                                //             'rstl_id' => $local_request->rstl_id,
+                                //             'type_fee_id' => $a_data['type_fee_id'],
+                                //             'local_user_id' => (int) Yii::$app->user->identity->profile->user_id,
+                                //             'local_request_id' => $a_data['request_id'],
+                                //         ];
+                                //         array_push($pstc_analysis_data, $pstc_analysisData);
+                                //     }
 
-                                    $pstc_request_details = Json::encode(['request_data'=>$pstc_requestData,'sample_data'=>$pstc_sample_data,'analysis_data'=>$pstc_analysis_data,'rstl_id'=>$rstlId,'pstc_id'=>$local_request->pstc_id],JSON_NUMERIC_CHECK);
-                                    $pstcUrl='https://eulimsapi.onelab.ph/api/web/referral/pstcrequests/updaterequest_details';
-                                    //$pstcUrl='http://localhost/eulimsapi.onelab.ph/api/web/referral/pstcrequests/updaterequest_details';
+                                //     $pstc_request_details = Json::encode(['request_data'=>$pstc_requestData,'sample_data'=>$pstc_sample_data,'analysis_data'=>$pstc_analysis_data,'rstl_id'=>$rstlId,'pstc_id'=>$local_request->pstc_id],JSON_NUMERIC_CHECK);
+                                //     $pstcUrl='https://eulimsapi.onelab.ph/api/web/referral/pstcrequests/updaterequest_details';
+                                //     //$pstcUrl='http://localhost/eulimsapi.onelab.ph/api/web/referral/pstcrequests/updaterequest_details';
 
-                                    $curlPstc = new curl\Curl();
-                                    $pstcResponse = $curlPstc->setRequestBody($pstc_request_details)
-                                    ->setHeaders([
-                                        'Content-Type' => 'application/json',
-                                        'Content-Length' => strlen($pstc_request_details),
-                                    ])->post($pstcUrl);
-                                }
+                                //     $curlPstc = new curl\Curl();
+                                //     $pstcResponse = $curlPstc->setRequestBody($pstc_request_details)
+                                //     ->setHeaders([
+                                //         'Content-Type' => 'application/json',
+                                //         'Content-Length' => strlen($pstc_request_details),
+                                //     ])->post($pstcUrl);
+                                // }
 
-                                if($notificationResponse > 0 && $pstcResponse > 0) {
-                                    if($ref_request->notified == 0){
-                                        $transaction->rollBack();
-                                        return "<div class='alert alert-danger'><span class='glyphicon glyphicon-exclamation-sign' style='font-size:18px;'></span>&nbsp;Not yet notified!</div>";
-                                    } else {
-                                        $transaction->commit();
-                                        //return 'Notification sent.';
-                                        //EGG Statuslog
-                                            $refcomponent=new ReferralComponent();
-                                            $refid=$referralResponse['referral_id'];
-                                            $stat=json_decode($refcomponent->getCheckstatus($refid,1));
+                                // if($notificationResponse > 0 && $pstcResponse > 0) {
+                                //     if($ref_request->notified == 0){
+                                //         $transaction->rollBack();
+                                //         return "<div class='alert alert-danger'><span class='glyphicon glyphicon-exclamation-sign' style='font-size:18px;'></span>&nbsp;Not yet notified!</div>";
+                                //     } else {
+                                //         $transaction->commit();
+                                //         //return 'Notification sent.';
+                                //         //EGG Statuslog
+                                //             $refcomponent=new ReferralComponent();
+                                //             $refid=$referralResponse['referral_id'];
+                                //             $stat=json_decode($refcomponent->getCheckstatus($refid,1));
 
-                                            if($stat == 0){
-                                                $received=['referralid'=>$refid,'statusid'=>1];
-                                                $receivedData = Json::encode(['data'=>$received]);
-                                                $receivedUrl ='https://eulimsapi.onelab.ph/api/web/referral/statuslogs/insertdata';
-                                                //$receivedUrl ='http://localhost/eulimsapi.onelab.ph/api/web/referral/statuslogs/insertdata';
+                                //             if($stat == 0){
+                                //                 $received=['referralid'=>$refid,'statusid'=>1];
+                                //                 $receivedData = Json::encode(['data'=>$received]);
+                                //                 $receivedUrl ='https://eulimsapi.onelab.ph/api/web/referral/statuslogs/insertdata';
+                                //                 //$receivedUrl ='http://localhost/eulimsapi.onelab.ph/api/web/referral/statuslogs/insertdata';
 
-                                                $curlTesting = new curl\Curl();
-                                                $receivedResponse = $curlTesting->setRequestBody($receivedData)
-                                                ->setHeaders([
-                                                        'Content-Type' => 'application/json',
-                                                        'Content-Length' => strlen($receivedData), 
-                                                ])->post($receivedUrl);
-                                            }
-                                        //
-                                        Yii::$app->session->setFlash('success', "Successfully sent");
-                                        //delay for 2 seconds, before executing next line of code
-                                        sleep(2);
-                                        return $this->redirect(['/lab/request/view', 'id' => $requestId]);
-                                    }
-                                } else {
-                                    $transaction->rollBack();
-                                    return "<div class='alert alert-danger'><span class='glyphicon glyphicon-exclamation-sign' style='font-size:18px;'></span>&nbsp;Server Error: Failed to send!</div>";
-                                }
+                                //                 $curlTesting = new curl\Curl();
+                                //                 $receivedResponse = $curlTesting->setRequestBody($receivedData)
+                                //                 ->setHeaders([
+                                //                         'Content-Type' => 'application/json',
+                                //                         'Content-Length' => strlen($receivedData), 
+                                //                 ])->post($receivedUrl);
+                                //             }
+                                //         //
+                                //         Yii::$app->session->setFlash('success', "Successfully sent");
+                                //         //delay for 2 seconds, before executing next line of code
+                                //         sleep(2);
+                                //         return $this->redirect(['/lab/request/view', 'id' => $requestId]);
+                                //     }
+                                // } else {
+                                //     $transaction->rollBack();
+                                //     return "<div class='alert alert-danger'><span class='glyphicon glyphicon-exclamation-sign' style='font-size:18px;'></span>&nbsp;Server Error: Failed to send!</div>";
+                                // }
                             }
                         }
                     } else {

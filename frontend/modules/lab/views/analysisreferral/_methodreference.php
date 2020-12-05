@@ -9,6 +9,7 @@ use kartik\widgets\Select2;
 use kartik\widgets\DepDrop;
 use yii\helpers\Url;
 use yii\helpers\Json;
+use common\components\ReferralComponent;
 
 /* @var $this yii\web\View */
 /* @var $model common\models\lab\Analysis */
@@ -17,6 +18,7 @@ use yii\helpers\Json;
 
 <?php
     $checkMethod = ($model->methodref_id) ? $model->methodref_id : null;
+    $referralcomp = new ReferralComponent();
 ?>
 
 <div class="analysismethodreference-form">
@@ -46,8 +48,12 @@ use yii\helpers\Json;
                     [
                         'attribute'=>'method',
                         'header' => 'Agency',
-                        'value' => function($data){
-                            return $data['methodreference']['sync_id'];
+                        'value' => function($data) use($referralcomp){
+                            $methodref = $referralcomp->getAgencybyMethodrefOne($data['methodreference_id']);
+                            if(!$methodref)
+                                return "Error: Cant get the agency details";
+                            
+                            return $methodref->name;
                         },
                     ],
                     [

@@ -144,6 +144,8 @@ class RequestController extends Controller
             //gets all the matching agency ??? hard to maintain, needs inovative idea here //btc 
             $agency = $refcomponent->listMatchAgency($id);
 
+            // var_dump($agency); exit;
+
             //gets the attachement details ??? //btc
 			//set third parameter to 1 for attachment type deposit slip
             //updated to new api with false return temporarily //btc TODOOOOOOOOOOOOOO
@@ -714,14 +716,13 @@ class RequestController extends Controller
         $GLOBALS['rstl_id']=Yii::$app->user->identity->profile->rstl_id;
         
         //gets the listoflabs //btc
-        $labreferral = ArrayHelper::map(json_decode($refcomponent->listLabreferral()), 'lab_id', 'labname');
-        
+        $labreferral = ArrayHelper::map($refcomponent->listLabreferral(), 'lab_id', 'labname');
         //gets the list of discounts //btc
-        $discountreferral = ArrayHelper::map(json_decode($refcomponent->listDiscountreferral()), 'discount_id', 'type');
+        $discountreferral = ArrayHelper::map($refcomponent->listDiscountreferral(), 'discount_id', 'type');
         //gets all the list of purposes //btc
-        $purposereferral = ArrayHelper::map(json_decode($refcomponent->listPurposereferral()), 'purpose_id', 'name');
+        $purposereferral = ArrayHelper::map($refcomponent->listPurposereferral(), 'purpose_id', 'name');
         //gets all the list of modeofrelease //btc 
-        $modereleasereferral = ArrayHelper::map(json_decode($refcomponent->listModereleasereferral()), 'modeofrelease_id', 'mode');
+        $modereleasereferral = ArrayHelper::map($refcomponent->listModereleasereferral(), 'modeofrelease_id', 'mode');
         
         if ($model->load(Yii::$app->request->post())) {
             $transaction = $connection->beginTransaction();
