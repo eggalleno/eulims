@@ -53,7 +53,7 @@ class ReferralComponent extends Component {
     * Notifies refered agency about the referral
     * @return boolean
     */
-    function notifyAgency($referral_id,$agency_id){
+    function notifyAgency($referral_id,$agency_id,$message){
         //salvaged from sTG
         $mi = !empty(Yii::$app->user->identity->profile->middleinitial) ? " ".substr(Yii::$app->user->identity->profile->middleinitial, 0, 1).". " : " ";
         $senderName = Yii::$app->user->identity->profile->firstname.$mi.Yii::$app->user->identity->profile->lastname;
@@ -64,7 +64,7 @@ class ReferralComponent extends Component {
             'recipient_id' => $agency_id,
             'sender_user_id' => Yii::$app->user->identity->profile->user_id,
             'sender_name' => $senderName,
-            'remarks' => "Notification sent"
+            'remarks' => $message
         ];
         
         $notificationData = Json::encode(['notice_details'=>$details],JSON_NUMERIC_CHECK);
@@ -183,6 +183,7 @@ class ReferralComponent extends Component {
 
             //obviously encoding the 
             $data = Json::encode(['request_data'=>$requestData,'sample_data'=>$sample_data,'analysis_data'=>$analysis_data,'agency_id'=>$agency_id],JSON_NUMERIC_CHECK);
+
 
             //trying to contact the mothership as API :D oh GOD how long do i need to read these code
             $apiUrl=$this->source.'/insertreferraldata';
@@ -394,8 +395,9 @@ class ReferralComponent extends Component {
         $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
         $curl->setOption(CURLOPT_TIMEOUT, 180);
         $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
-        $list = $curl->get($apiUrl);
-        return $list;
+        $list = Json::decode($curl->get($apiUrl));
+
+        return $list?$list:[];
     }
     //get referral discount list
     function listDiscountreferral()
@@ -405,8 +407,8 @@ class ReferralComponent extends Component {
         $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
         $curl->setOption(CURLOPT_TIMEOUT, 180);
         $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
-        $list = $curl->get($apiUrl);
-        return $list;
+        $list = Json::decode($curl->get($apiUrl));
+        return $list?$list:[];
     }
     //get referral purpose list
     function listPurposereferral()
@@ -416,8 +418,8 @@ class ReferralComponent extends Component {
         $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
         $curl->setOption(CURLOPT_TIMEOUT, 180);
         $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
-        $list = $curl->get($apiUrl);
-        return $list;
+        $list = Json::decode($curl->get($apiUrl));
+        return $list?$list:[];
     }
     //get referral mode of release list
     function listModereleasereferral()
@@ -427,8 +429,8 @@ class ReferralComponent extends Component {
         $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
         $curl->setOption(CURLOPT_TIMEOUT, 180);
         $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
-        $list = $curl->get($apiUrl);
-        return $list;
+        $list = Json::decode($curl->get($apiUrl));
+        return $list?$list:[];
     }
 
     //get matching services
@@ -444,7 +446,7 @@ class ReferralComponent extends Component {
             ->where('tbl_sample.request_id =:requestId AND is_package =:packageName',[':requestId'=>$requestId,':packageName'=>0])
             ->groupBy(['test_id','methodref_id'])
             ->asArray()->all();
-
+        // var_dump($analysis); exit;
         //if there are no tests then dont proceed
         if(!$analysis)
             return [];

@@ -146,6 +146,7 @@ class AnalysisreferralController extends Controller
                 $analysis->fee =$method->fee;
                 $analysis->quantity = 1; 
                 $analysis->test_id = (int) $testId;
+                $analysis->is_package = 0;
                 //$model->sample_type_id = null;
                 //$model->testcategory_id = null;
                 //$analysis->save(false);
