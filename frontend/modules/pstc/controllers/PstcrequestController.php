@@ -97,7 +97,7 @@ class PstcrequestController extends Controller
             $function = new PstcComponent();
 
             $details = json_decode($function->getViewRequest($requestId,$rstlId,$pstcId),true);
-            // var_dump($details); exit();
+           
             $request = $details['request_data'];
             $samples = $details['sample_data'];
             $analysis = $details['analysis_data'];
@@ -181,9 +181,11 @@ class PstcrequestController extends Controller
                 'received' => $user_fullname,
             ];
 
+            //var_dump($testarray); exit();
+
             $function = new PstcComponent();
             $data = json_decode($function->getRequestcreate($testarray),true);
-            // var_dump($data); exit();
+       
             if($data){
                 Yii::$app->session->setFlash('success', 'Request successfully saved!');
                 return $this->redirect(['/pstc/pstcrequest/view','request_id'=>$data['pstc_request_id'],'pstc_id'=>$data['pstc_id']]);
@@ -262,6 +264,8 @@ class PstcrequestController extends Controller
 
                 $function = new PstcComponent();
                 $data = json_decode($function->getAnalysiscreate($testarray),true);
+
+             
             }
 
             if($data){
@@ -277,7 +281,7 @@ class PstcrequestController extends Controller
         $details = json_decode($function->getViewRequest($request_id,$rstlId,$pstc_id),true);
         $samples = $details['sample_data'];
         $lists = json_decode($function->listLab(),true);
-
+   
 
         return $this->renderAjax('createanalysis', [
             'model' => $model,
@@ -312,13 +316,20 @@ class PstcrequestController extends Controller
 
     public function actionSavetolocal()
     {
-        $pstc = Pstcrequest::findOne(Yii::$app->request->post('request_id'));
+        $rstlId = (int) Yii::$app->user->identity->profile->rstl_id;
+        $request_id = (int) Yii::$app->request->post('request_id');
+        $pstc_id = 112;
+        
+        $function = new PstcComponent();
+        $pstc = json_decode($function->getViewRequest($request_id,$rstlId,$pstc_id),true);
+        
+        // var_dump($pstc['analysis_data']); exit();
         $post= Yii::$app->request->post('eRequest');
 
         $model = new Request;
         $model->request_datetime = $post['request_datetime'];
         $model->rstl_id = Yii::$app->user->identity->profile->rstl_id;
-        $model->customer_id = $pstc->customer_id;
+        $model->customer_id = $pstc['request_data']['customer_id'];
         $model->lab_id = $post['lab_id'];
         $model->payment_type_id = 1;
         $model->discount_id = $post['discount_id'];
@@ -329,12 +340,12 @@ class PstcrequestController extends Controller
         $model->receivedBy= $post['receivedBy'];
         $model->request_type_id = 3;
         $model->report_due = $post['report_due'];
-        $model->referral_id = $pstc['pstc_request_id'];
+        $model->referral_id = $pstc['request_data']['pstc_request_id'];
        
         if($model->save(false))
         {
             
-            foreach($pstc->samples as $sampol) 
+            foreach($pstc['sample_data'] as $sampol) 
             {
                 $sample = new Sample;
                 $sample->request_id = $model->request_id;
@@ -348,24 +359,26 @@ class PstcrequestController extends Controller
                 
                 if($sample->save(false))
                 {
-                    foreach($sampol->analysis as $an){
+                    foreach($pstc['analysis_data'] as $an){
                         $analysis = new Analysis;
                         $analysis->request_id = $model->request_id;
                         $analysis->sample_id = $sample->sample_id;
-                        $analysis->testname =$an->testname;
-                        $analysis->method =$an->method;
-                        $analysis->references =$an->reference;
-                        $analysis->fee = $an->fee;
+                        $analysis->testname =$an['testname'];
+                        $analysis->method =$an['method'];
+                        $analysis->references =$an['reference'];
+                        $analysis->fee = $an['fee'];
                         $analysis->quantity =1;
                         $analysis->date_analysis = date('Y-m-d');
                         $analysis->rstl_id = $model->rstl_id;
                         $analysis->test_id = 0;
                         $analysis->save(false);
                     }
-                    
-                    $pstc->accepted = 1;
-                    $pstc->save();
+                    $pstc_id = $pstc['request_data']['pstc_request_id'];
+                    $function = new PstcComponent();
+                    $pstc = json_decode($function->getAccepted($pstc_id),true);
+                    // var_dump($pstc); exit();
                     Yii::$app->session->setFlash('success', 'Request Saved to local!');
+
                     // return $this->redirect(['/pstc/pstcrequest/view','request_id'=>$pstc['pstc_request_id'],'pstc_id'=>$pstc['pstc_id']]);
                     return $this->redirect(['/lab/request/view','id'=>$model->request_id]);
 

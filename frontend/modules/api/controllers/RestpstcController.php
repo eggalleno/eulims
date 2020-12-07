@@ -53,7 +53,7 @@ class RestpstcController extends \yii\rest\Controller
 		// re-add authentication filter
 		$behaviors['authenticator'] = $auth;
 		// avoid authentication on CORS-pre-flight requests (HTTP OPTIONS method)
-		$behaviors['authenticator']['except'] = ['request','requestview','listlab','testnamemethods','testnamemethod'];
+		$behaviors['authenticator']['except'] = ['request','requestview','testnamemethods','testnamemethod'];
 
 		return $behaviors;
 	}
@@ -79,6 +79,17 @@ class RestpstcController extends \yii\rest\Controller
         }
     }
 
+    public function actionPstcaccepted()
+    {
+        $pstcId = (int) Yii::$app->request->get('id');
+        $data = Pstcrequest::findOne($pstcId);
+        $data->accepted = 1;
+        $data->save(false);
+
+        return $data;
+    
+    }
+
     public function actionUpdateref() //Create or Update pstc request
     {
         $id = (int) Yii::$app->request->post('id');
@@ -98,7 +109,7 @@ class RestpstcController extends \yii\rest\Controller
         $request = Yii::$app->request;
         $data = ($request->isPut) ? Pstcrequest::find()->where(['id' => $id])->one() : new Pstcrequest;
         $data->rstl_id = 11;
-        $data->pstc_id = 113;
+        $data->pstc_id = 112;
         $data->customer_id = (int) Yii::$app->request->post('customer_id');
         $data->submitted_by=  ucwords(strtolower(Yii::$app->request->post('submitted')));
         $data->received_by = ucwords(strtolower(Yii::$app->request->post('received')));
@@ -129,7 +140,7 @@ class RestpstcController extends \yii\rest\Controller
             if($checkAgency > 0)
             {
                 $request = Pstcrequest::findOne($request_id);
-
+               
                 //return $request->samples[0]->analysis;
                 foreach($request->samples as $sample)
                 {   
@@ -162,6 +173,7 @@ class RestpstcController extends \yii\rest\Controller
             throw new \yii\web\HttpException(400, 'Please specify parameters correctly. :)');
         }
     }
+
 
     public function actionUpdatepstc(){
         

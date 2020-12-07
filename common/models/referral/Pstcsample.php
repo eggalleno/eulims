@@ -44,6 +44,11 @@ class Pstcsample extends \yii\db\ActiveRecord
         return Yii::$app->get('referraldb');
     }
 
+    public static function primaryKey()
+    {
+        return ['pstc_sample_id'];
+    }
+
     /**
      * {@inheritdoc}
      */

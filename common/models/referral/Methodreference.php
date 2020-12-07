@@ -27,6 +27,12 @@ class Methodreference extends \yii\db\ActiveRecord
         return 'tbl_methodreference';
     }
 
+    public static function primaryKey()
+    {
+        return ['methodreference_id'];
+    }
+
+
     /**
      * @return \yii\db\Connection the database connection used by this AR class.
      */

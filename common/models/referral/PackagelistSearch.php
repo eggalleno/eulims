@@ -19,7 +19,7 @@ class PackagelistSearch extends Packagelist
     {
         return [
             [['package_id', 'lab_id', 'sampletype_id'], 'integer'],
-            [['name', 'test_method'], 'safe'],
+            [['name', 'test_methods'], 'safe'],
             [['rate'], 'number'],
         ];
     }
@@ -67,7 +67,7 @@ class PackagelistSearch extends Packagelist
         ]);
 
         $query->andFilterWhere(['like', 'name', $this->name])
-            ->andFilterWhere(['like', 'test_method', $this->test_method]);
+            ->andFilterWhere(['like', 'test_methods', $this->test_methods]);
 
         return $dataProvider;
     }

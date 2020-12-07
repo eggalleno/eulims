@@ -55,6 +55,11 @@ class Pstcanalysis extends \yii\db\ActiveRecord
         return Yii::$app->get('referraldb');
     }
 
+
+    public static function primaryKey()
+    {
+        return ['pstc_analysis_id'];
+    }
     /**
      * {@inheritdoc}
      */

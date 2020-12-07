@@ -43,6 +43,10 @@ class Pstcrequest extends \yii\db\ActiveRecord
         return Yii::$app->get('referraldb');
     }
 
+    public static function primaryKey()
+    {
+        return ['pstc_request_id'];
+    }
     /**
      * {@inheritdoc}
      */

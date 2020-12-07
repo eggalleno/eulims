@@ -26,17 +26,18 @@ class PstcComponent extends Component {
 
     // public $source = 'http://eulims.test/api/restpstc/';
     public $source = 'https://eulims.onelab.ph/api/restpstc/';
-    public $authorization = 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiIsImp0aSI6IjRmMWcyM2ExMmFhIn0.eyJpc3MiOiJodHRwOlwvXC9leGFtcGxlLmNvbSIsImF1ZCI6Imh0dHA6XC9cL2V4YW1wbGUub3JnIiwianRpIjoiNGYxZzIzYTEyYWEiLCJpYXQiOjE2MDE5NTY5MTUsImV4cCI6MTAyNDE5NTY5MTUsInVpZCI6NTB9.lMIUidFxtg9jXF9VLFJuKghHzqgVlu2S7s5OrZMUHoQ';
     //public $source = 'http://localhost/eulimsapi.onelab.ph';
     
     //list to view
     
     function getAll($rstlId)
 	{
+        $token= 'Authorization: Bearer '.$_SESSION['usertoken'];
+
 		if($rstlId > 0) {
             $apiUrl=$this->source.'request?rstl_id='.$rstlId;
             $curl = new curl\Curl();
-            $curl->setOption(CURLOPT_HTTPHEADER, ['Content-Type: application/json' , $this->authorization]);
+            $curl->setOption(CURLOPT_HTTPHEADER, ['Content-Type: application/json' , $token]);
             $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
             $curl->setOption(CURLOPT_TIMEOUT, 180);
             $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
@@ -49,10 +50,12 @@ class PstcComponent extends Component {
     
 	function getRequest($rstlId,$accepted)
 	{
+        $token= 'Authorization: Bearer '.$_SESSION['usertoken'];
+        
 		if($rstlId > 0 && isset($accepted)) {
             $apiUrl=$this->source.'request?rstl_id='.$rstlId.'&accepted='.$accepted;
             $curl = new curl\Curl();
-            $curl->setOption(CURLOPT_HTTPHEADER, ['Content-Type: application/json' , $this->authorization]);
+            $curl->setOption(CURLOPT_HTTPHEADER, ['Content-Type: application/json' , $token]);
             $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
             $curl->setOption(CURLOPT_TIMEOUT, 180);
             $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
@@ -66,6 +69,7 @@ class PstcComponent extends Component {
     function getUpdateref($data)
 	{
         $apiUrl=$this->source.'updateref';
+        $token= 'Authorization: Bearer '.$_SESSION['usertoken'];
         $params = [
             'id' => $data['id'],
             'reference' => $data['reference'],
@@ -74,7 +78,7 @@ class PstcComponent extends Component {
 
         $curl = new curl\Curl();
         $curl->setRequestBody(json_encode($params));
-        $curl->setOption(CURLOPT_HTTPHEADER, ['Content-Type: application/json' , $this->authorization]);
+        $curl->setOption(CURLOPT_HTTPHEADER, ['Content-Type: application/json' , $token]);
         $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
         $curl->setOption(CURLOPT_TIMEOUT, 180);
         $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
@@ -86,6 +90,7 @@ class PstcComponent extends Component {
     function getRequestcreate($data)
 	{
         $apiUrl=$this->source.'requestcreate';
+        $token= 'Authorization: Bearer '.$_SESSION['usertoken'];
         $params = [
             'customer_id' => $data['customer_id'],
             'user_id' => $data['user_id'],
@@ -94,17 +99,33 @@ class PstcComponent extends Component {
         ];
         $curl = new curl\Curl();
         $curl->setRequestBody(json_encode($params));
-        $curl->setOption(CURLOPT_HTTPHEADER, ['Content-Type: application/json' , $this->authorization]);
+        $curl->setOption(CURLOPT_HTTPHEADER, ['Content-Type: application/json' , $token]);
         $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
         $curl->setOption(CURLOPT_TIMEOUT, 180);
         $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
         return $data = $curl->post($apiUrl);
         
     }
+
+    function getAccepted($id)
+	{
+        $apiUrl=$this->source.'pstcaccepted?id='.$id;
+        $token= 'Authorization: Bearer '.$_SESSION['usertoken'];
+        
+        $curl = new curl\Curl();
+        $curl->setOption(CURLOPT_HTTPHEADER, ['Content-Type: application/json' , $token]);
+        $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
+        $curl->setOption(CURLOPT_TIMEOUT, 180);
+        $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
+        return $data = $curl->get($apiUrl);
+        
+    }
     
     function getSamplecreate($data)
 	{
         $apiUrl=$this->source.'sample';
+        $token= 'Authorization: Bearer '.$_SESSION['usertoken'];
+
         $params = [
             'pstc_request_id' => $data['pstc_request_id'],
             'qnty' => $data['qnty'],
@@ -113,7 +134,7 @@ class PstcComponent extends Component {
         ];
         $curl = new curl\Curl();
         $curl->setRequestBody(json_encode($params));
-        $curl->setOption(CURLOPT_HTTPHEADER, ['Content-Type: application/json' , $this->authorization]);
+        $curl->setOption(CURLOPT_HTTPHEADER, ['Content-Type: application/json' , $token]);
         $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
         $curl->setOption(CURLOPT_TIMEOUT, 180);
         $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
@@ -124,6 +145,8 @@ class PstcComponent extends Component {
     function getAnalysiscreate($data)
 	{
         $apiUrl=$this->source.'analysis';
+        $token= 'Authorization: Bearer '.$_SESSION['usertoken'];
+
         $params = [
             'rstl_id' => $data['rstl_id'],
             'pstc_id' => $data['pstc_id'],
@@ -131,22 +154,28 @@ class PstcComponent extends Component {
             'method_id' =>$data['method_id'],
             'testname' => $data['testname'],
         ];
+
         $curl = new curl\Curl();
         $curl->setRequestBody(json_encode($params));
-        $curl->setOption(CURLOPT_HTTPHEADER, ['Content-Type: application/json' , $this->authorization]);
+        $curl->setOption(CURLOPT_HTTPHEADER, ['Content-Type: application/json' , $token]);
         $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
         $curl->setOption(CURLOPT_TIMEOUT, 180);
         $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
         return $data = $curl->post($apiUrl);
+
+        
+        // var_dump($); exit();
 	}
 	
     //for viewing single pstc request
     function getViewRequest($requestId,$rstlId,$pstcId)
     {
+        $token= 'Authorization: Bearer '.$_SESSION['usertoken'];
+
         if($requestId > 0 && $rstlId > 0 && $pstcId > 0) {
             $apiUrl=$this->source.'requestview?request_id='.$requestId.'&rstl_id='.$rstlId.'&pstc_id='.$pstcId;
             $curl = new curl\Curl();
-            $curl->setOption(CURLOPT_HTTPHEADER, ['Content-Type: application/json' , $this->authorization]);
+            $curl->setOption(CURLOPT_HTTPHEADER, ['Content-Type: application/json' , $token]);
             $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
             $curl->setOption(CURLOPT_TIMEOUT, 180);
             $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
@@ -160,10 +189,12 @@ class PstcComponent extends Component {
     //pstc request details for saving
     function getRequestDetails($requestId,$rstlId,$pstcId)
     {
+        $token= 'Authorization: Bearer '.$_SESSION['usertoken'];
+
         if($requestId > 0 && $rstlId > 0 && $pstcId > 0) {
             $apiUrl=$this->source.'request_details?request_id='.$requestId.'&rstl_id='.$rstlId.'&pstc_id='.$pstcId;
             $curl = new curl\Curl();
-            $curl->setOption(CURLOPT_HTTPHEADER, ['Content-Type: application/json' , $this->authorization]);
+            $curl->setOption(CURLOPT_HTTPHEADER, ['Content-Type: application/json' , $token]);
             $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
             $curl->setOption(CURLOPT_TIMEOUT, 180);
             $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
@@ -176,10 +207,12 @@ class PstcComponent extends Component {
 
     //get sample by sample ID
     function getSampleOne($sampleId,$requestId,$rstlId,$pstcId) {
+        $token= 'Authorization: Bearer '.$_SESSION['usertoken'];
+
         if($sampleId > 0 && $requestId > 0 && $rstlId > 0 && $pstcId > 0) {
             $apiUrl=$this->source.'get_pstcsample?sample_id='.$sampleId.'&request_id='.$requestId.'&rstl_id='.$rstlId.'&pstc_id='.$pstcId;
             $curl = new curl\Curl();
-            $curl->setOption(CURLOPT_HTTPHEADER, ['Content-Type: application/json' , $this->authorization]);
+            $curl->setOption(CURLOPT_HTTPHEADER, ['Content-Type: application/json' , $token]);
             $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
             $curl->setOption(CURLOPT_TIMEOUT, 180);
             $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
@@ -193,6 +226,8 @@ class PstcComponent extends Component {
     //check if the agency is the owner of the pstc request
     function checkOwner($requestId,$rstlId,$pstcId)
     {
+        $token= 'Authorization: Bearer '.$_SESSION['usertoken'];
+
         if($requestId > 0 && $rstlId > 0 && $pstcId > 0){
             $check = Pstcrequest::find()
                 ->where('pstc_request_id =:requestId', [':requestId' => $requestId])
@@ -214,10 +249,12 @@ class PstcComponent extends Component {
     //download request form
     function downloadRequest($requestId,$rstlId,$fileId)
     {
+        $token= 'Authorization: Bearer '.$_SESSION['usertoken'];
+
         if($requestId > 0 && $rstlId > 0 && $fileId > 0) {
             $apiUrl=$this->source.'/api/web/referral/pstcattachments/download?request_id='.$requestId.'&rstl_id='.$rstlId.'&file='.$fileId;
             $curl = new curl\Curl();
-            $curl->setOption(CURLOPT_HTTPHEADER, ['Content-Type: application/json' , $this->authorization]);
+            $curl->setOption(CURLOPT_HTTPHEADER, ['Content-Type: application/json' , $token]);
             $curl->setOption(CURLOPT_CONNECTTIMEOUT, 120);
             $curl->setOption(CURLOPT_TIMEOUT, 120);
             $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
@@ -238,8 +275,11 @@ class PstcComponent extends Component {
 
     function checkMethod($id)
     {
+        $token= 'Authorization: Bearer '.$_SESSION['usertoken'];
+
         $curl = new curl\Curl();
         $curl->setOption(CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+        $curl->setOption(CURLOPT_HTTPHEADER, ['Content-Type: application/json' , $token]);
         $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
         $curl->setOption(CURLOPT_TIMEOUT, 180);
         $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
@@ -253,8 +293,10 @@ class PstcComponent extends Component {
 
     function listLab()
     {
+        $token= 'Authorization: Bearer '.$_SESSION['usertoken'];
         $curl = new curl\Curl();
         $curl->setOption(CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+        $curl->setOption(CURLOPT_HTTPHEADER, ['Content-Type: application/json' , $token]);
         $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
         $curl->setOption(CURLOPT_TIMEOUT, 180);
         $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
@@ -265,8 +307,10 @@ class PstcComponent extends Component {
 
     function testnamemethods($id)
     {
+        $token= 'Authorization: Bearer '.$_SESSION['usertoken'];
         $curl = new curl\Curl();
         $curl->setOption(CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+        $curl->setOption(CURLOPT_HTTPHEADER, ['Content-Type: application/json' , $token]);
         $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
         $curl->setOption(CURLOPT_TIMEOUT, 180);
         $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
@@ -277,8 +321,10 @@ class PstcComponent extends Component {
 
     function sampletest($id)
     {
+        $token= 'Authorization: Bearer '.$_SESSION['usertoken'];
         $curl = new curl\Curl();
         $curl->setOption(CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+        $curl->setOption(CURLOPT_HTTPHEADER, ['Content-Type: application/json' , $token]);
         $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
         $curl->setOption(CURLOPT_TIMEOUT, 180);
         $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
@@ -290,8 +336,10 @@ class PstcComponent extends Component {
 
     function testnamemethod($testname_id,$sampletype_id)
     {
+        $token= 'Authorization: Bearer '.$_SESSION['usertoken'];
         $curl = new curl\Curl();
         $curl->setOption(CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+        $curl->setOption(CURLOPT_HTTPHEADER, ['Content-Type: application/json' , $token]);
         $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
         $curl->setOption(CURLOPT_TIMEOUT, 180);
         $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
@@ -302,9 +350,11 @@ class PstcComponent extends Component {
 
     function syncMethod($params)
     {
+        $token= 'Authorization: Bearer '.$_SESSION['usertoken'];
         $curl = new curl\Curl();
         $curl->setRequestBody(json_encode($params));
         $curl->setOption(CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+        $curl->setOption(CURLOPT_HTTPHEADER, ['Content-Type: application/json' , $token]);
         $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
         $curl->setOption(CURLOPT_TIMEOUT, 180);
 
@@ -317,9 +367,11 @@ class PstcComponent extends Component {
 
     function updatePstc($params)
     {
+        $token= 'Authorization: Bearer '.$_SESSION['usertoken'];
         $curl = new curl\Curl();
         $curl->setRequestBody(json_encode($params));
         $curl->setOption(CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+        $curl->setOption(CURLOPT_HTTPHEADER, ['Content-Type: application/json' , $token]);
         $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
         $curl->setOption(CURLOPT_TIMEOUT, 180);
 
