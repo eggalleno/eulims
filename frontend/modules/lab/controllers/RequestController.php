@@ -983,6 +983,7 @@ class RequestController extends Controller
 	   $tomorrow = date("Y-m-d", strtotime("+1 day"));
 	  // echo $tomorrow;
        $request = Request::find()->where(['report_due' => $tomorrow])->all();
+	   $rstlid=Yii::$app->user->identity->profile->rstl_id;
 	    $countdue=0;
 		foreach ($request as $res){
 			$refnum= $res->request_ref_num;
@@ -1008,6 +1009,7 @@ class RequestController extends Controller
 	//egg Calibration schedule
 	 public function Notifysched()
     {
+	   $rstlid=Yii::$app->user->identity->profile->rstl_id;
 	   $tomorrow = date("Y-m-d", strtotime("+1 day"));
        $sched = Equipmentservice::find()->where(['startdate' => $tomorrow])->all();
 	  
