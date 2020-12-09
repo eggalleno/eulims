@@ -53,7 +53,7 @@ class RestpstcController extends \yii\rest\Controller
 		// re-add authentication filter
 		$behaviors['authenticator'] = $auth;
 		// avoid authentication on CORS-pre-flight requests (HTTP OPTIONS method)
-		$behaviors['authenticator']['except'] = ['request','requestview','testnamemethods','testnamemethod'];
+		$behaviors['authenticator']['except'] = ['request','requestview'];
 
 		return $behaviors;
 	}
