@@ -35,9 +35,11 @@ use yii\helpers\Json;
  */
 class ReferralComponent extends Component {
 
-    public $source = 'http://www.eulims.local/api/restreferral';
-    // public $source = 'https://eulims.dost9.ph/api/restreferral';
-    // public $source = 'https://eulims.onelab.dost.gov.ph/api/restreferral';
+    public $source="";
+
+    function init(){
+        $this->source = 'http://www.eulims.local/api/restreferral'; //incase you need to get the api somewhere
+    }
 
     /**
      * Get Source
@@ -71,6 +73,47 @@ class ReferralComponent extends Component {
 
         //trying to contact the mothership as API :D oh GOD how long do i need to read these code
         $apiUrl=$this->source.'/notify';
+        $curl = new curl\Curl();
+        $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
+        $curl->setOption(CURLOPT_TIMEOUT, 180);
+        $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
+        $response = $curl->setRequestBody($notificationData)
+        ->setHeaders([
+            'Content-Type' => 'application/json',
+            'Content-Length' => strlen($notificationData),
+        ])->post($apiUrl);
+
+
+        //check the response
+        if($response)
+            return $response;
+
+        return false;
+    }
+
+    /**
+    *
+    * Notifies refered agency about the SENT referral
+    * @return boolean
+    */
+    function notifysendReferral($referral_id,$agency_id,$message){
+        //salvaged from sTG
+        $mi = !empty(Yii::$app->user->identity->profile->middleinitial) ? " ".substr(Yii::$app->user->identity->profile->middleinitial, 0, 1).". " : " ";
+        $senderName = Yii::$app->user->identity->profile->firstname.$mi.Yii::$app->user->identity->profile->lastname;
+
+        $details = [
+            'referral_id' => $referral_id,
+            'sender_id' => Yii::$app->user->identity->profile->rstl_id,
+            'recipient_id' => $agency_id,
+            'sender_user_id' => Yii::$app->user->identity->profile->user_id,
+            'sender_name' => $senderName,
+            'remarks' => $message
+        ];
+        
+        $notificationData = Json::encode(['notice_details'=>$details],JSON_NUMERIC_CHECK);
+
+        //trying to contact the mothership as API :D oh GOD how long do i need to read these code
+        $apiUrl=$this->source.'/notifysent';
         $curl = new curl\Curl();
         $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
         $curl->setOption(CURLOPT_TIMEOUT, 180);
@@ -446,7 +489,6 @@ class ReferralComponent extends Component {
             ->where('tbl_sample.request_id =:requestId AND is_package =:packageName',[':requestId'=>$requestId,':packageName'=>0])
             ->groupBy(['test_id','methodref_id'])
             ->asArray()->all();
-        // var_dump($analysis); exit;
         //if there are no tests then dont proceed
         if(!$analysis)
             return [];
@@ -721,13 +763,13 @@ class ReferralComponent extends Component {
     function getReferralRequestDetails($referralId,$rstlId)
     {
         if($referralId > 0 && $rstlId > 0) {
-            $apiUrl=$this->source.'/api/web/referral/referrals/get_referral_detail?referral_id='.$referralId.'&rstl_id='.$rstlId;
+            $apiUrl=$this->source.'/getreferraldetail?referral_id='.$referralId.'&rstl_id='.$rstlId;
             $curl = new curl\Curl();
             $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
             $curl->setOption(CURLOPT_TIMEOUT, 180);
             $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
             $list = $curl->get($apiUrl);
-            return $list;
+            return Json::decode($list);
         } else {
             return 'Not valid request!';
         }
@@ -821,13 +863,13 @@ class ReferralComponent extends Component {
     //get details for sample code
     function getSamplecode_details($requestId,$rstlId){
         if($requestId > 0 && $rstlId > 0) {
-            $apiUrl=$this->source.'/api/web/referral/referrals/get_samplecode?request_id='.$requestId.'&rstl_id='.$rstlId;
+            $apiUrl=$this->source.'/getsamplecode?request_id='.$requestId.'&rstl_id='.$rstlId;
             $curl = new curl\Curl();
             $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
             $curl->setOption(CURLOPT_TIMEOUT, 180);
             $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
             $list = $curl->get($apiUrl);
-            return $list;
+            return Json::decode($list);
         } else {
             return 'Invalid request!';
         }
@@ -871,11 +913,31 @@ class ReferralComponent extends Component {
             $curl->setOption(CURLOPT_TIMEOUT, 180);
             $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
             $list = $curl->get($apiUrl);
-            return $list;
+            return Json::decode($list);
         } else {
             return false;
         }
     }
+
+    //update the samplecode in the api
+    function updatesamplecode($data){
+        $referralUrl=$this->source.'/updatesamplecode';
+        $curl = new curl\Curl();
+        $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
+        $curl->setOption(CURLOPT_TIMEOUT, 180);
+        $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
+        $referralreturn = $curl->setRequestBody($data)
+        ->setHeaders([
+            'Content-Type' => 'application/json',
+            'Content-Length' => strlen($data),
+        ])->post($referralUrl);
+
+        return $referralreturn;
+    }
+
+    
+
+
     function getReferralAll($rstlId){
         if($rstlId > 0) {
             $apiUrl=$this->source.'/api/web/referral/referrals/referral_all?rstl_id='.$rstlId;

@@ -128,7 +128,8 @@ class RestreferralController extends \yii\rest\Controller
                     ->andWhere('receiving_agency_id =:receivingAgency OR testing_agency_id =:testingAgency', [':receivingAgency'=>$rstl_id,':testingAgency'=>$rstl_id])
                     ->one();
         
-        if(referral){
+        
+        if($referral){
             $receivingAgency = Agency::find()
                         ->where('agency_id =:agencyId', [':agencyId'=>$referral->receiving_agency_id])
                         ->one();
@@ -591,6 +592,32 @@ class RestreferralController extends \yii\rest\Controller
         return false;
     }
 
+    //returns boolean, notifies the referred agency about the referral    
+    public function actionNotifysent(){
+        \Yii::$app->response->format= \yii\web\Response::FORMAT_JSON;
+
+        if(count(\Yii::$app->request->post('notice_details')) > 0){
+            $details = \Yii::$app->request->post('notice_details');
+
+            $notification = new Notification;
+            $notification->referral_id = (int) $details['referral_id'];
+            $notification->notification_type_id = 3;
+            $notification->sender_id = (int) $details['sender_id'];
+            $notification->recipient_id = (int) $details['recipient_id'];
+            $notification->sender_user_id = (int) $details['sender_user_id'];
+            $notification->sender_name = $details['sender_name'];
+            $notification->remarks = $details['remarks'];
+            $notification->notification_date = date('Y-m-d H:i:s');
+            if($notification->save(false)){
+                return true;
+            } else {
+                return false;
+            }
+        }
+
+        return false;
+    }
+
     //returns number of notification
     public function actionCountnotification($rstl_id)
     {
@@ -918,6 +945,187 @@ class RestreferralController extends \yii\rest\Controller
         
         return $referralId;
     }
+
+    //salvaged data from STG
+    //for saving eulims local
+    public function actionGetreferraldetail($referral_id,$rstl_id){
+        $getrequest = \Yii::$app->request;
+        
+        if($referral_id && $rstl_id){
+            
+            $checkTestingLab = $this->checkTestingLab($referral_id,$rstl_id);
+            $checkOwner = $this->actionCheckowner($referral_id,$rstl_id);
+            
+            if($checkTestingLab > 0 || $checkOwner > 0){
+                
+                $referral = Referral::find()
+                    ->where('referral_id =:referralId', [':referralId'=>$referral_id])
+                    ->one();
+                
+                $samples_analyses = Sample::find()
+                    ->joinWith(['analyses','analyses.testname','analyses.methodreference'])
+                    ->where('referral_id =:referralId', [':referralId'=>$referral_id])
+                    ->asArray()
+                    ->all();
+                    
+                $customer = Customer::find()
+                    ->where('customer_id =:customerId', [':customerId'=>$referral->customer_id])
+                    ->one();
+                    
+                $data = ['request_data'=>$referral,'sample_analysis_data'=>$samples_analyses,'customer_data'=>$customer];
+                
+                return $data;
+                
+            } else {
+                //return "Your agency doesn't appear notified!";
+                return 0;
+            }
+        } else {
+            throw new \yii\web\HttpException(400, 'No records found');
+        }
+    }
+
+    //salvaged from STG but changed few ~BTC
+    //update samplecode
+    public function actionUpdatesamplecode()
+    {
+        if(count(\Yii::$app->request->post()) > 0){
+            $connection= \Yii::$app->referraldb;
+            $connection->createCommand('SET FOREIGN_KEY_CHECKS=0')->execute();
+            $transaction = $connection->beginTransaction();
+            
+            $samples = \Yii::$app->request->post('sample_data');
+            $receivingAgencyId = (int) \Yii::$app->request->post('receiving_agency');
+            $referralId = (int) \Yii::$app->request->post('referral_id');
+            $notificationId=(int) \Yii::$app->request->post('notificationId');
+            if($referralId > 0 && $receivingAgencyId > 0){
+                $checkReferral = Referral::find()
+                    ->where('referral_id =:referralId', [':referralId'=>$referralId])
+                    ->andWhere('receiving_agency_id =:rstlId', [':rstlId'=>$receivingAgencyId])
+                    ->count();
+            } else {
+                $checkReferral = 0;
+            }
+            
+            if($checkReferral == 0){
+                $return = 0;
+            } else {
+                if(count($samples) > 0)
+                {
+                    foreach($samples as $sample){
+                        
+                        if($sample['sample_id'] > 0){
+                            $sampleData = Sample::find()->where('referral_id =:referralId AND sample_id =:sampleId AND receiving_agency_id =:receivingAgency',[':referralId'=>$referralId,':sampleId'=>$sample['sample_id'],':receivingAgency'=>$receivingAgencyId])->one();
+                        
+                            $sampleData->sample_code = $sample['sample_code'];
+                            $sampleData->sample_month = $sample['sample_month'];
+                            $sampleData->sample_year = $sample['sample_year'];
+                            $sampleData->updated_at = date('Y-m-d H:i:s');
+                            //if($sampleData->save(false) !== false){
+                            if($sampleData->save(false)){
+                                $sampleSave = 1;
+                            } else {
+                                $transaction->rollBack();
+                                $sampleSave = 0;
+                            }
+                        } else {
+                            $transaction->rollBack();
+                            $return = 0;
+                        }
+                    }
+                    if($sampleSave == 1){
+                        //update/respond the notification
+                        $notice = Notification::find()->where('notification_id =:notificationId AND notification_type_id =:notificationType',[':notificationId'=>$notificationId,':notificationType'=>3])->one();
+                        $notice->responded = 1;
+                        $notice->date_responded = date('Y-m-d H:i:s');
+                        if($notice->save(false)){
+                            $transaction->commit();
+                            $return = 1;
+                        }else{
+                            $transaction->rollBack();
+                            $return = 0;
+                        }
+                    } else {
+                        $transaction->rollBack();
+                        $return = 0;
+                    }
+                } else {
+                    $transaction->rollBack();
+                    $return = 0;
+                }
+            }
+        } else {
+            $return = 0;
+        }
+        return $return;
+    }
+
+    //salvaged from stg
+    //get sample code
+    public function actionGetsamplecode()
+    {
+        \Yii::$app->response->format= \yii\web\Response::FORMAT_JSON;
+        $getrequest = \Yii::$app->request;
+        
+        if(!empty($getrequest->get('request_id')) && !empty($getrequest->get('rstl_id'))){
+            $requestId = (int) $getrequest->get('request_id');
+            $senderId = (int) $getrequest->get('rstl_id');
+            
+            if($requestId > 0){
+                $owner = Referral::find()
+                    ->where('local_request_id =:requestId', [':requestId'=>$requestId])
+                    ->andWhere('receiving_agency_id =:senderId', [':senderId'=>$senderId])
+                    ->count();
+            } else {
+                $owner = 0;
+            }
+            
+            if($owner){
+                $modelSample = new Sample;
+
+                $referral = Referral::find()
+                    ->where('local_request_id =:requestId AND receiving_agency_id =:receivingAgencyId', [':requestId'=>$requestId,':receivingAgencyId'=>$senderId])
+                    ->one();
+                
+                $samples_analyses = Sample::find()
+                    ->joinWith(['analyses'],true)
+                    ->where('local_request_id =:requestId AND receiving_agency_id =:receivingAgencyId', [':requestId'=>$requestId,':receivingAgencyId'=>$senderId])
+                    ->asArray()
+                    ->all();
+                    
+                $data = ['referral_data'=>$referral,'sample_analysis_data'=>$samples_analyses];
+                
+                return $data;
+                
+            } else {
+                return 0;
+            }
+        } else {
+            throw new \yii\web\HttpException(400, 'No records found');
+        }
+    }
+
+    //salvaged from STG
+    protected function checkTestingLab($referralId,$recipientId)
+    {
+        if($referralId > 0 && $recipientId > 0){
+            $check = Notification::find()
+                ->where('referral_id =:referralId', [':referralId'=>$referralId])
+                ->andWhere('recipient_id =:recipientId', [':recipientId'=>$recipientId])
+                ->andWhere('notification_type_id =:notice', [':notice'=>3])
+                ->count();
+            
+            if($check > 0){
+                $status = 1;
+            } else {
+                $status = 0;
+            }
+            return $status;
+        } else {
+            return 0;
+        }
+    }
+
     //salvaged from STG
     protected function checkNotified($referralId,$recipientId)
     {

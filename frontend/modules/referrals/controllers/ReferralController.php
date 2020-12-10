@@ -134,6 +134,9 @@ class ReferralController extends Controller
      */
     public function actionView($id)
     {
+        // $refcomponent = new ReferralComponent();
+        // echo $refcomponent->getSource(); exit;
+
         $referralId = (int) $id;
         $rstlId = (int) Yii::$app->user->identity->profile->rstl_id;
         $noticeId = (int) Yii::$app->request->get('notice_id');
@@ -142,7 +145,6 @@ class ReferralController extends Controller
         {
             $refcomponent = new ReferralComponent();
             $referralDetails = $refcomponent->getReferraldetails($referralId,$rstlId);
-
             $noticeDetails = $refcomponent->getNotificationOne($noticeId,$rstlId);
 
             if($referralDetails && $noticeDetails)
@@ -157,7 +159,7 @@ class ReferralController extends Controller
                 $deposit = json_decode($refcomponent->getAttachment($referralId,Yii::$app->user->identity->profile->rstl_id,1),true);
                 //set third parameter to 2 for attachment type or //this one returns false temporarily
                 $or = json_decode($refcomponent->getAttachment($referralId,Yii::$app->user->identity->profile->rstl_id,2),true);
-                $referred_agency = json_decode($refcomponent->getReferredAgency($referralId,Yii::$app->user->identity->profile->rstl_id),true);
+                $referred_agency = $refcomponent->getReferredAgency($referralId,Yii::$app->user->identity->profile->rstl_id);
 
                 $receiving_agency = !empty($referred_agency['receiving_agency']) && $referred_agency > 0 ? $referred_agency['receiving_agency']['name'] : null;
                 $testing_agency = !empty($referred_agency['testing_agency']) && $referred_agency > 0 ? $referred_agency['testing_agency']['name'] : null;
@@ -235,11 +237,6 @@ class ReferralController extends Controller
                 $notification=$referralDetails['notification_data'];
                 $statuslogs= json_decode($refcomponent->getStatuslogs($referralId));
                
-               /*
-                *  echo"<pre>";
-               var_dump($statuslogs);
-                echo"</pre>";
-                exit; */
                 //set third parameter to 1 for attachment type deposit slip
                 $deposit = json_decode($refcomponent->getAttachment($referralId,Yii::$app->user->identity->profile->rstl_id,1),true);
                 //set third parameter to 2 for attachment type or
@@ -337,7 +334,6 @@ class ReferralController extends Controller
         {
             $refcomponent = new ReferralComponent();
               $referralDetails = json_decode($refcomponent->getReferraldetails($referralId,$rstlId),true);
-            // var_dump($referralDetails); exit;
             if($referralDetails != 0)
             {
                 $model = new Request(); //for declaration required in Detailview
@@ -349,11 +345,6 @@ class ReferralController extends Controller
                 // $notification=$referralDetails['notification_data'];
                 $statuslogs= json_decode($refcomponent->getStatuslogs($referralId));
                
-               /*
-                *  echo"<pre>";
-               var_dump($statuslogs);
-                echo"</pre>";
-                exit; */
                 //set third parameter to 1 for attachment type deposit slip
                 $deposit = json_decode($refcomponent->getAttachment($referralId,Yii::$app->user->identity->profile->rstl_id,1),true);
                 //set third parameter to 2 for attachment type or
@@ -684,7 +675,6 @@ class ReferralController extends Controller
             return $this->redirect(['/lab/request']);
         }
 
-        // i dont think this transaction is neccessarry, when the aim is only reading data???
         $connection= Yii::$app->labdb;
         $connection->createCommand('SET FOREIGN_KEY_CHECKS=0')->execute();
         $transaction = $connection->beginTransaction();
@@ -793,6 +783,7 @@ class ReferralController extends Controller
                         //new function in the referral component that contacts 'sendreferral' action in the api
                         $refcomponent=new ReferralComponent();
                         $referralResponse = $refcomponent->sendReferral($data);
+
                         switch ($referralResponse['response']) {
                             case 0:
                                 $transaction->rollBack();
@@ -832,7 +823,7 @@ class ReferralController extends Controller
                                 } else {
                                     $requestUpdate = Request::find()->where(['request_id'=>$requestId,'request_type_id'=>2])->one();
                                     $requestUpdate->report_due = $referralResponse['estimated_due'];
-
+                                    $requestUpdate->referral_id = $referralResponse['referral_id'];
                                     $referral_request_update = Referralrequest::find()->where('request_id =:requestId AND notified =:notified',[':requestId'=>$requestId,':notified'=>1])->one();
                                     $referral_request_update->testing_agency_id = $agency_id;
 
@@ -854,6 +845,7 @@ class ReferralController extends Controller
                                 //sends notification that the referral has been sent
                                 $transaction->commit();//new changes i move the commit here because the columns needed for the pstc is not existing anymore
                                 $notifyresponse = $refcomponent->notifyAgency($referralResponse['referral_id'],$agency_id,"Referral Sent");
+                                $notifyresponse = $refcomponent->notifysendReferral($referralResponse['referral_id'],$agency_id,"Referral Sent");
 
                                 //new line , i move the notification greetings here
                                 if($notifyresponse){
@@ -1178,7 +1170,8 @@ class ReferralController extends Controller
         }
     }
 
-    //referral details save as local request
+    //referral details save as local request 
+    //btc reached here , lets see what is in store
     public function actionSavelocal()
     {
         //saving request
@@ -1191,17 +1184,15 @@ class ReferralController extends Controller
                 $modelReferralrequest = new Referralrequest();
                 $refcomponent = new ReferralComponent();
                 $rstlId = Yii::$app->user->identity->profile->rstl_id;
-
                 $connection= Yii::$app->labdb;
                 $connection->createCommand('SET FOREIGN_KEY_CHECKS=0')->execute();
                 $transaction = $connection->beginTransaction();
 
-                $referralDetails = json_decode($refcomponent->getReferralRequestDetails($referralId,$rstlId),true);
-
+                $referralDetails = $refcomponent->getReferralRequestDetails($referralId,$rstlId);
                 $referral = $referralDetails['request_data'];
                 $samples_analyses = $referralDetails['sample_analysis_data'];
                 $customer = $referralDetails['customer_data'];
-
+                //request
                 $model->request_datetime = date('Y-m-d H:i:s', strtotime($referral['referral_date_time']));
                 $model->rstl_id = $rstlId;
                 $model->lab_id = $referral['lab_id'];
@@ -1230,10 +1221,8 @@ class ReferralController extends Controller
                     $modelReferralrequest->receiving_agency_id = $referral['receiving_agency_id'];
                     $modelReferralrequest->testing_agency_id = $rstlId;
                     $modelReferralrequest->referral_type_id = 2;
-
                     foreach($samples_analyses as $sample){
                         $modelSample = new Sample();
-
                         $modelSample->request_id = $model->request_id;
                         $modelSample->rstl_id = $rstlId;
                         $modelSample->sample_month = date_format(date_create($model->request_datetime),'m');
@@ -1244,7 +1233,6 @@ class ReferralController extends Controller
                         $modelSample->customer_description = $sample['customer_description'];
                         $modelSample->sampling_date = $sample['sampling_date'];
                         $modelSample->referral_sample_id = $sample['sample_id'];
-
                         if($modelSample->save(false)){
                             foreach ($sample['analyses'] as $analysis) {
                                 $modelAnalysis = new Analysisextend();
@@ -1273,7 +1261,6 @@ class ReferralController extends Controller
                             $sampleSave = 0;
                         }
                     }
-
                     if($sampleSave == 1 && $analysisSave == 1 && $modelReferralrequest->save() && $updateReference) {
                         $func = new Functions();
                         $samplecode = $func->GenerateSampleCode($requestId);
@@ -1291,44 +1278,16 @@ class ReferralController extends Controller
                                 array_push($sample_data, $sampleData);
                             }
 
-                            $sampledata = Json::encode(['sample_data'=>$sample_data,'referral_id'=>$referralId,'receiving_agency'=>$referral['receiving_agency_id']],JSON_NUMERIC_CHECK);
-                            $referralUrl='https://eulimsapi.onelab.ph/api/web/referral/referrals/updatesamplecode';
-                            //$referralUrl='http://localhost/eulimsapi.onelab.ph/api/web/referral/referrals/updatesamplecode';
+                            $sampledata = Json::encode(['sample_data'=>$sample_data,'referral_id'=>$referralId,'receiving_agency'=>$referral['receiving_agency_id'],'notificationId'=>$notificationId],JSON_NUMERIC_CHECK);
+                            //update the sample code of the referral in the api
                        
-                            $curl = new curl\Curl();
-                            $referralreturn = $curl->setRequestBody($sampledata)
-                            ->setHeaders([
-                                'Content-Type' => 'application/json',
-                                'Content-Length' => strlen($sampledata),
-                            ])->post($referralUrl);
-
+                            $referralreturn = $refcomponent->updatesamplecode($sampledata); //changes made we will also update the notification 
                             if($referralreturn == 1){
-                                $details = [
-                                    'referral_id' => $referralId,
-                                    'sender_id' => $referral['receiving_agency_id'],
-                                    'recipient_id' => Yii::$app->user->identity->profile->rstl_id,
-                                    'id_noticed' => $notificationId,
-                                ];
 
-                                $notificationData = Json::encode(['notice_details'=>$details],JSON_NUMERIC_CHECK);
-                                $notificationUrl ='https://eulimsapi.onelab.ph/api/web/referral/notifications/updateresponse';
-                                //$notificationUrl ='http://localhost/eulimsapi.onelab.ph/api/web/referral/notifications/updateresponse';
+                                $transaction->commit();
+                                Yii::$app->session->setFlash('success', 'Request successfully saved!');
+                                return $this->redirect(['view', 'id' => $referralId,'notice_id'=>$notificationId]);
 
-                                $curlNoti = new curl\Curl();
-                                $notificationResponse = $curlNoti->setRequestBody($notificationData)
-                                ->setHeaders([
-                                    'Content-Type' => 'application/json',
-                                    'Content-Length' => strlen($notificationData),
-                                ])->post($notificationUrl);
-
-                                if($notificationResponse == 1){
-                                    $transaction->commit();
-                                    Yii::$app->session->setFlash('success', 'Request successfully saved!');
-                                    return $this->redirect(['view', 'id' => $referralId,'notice_id'=>$notificationId]);
-                                } else {
-                                    $transaction->rollBack();
-                                    return "<div class='alert alert-danger'><span class='glyphicon glyphicon-exclamation-sign' style='font-size:18px;'></span>&nbsp;Request was not saved to local!</div>";
-                                }
                             } else {
                                 $transaction->rollBack();
                                 return "<div class='alert alert-danger'><span class='glyphicon glyphicon-exclamation-sign' style='font-size:18px;'></span>&nbsp;Failed to update sample code!</div>";
@@ -1351,7 +1310,6 @@ class ReferralController extends Controller
                 return $this->redirect(['notifications']);
             }
         } else {
-            $transaction->rollBack();
             Yii::$app->session->setFlash('error', 'Invalid request!');
             return $this->redirect(['view', 'id' => $referralId,'notice_id'=>$notificationId]);
         }
@@ -1494,14 +1452,13 @@ class ReferralController extends Controller
 
             $rstlId = Yii::$app->user->identity->profile->rstl_id;
             $refcomponent = new ReferralComponent();
-            $get_details = json_decode($refcomponent->getSamplecode_details($requestId,$rstlId),true);
-
+            $get_details = $refcomponent->getSamplecode_details($requestId,$rstlId);
             if($get_details > 0){
                 $referral = $get_details['referral_data'];
                 $samples_analyses = $get_details['sample_analysis_data'];
             } else {
                 Yii::$app->session->setFlash('error', "Sample code not yet generated!");
-                return $this->redirect(['/lab/request']);
+                return $this->redirect(['/lab/request/view', 'id' => $requestId]);
             }
 
             //update request
@@ -1525,7 +1482,6 @@ class ReferralController extends Controller
                             $samplecode->reference_num = $referral['referral_code'];
                             $samplecode->sample_id = $data_sample['local_sample_id'];
                             $samplecode->lab_id = $referral['lab_id'];
-                            //$samplecode->number = $samplecodeIncrement;
                             $samplecode->number = 0; //if the source is referral request
                             $samplecode->year = date('Y',strtotime($request->request_datetime));
                             $samplecode->source = 2;
@@ -1564,54 +1520,61 @@ class ReferralController extends Controller
             }
             if($requestSave == 1 && $sampleSave == 1 && $analysisSave == 1 && $samplecodeSave == 1) {
 
-                if($request->pstc_request_id > 0 && $request->pstc_id > 0) {
-                    $local_samples = Sample::find()->where(['request_id'=>$requestId])->asArray()->all();
-                    $local_request = Request::findOne($requestId);
-                    $pstc_sample_data = [];
+                //these 3 lines of code are from below , but we dont need to udpate the pstc yet
+                $transaction->commit();
+                Yii::$app->session->setFlash('success', 'Sample code updated!');
+                return $this->redirect(['/lab/request/view', 'id' => $requestId]);
 
-                    $pstc_requestData = [
-                        'pstc_id' => $local_request->pstc_id,
-                        'rstl_id' => $local_request->rstl_id,
-                        'request_id' => $local_request->request_id,
-                        'pstc_request_id' => $local_request->pstc_request_id,
-                    ];
+                //pstc disabled here temporarily
+                //check if the request is from the pstc and updates it ~btc
+                // if($request->pstc_request_id > 0 && $request->pstc_id > 0) {
+                //     $local_samples = Sample::find()->where(['request_id'=>$requestId])->asArray()->all();
+                //     $local_request = Request::findOne($requestId);
+                //     $pstc_sample_data = [];
 
-                    foreach ($local_samples as $s_data) {
-                        $pstcsampleData = [
-                            'pstc_sample_id' => $s_data['pstcsample_id'],
-                            'sample_code' => $s_data['sample_code'],
-                            'sample_id' => $s_data['sample_id'],
-                            'rstl_id' => $local_request->rstl_id,
-                            'local_sample_id' => $s_data['sample_id'],
-                            'local_request_id' => $s_data['request_id'],
-                        ];
-                        array_push($pstc_sample_data, $pstcsampleData);
-                    }
+                //     $pstc_requestData = [
+                //         'pstc_id' => $local_request->pstc_id,
+                //         'rstl_id' => $local_request->rstl_id,
+                //         'request_id' => $local_request->request_id,
+                //         'pstc_request_id' => $local_request->pstc_request_id,
+                //     ];
 
-                    $pstc_request_details = Json::encode(['sample_data'=>$pstc_sample_data,'request_data'=>$pstc_requestData],JSON_NUMERIC_CHECK);
-                    $pstcUrl='https://eulimsapi.onelab.ph/api/web/referral/pstcrequests/update_samplecode';
-                    //$pstcUrl='http://localhost/eulimsapi.onelab.ph/api/web/referral/pstcrequests/update_samplecode';
+                //     foreach ($local_samples as $s_data) {
+                //         $pstcsampleData = [
+                //             'pstc_sample_id' => $s_data['pstcsample_id'],
+                //             'sample_code' => $s_data['sample_code'],
+                //             'sample_id' => $s_data['sample_id'],
+                //             'rstl_id' => $local_request->rstl_id,
+                //             'local_sample_id' => $s_data['sample_id'],
+                //             'local_request_id' => $s_data['request_id'],
+                //         ];
+                //         array_push($pstc_sample_data, $pstcsampleData);
+                //     }
+
+                //     $pstc_request_details = Json::encode(['sample_data'=>$pstc_sample_data,'request_data'=>$pstc_requestData],JSON_NUMERIC_CHECK);
+                //     $pstcUrl='https://eulimsapi.onelab.ph/api/web/referral/pstcrequests/update_samplecode';
+                //     //$pstcUrl='http://localhost/eulimsapi.onelab.ph/api/web/referral/pstcrequests/update_samplecode';
                
-                    $curl = new curl\Curl();
-                    $pstc_return = $curl->setRequestBody($pstc_request_details)
-                    ->setHeaders([
-                        'Content-Type' => 'application/json',
-                        'Content-Length' => strlen($pstc_request_details),
-                    ])->post($pstcUrl);
+                //     $curl = new curl\Curl();
+                //     $pstc_return = $curl->setRequestBody($pstc_request_details)
+                //     ->setHeaders([
+                //         'Content-Type' => 'application/json',
+                //         'Content-Length' => strlen($pstc_request_details),
+                //     ])->post($pstcUrl);
 
-                    if($pstc_return == 1) {
-                        $transaction->commit();
-                        Yii::$app->session->setFlash('success', 'Sample code updated!');
-                        return $this->redirect(['/lab/request/view', 'id' => $requestId]);
-                    } else {
-                        $transaction->rollBack();
-                        return "<div class='alert alert-danger'><span class='glyphicon glyphicon-exclamation-sign' style='font-size:18px;'></span>&nbsp;Fail to update sample code!</div>";
-                    }
-                } else {
-                    $transaction->commit();
-                    Yii::$app->session->setFlash('success', 'Sample code updated!');
-                    return $this->redirect(['/lab/request/view', 'id' => $requestId]);
-                }
+                //     if($pstc_return == 1) {
+                //         $transaction->commit();
+                //         Yii::$app->session->setFlash('success', 'Sample code updated!');
+                //         return $this->redirect(['/lab/request/view', 'id' => $requestId]);
+                //     } else {
+                //         $transaction->rollBack();
+                //         return "<div class='alert alert-danger'><span class='glyphicon glyphicon-exclamation-sign' style='font-size:18px;'></span>&nbsp;Fail to update sample code!</div>";
+                //     }
+                // } else {
+                //     $transaction->commit();
+                //     Yii::$app->session->setFlash('success', 'Sample code updated!');
+                //     return $this->redirect(['/lab/request/view', 'id' => $requestId]);
+                // }
             } else {
                 $transaction->rollBack();
                 return "<div class='alert alert-danger'><span class='glyphicon glyphicon-exclamation-sign' style='font-size:18px;'></span>&nbsp;Can't get sample code!</div>";
