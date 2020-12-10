@@ -329,6 +329,19 @@ class PstcComponent extends Component {
         return $lists;
     }
 
+    function getMethodreference($id)
+    {
+
+        $token= 'Authorization: Bearer '.$_SESSION['usertoken'];
+        $curl = new curl\Curl();
+        $curl->setOption(CURLOPT_HTTPHEADER, ['Content-Type: application/json' , $token]);
+        $curl->setOption(CURLOPT_CONNECTTIMEOUT, 120);
+        $curl->setOption(CURLOPT_TIMEOUT, 120);
+        $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
+        return $method = $curl->get($this->source."methodreference?id=".$id);
+        
+    }
+
 
     function testnamemethod($testname_id,$sampletype_id)
     {

@@ -365,6 +365,12 @@ class RestpstcController extends \yii\rest\Controller
         return $testnamemethods;
     }
 
+    public function actionMethodreference($id){
+
+        $data = Methodreference::find()->where(['methodreference_id' => $id])->one();
+        return $data;
+    }
+
     public function actionTestnamemethod(){
 
         $getrequest = Yii::$app->request;

@@ -14,6 +14,7 @@ use kartik\widgets\Select2;
 use kartik\widgets\DepDrop;
 use kartik\widgets\DatePicker;
 use kartik\datetime\DateTimePicker;
+use common\components\PstcComponent;
 
 $js=<<<SCRIPT
 
@@ -78,10 +79,12 @@ $this->registerJs($js, $this::POS_READY);
                 'format' => 'raw',
                 'contentOptions' => ['style' => 'width: 50%;word-wrap: break-word;white-space:pre-line;'],  
                 'value' => function($model) {
-                    $method_query = Methodreference::find()->where(['methodreference_id'=>$model['testname_method_id']])->one();
-        
+
+                    $pstcComponent = new PstcComponent();
+                    $method_query = json_decode($pstcComponent->getMethodreference($model['testname_method_id']),true);
+    
                     if ($method_query){
-                        return $method_query->method;
+                        return $method_query['method'];
                     }else{
                         return "";
                     }
@@ -93,9 +96,11 @@ $this->registerJs($js, $this::POS_READY);
                 'contentOptions' => ['style' => 'width: 40%;word-wrap: break-word;white-space:pre-line;'],  
                 'value' => function($model) {
 
-                    $method_query = Methodreference::find()->where(['methodreference_id'=>$model['testname_method_id']])->one();
+                    $pstcComponent = new PstcComponent();
+                    $method_query = json_decode($pstcComponent->getMethodreference($model['testname_method_id']),true);
+                    
                     if ($method_query){
-                        return $method_query->reference;
+                        return $method_query['reference'];
                     }else{
                         return "";
                     }
@@ -108,9 +113,10 @@ $this->registerJs($js, $this::POS_READY);
                 'width'=> '150px',
                 'contentOptions' => ['style' => 'width: 10%;word-wrap: break-word;white-space:pre-line;'],  
                 'value' => function($model) {
-                    $method_query = Methodreference::find()->where(['methodreference_id'=>$model['testname_method_id']])->one();
+                    $pstcComponent = new PstcComponent();
+                    $method_query = json_decode($pstcComponent->getMethodreference($model['testname_method_id']),true);
                     if ($method_query){
-                        return number_format($method_query->fee,2);
+                        return number_format($method_query['fee'],2);
                     }else{
                         return "";
                     }
