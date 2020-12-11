@@ -21,6 +21,8 @@ use yii\helpers\Json;
 use yii\data\ArrayDataProvider;
 use linslin\yii2\curl;
 use common\components\PstcComponent;
+use common\models\system\LoginForm;
+use yii\helpers\Html;
 
 
 /**
@@ -139,26 +141,31 @@ class TestnamemethodController extends Controller
 
     public function actionCheckmethod($id)
     {
-        $methodreference = Methodreference::find()->where(['method_reference_id' => $id])->one();
-        
-        $function = new PstcComponent();
-        $response = $function->checkMethod($id);
-        $lists = $function->listLab();
-        $list = json_decode($lists);
+        if(isset($_SESSION['usertoken'])){
+            $methodreference = Methodreference::find()->where(['method_reference_id' => $id])->one();
+            
+            $function = new PstcComponent();
+            $response = $function->checkMethod($id);
+            $lists = $function->listLab();
+            $list = json_decode($lists);
 
-        if(Yii::$app->request->isAjax){
-            return $this->renderAjax('sync', [
-                'response' => $response,
-                'model' => $methodreference,
-                'laboratories' => $list->labs,
-                'sampletypes' => $list->sampletypes,
-                'testnamelist' => $list->testnamelist,
-            ]);
+            if(Yii::$app->request->isAjax){
+                return $this->renderAjax('sync', [
+                    'response' => $response,
+                    'model' => $methodreference,
+                    'laboratories' => $list->labs,
+                    'sampletypes' => $list->sampletypes,
+                    'testnamelist' => $list->testnamelist,
+                ]);
+            }
+        }else{
+            return Html::button('Please login to access the Synching thru API', ['value'=>'/chat/info/login', 'class' => 'btn btn-lg btn-info','title' => Yii::t('app', "Login"),'id'=>'btnOP','onclick'=>'LoadModal(this.title, this.value,"100px","300px");']);
         }
     }
 
     public function actionSyncmethod()
     {
+        if(isset($_SESSION['usertoken'])){
         $id = Yii::$app->request->post('id');
         $methodreference = Methodreference::find()->where(['method_reference_id' => $id])->one();
         
@@ -175,6 +182,12 @@ class TestnamemethodController extends Controller
         $function = new PstcComponent();
         $response = $function->syncMethod($params);
         return $response;
+    }else{
+        $model = new LoginForm();
+        return $this->render('login', [
+        'model' => $model
+        ]);
+    }
     }
 
 

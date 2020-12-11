@@ -90,14 +90,18 @@ class Testnamemethod extends \yii\db\ActiveRecord
 
     public static function checking($id){
         
-        $token= 'Authorization: Bearer '.$_SESSION['usertoken'];
-        $curl = new curl\Curl();
-        $curl->setOption(CURLOPT_HTTPHEADER, ['Content-Type: application/json' , $token]);
-        $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
-        $curl->setOption(CURLOPT_TIMEOUT, 180);
-        $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
-        $response = $curl->setGetParams(['id' => Yii::$app->user->identity->profile->rstl_id.'-'.$id,])->get("https://eulims.onelab.ph/api/restpstc/checkmethod");
+        if(isset($_SESSION['usertoken'])){
+            $token= 'Authorization: Bearer '.$_SESSION['usertoken'];
+            $curl = new curl\Curl();
+            $curl->setOption(CURLOPT_HTTPHEADER, ['Content-Type: application/json' , $token]);
+            $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
+            $curl->setOption(CURLOPT_TIMEOUT, 180);
+            $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
+            $response = $curl->setGetParams(['id' => Yii::$app->user->identity->profile->rstl_id.'-'.$id,])->get("https://eulims.onelab.ph/api/restpstc/checkmethod");
 
-        return $response;
+            return $response;
+        }else{
+            return '';
+        }
     }
 }

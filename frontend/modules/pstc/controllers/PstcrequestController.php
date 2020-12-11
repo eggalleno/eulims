@@ -23,79 +23,70 @@ use common\models\lab\Labsampletype;
 use common\models\lab\Sampletype;
 use common\models\lab\SampleName;
 use common\models\lab\Lab;
-use common\models\lab\Referralrequest;
 use common\models\lab\Testcategory;
+use frontend\modules\lab\components\eRequest;
+use DateTime;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use yii\helpers\ArrayHelper;
-//use yii\data\ActiveDataProvider;
 use yii\data\ArrayDataProvider;
 use common\components\PstcComponent;
-use yii\db\Query;
-/*** for saving pstc request details ***/
-use DateTime;
 use common\models\system\Profile;
-use common\components\Functions;
-use common\components\ReferralComponent;
-use frontend\modules\lab\components\eRequest;
-use common\models\lab\exRequestreferral;
 use linslin\yii2\curl;
 use yii\helpers\Json;
-/*** end for saving pstc request details ***/
+use common\models\system\LoginForm;
 
-/**
- * PstcrequestController implements the CRUD actions for Pstcrequest model.
- */
 class PstcrequestController extends Controller
 {
-  
+    public function beforeAction($action)
+    {
+        if(parent::beforeAction($action)) 
+        {
+            if(!isset($_SESSION['usertoken'])){
+                return $this->redirect('/pstc')->send();
+            }
+
+            if(!isset(Yii::$app->user->identity->profile->rstl_id)){
+                return $this->redirect('/site/login')->send();
+            }            
+
+            return true;
+        }
+    }
+
     public function actionIndex()
     {
         $rstlId = (int) Yii::$app->user->identity->profile->rstl_id;
+        $pstcComponent = new PstcComponent();
+        $referrals = json_decode($pstcComponent->getAll($rstlId),true);
 
-        if($rstlId > 0)
-        {
-            $pstcComponent = new PstcComponent();
-            $referrals = json_decode($pstcComponent->getAll($rstlId),true);
-
-            if((int) $referrals == 0){
-                $referralDataprovider = new ArrayDataProvider([
-                    'allModels' => [],
-                    'pagination'=> ['pageSize' => 10],
-                ]);
-            } else {
-                $referralDataprovider = new ArrayDataProvider([
-                    'allModels' => $referrals,
-                    'pagination'=> ['pageSize' => 10],
-                ]);
-            }
-
-            return $this->render('index', [
-                //'searchModel' => $searchModel,
-                'dataProvider' => $referralDataprovider,
+        if((int) $referrals == 0){
+            $referralDataprovider = new ArrayDataProvider([
+                'allModels' => [],
+                'pagination'=> ['pageSize' => 10],
             ]);
         } else {
-            return $this->redirect(['/site/login']);
+            $referralDataprovider = new ArrayDataProvider([
+                'allModels' => $referrals,
+                'pagination'=> ['pageSize' => 10],
+            ]);
         }
+
+        return $this->render('index', [
+            'dataProvider' => $referralDataprovider,
+        ]);
     } 
 
     public function actionView()
     {
-        if(isset(Yii::$app->user->identity->profile->rstl_id)){
-            $rstlId = (int) Yii::$app->user->identity->profile->rstl_id;
-        } else {
-            //return 'Session time out!';
-            return $this->redirect(['/site/login']);
-        }
-
+        $rstlId = (int) Yii::$app->user->identity->profile->rstl_id;
         $requestId = (int) Yii::$app->request->get('request_id');
         $pstcId = (int) Yii::$app->request->get('pstc_id');
 
         if($rstlId > 0 && $requestId > 0 && $pstcId > 0)
         {
             $function = new PstcComponent();
-
             $details = json_decode($function->getViewRequest($requestId,$rstlId,$pstcId),true);
            
             $request = $details['request_data'];
@@ -124,10 +115,8 @@ class PstcrequestController extends Controller
                 'pagination' => false,
             ]);
 
-            // var_dump($request); exit();
-
             return $this->render('view', [
-                'model' => new Request(), //just to initialize detail view
+                'model' => new Request(), 
                 'request' => $request,
                 'customer' => $customer,
                 'sample' => $samples,
@@ -152,21 +141,16 @@ class PstcrequestController extends Controller
     {
         $model = new Pstcrequest;
         $rstl_id = (int) Yii::$app->user->identity->profile->rstl_id;
-        if($rstl_id > 0){
-            //$model->rstl_id = $rstlId;
-            //$model->user_id = (int) Yii::$app->user->identity->profile->user_id;
-            $mi = !empty(Yii::$app->user->identity->profile->middleinitial) ? " ".substr(Yii::$app->user->identity->profile->middleinitial, 0, 1).". " : " ";
-            $user_fullname = Yii::$app->user->identity->profile->firstname.$mi.Yii::$app->user->identity->profile->lastname;
+       
+        $mi = !empty(Yii::$app->user->identity->profile->middleinitial) ? " ".substr(Yii::$app->user->identity->profile->middleinitial, 0, 1).". " : " ";
+        $user_fullname = Yii::$app->user->identity->profile->firstname.$mi.Yii::$app->user->identity->profile->lastname;
 
-            $customers = $this->listCustomers($rstl_id);
-            
-            if($user_fullname){
-                $model->received_by = $user_fullname;
-            } else {
-                $model->received_by = "";
-            }
+        $customers = $this->listCustomers($rstl_id);
+        
+        if($user_fullname){
+            $model->received_by = $user_fullname;
         } else {
-            return $this->redirect(['/site/login']);
+            $model->received_by = "";
         }
 
         if(Yii::$app->request->post()) 
@@ -180,8 +164,6 @@ class PstcrequestController extends Controller
                 'submitted' => $post['submitted_by'],
                 'received' => $user_fullname,
             ];
-
-            //var_dump($testarray); exit();
 
             $function = new PstcComponent();
             $data = json_decode($function->getRequestcreate($testarray),true);
@@ -264,8 +246,6 @@ class PstcrequestController extends Controller
 
                 $function = new PstcComponent();
                 $data = json_decode($function->getAnalysiscreate($testarray),true);
-
-             
             }
 
             if($data){
@@ -281,7 +261,6 @@ class PstcrequestController extends Controller
         $details = json_decode($function->getViewRequest($request_id,$rstlId,$pstc_id),true);
         $samples = $details['sample_data'];
         $lists = json_decode($function->listLab(),true);
-   
 
         return $this->renderAjax('createanalysis', [
             'model' => $model,
@@ -292,6 +271,7 @@ class PstcrequestController extends Controller
             'sampletype' => []
         ]);
     }
+
     public function actionGetlisttemplate() {
         if(isset($_GET['template_id'])){
             $id = (int) $_GET['template_id'];
@@ -323,7 +303,6 @@ class PstcrequestController extends Controller
         $function = new PstcComponent();
         $pstc = json_decode($function->getViewRequest($request_id,$rstlId,$pstc_id),true);
         
-        // var_dump($pstc['analysis_data']); exit();
         $post= Yii::$app->request->post('eRequest');
 
         $model = new Request;
@@ -340,11 +319,10 @@ class PstcrequestController extends Controller
         $model->receivedBy= $post['receivedBy'];
         $model->request_type_id = 3;
         $model->report_due = $post['report_due'];
-        $model->referral_id = $pstc['request_data']['pstc_request_id'];
+        $model->pstc_id = $pstc['request_data']['pstc_request_id'];
        
         if($model->save(false))
         {
-            
             foreach($pstc['sample_data'] as $sampol) 
             {
                 $sample = new Sample;
@@ -381,13 +359,8 @@ class PstcrequestController extends Controller
 
                     // return $this->redirect(['/pstc/pstcrequest/view','request_id'=>$pstc['pstc_request_id'],'pstc_id'=>$pstc['pstc_id']]);
                     return $this->redirect(['/lab/request/view','id'=>$model->request_id]);
-
-                }else{
-
                 }
             }
-
-            
         }
     }
 
@@ -399,13 +372,7 @@ class PstcrequestController extends Controller
         $connection->createCommand('SET FOREIGN_KEY_CHECKS=0')->execute();
         $transaction = $connection->beginTransaction();
         
-        if(isset(Yii::$app->user->identity->profile->rstl_id)){
-            $rstlId = (int) Yii::$app->user->identity->profile->rstl_id;
-        } else {
-            //return 'Session time out!';
-            return $this->redirect(['/site/login']);
-        }
-
+        $rstlId = (int) Yii::$app->user->identity->profile->rstl_id;
         $requestId = (int) Yii::$app->request->get('request_id');
         $pstcId = (int) Yii::$app->request->get('pstc_id');
         $function = new PstcComponent();
@@ -437,8 +404,6 @@ class PstcrequestController extends Controller
             return $this->redirect(['/pstc/pstcrequest']);
         }
 
-        //if (Yii::$app->request->post()) {
-        //if ($model->load(Yii::$app->request->post()) && $model->save()) {
         if ($model->load(Yii::$app->request->post()) && count($analyses) >= count($samples)) {
             $post = Yii::$app->request->post('eRequest');
             $total_fee = $total - ($subtotal * ($post['discount']/100));
@@ -725,15 +690,10 @@ class PstcrequestController extends Controller
     public function actionListsampletype() {
         $out = [];
         if (isset($_POST['depdrop_parents'])) {
-            //$sampleids = end($_POST['depdrop_parents']);
             $sampletypeId = end($_POST['depdrop_parents']);
-
-            //this line belows removes the purpose of the sampletype _testname table , gets all the testnamemethod join with testname under certain sampletype_id
-            // $list = Testnamemethod::find()->with('testname')->where(['sampletype_id'=>$sampletypeId])->asArray()->all();
-            
+          
             $function = new PstcComponent();
             $list = json_decode($function->testnamemethods($sampletypeId),true);
-           
             
             $selected  = null;
             if ($sampletypeId != null && count($list) > 0) {
@@ -757,12 +717,11 @@ class PstcrequestController extends Controller
     {
         $model = $this->findModel($id);
         $session = Yii::$app->session;    
-            if($model->delete()) {
-                location.reload();
-            } else {
-                return $model->error();
-            }
-        
+        if($model->delete()) {
+            location.reload();
+        } else {
+            return $model->error();
+        }
     }
 
     protected function findModel($id)
@@ -775,22 +734,18 @@ class PstcrequestController extends Controller
 
     public function actionGettestnamemethod()
 	{
-      
         $testname_id = $_GET['testname_id'];
         $sampletype_id = $_GET['sampletype_id'];
         $sample = $_GET['sample'];
 
-       
-        
         $function = new PstcComponent();
         $testnamemethod = json_decode($function->testnamemethod($testname_id,$sampletype_id),true);
         
         $testnamedataprovider = new ArrayDataProvider([
-                'allModels' => $testnamemethod,
-                'pagination' => [
-                    'pageSize' => false,
-                ],
-             
+            'allModels' => $testnamemethod,
+            'pagination' => [
+                'pageSize' => false,
+            ],
         ]);
    
         return $this->renderAjax('_method', [
@@ -834,10 +789,6 @@ class PstcrequestController extends Controller
                 ->groupBy('tbl_testcategory.testcategory_id')
                 ->all();
 
-                // var_dump($testcategory); exit();
-
-                //print_r($testcategory);
-
             \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
             if(count($testcategory) > 0)
             {
@@ -845,7 +796,6 @@ class PstcrequestController extends Controller
                    
                     $data[] = ['id' => $list->testcategory->testcategory_id, 'text' => $list->testcategory->category];
                 }
-                //$data = ['id' => '', 'text' => 'No results found'];
             } else {
                 $data = ['id' => '', 'text' => 'No results found'];
             }
@@ -854,16 +804,6 @@ class PstcrequestController extends Controller
         }
         return ['data' => $data];
     }
-
-
-
-
-
-
-
-
-
-
 
 
     public function actionCreatepackage($id)
@@ -878,34 +818,32 @@ class PstcrequestController extends Controller
             $sample_ids= $_POST['sample_ids'];
             $ids = explode(',', $sample_ids);  
             $post= Yii::$app->request->post();       
-            }
-            $samplesQuery = Pstcsample::find()->where(['pstc_request_id' => $id]);
+        }
+
+        $samplesQuery = Pstcsample::find()->where(['pstc_request_id' => $id]);
             $sampleDataProvider = new ActiveDataProvider([
-                    'query' => $samplesQuery,
-                    'pagination' => [
-                        'pageSize' => false,
-                               ],             
-            ]);
+                'query' => $samplesQuery,
+                'pagination' => [
+                'pageSize' => false,
+            ],             
+        ]);
 
-            $request = $this->findRequest($request_id);
-            $testcategory = $this->listTestcategory();
-         
-            $sampletype = [];
-            $test = [];
+        $request = $this->findRequest($request_id);
+        $testcategory = $this->listTestcategory();
+        
+        $sampletype = [];
+        $test = [];
 
-         if ($model->load(Yii::$app->request->post())) {
+        if ($model->load(Yii::$app->request->post())) {
                  $sample_ids= $_POST['sample_ids'];
                  $ids = explode(',', $sample_ids);  
                  $post= Yii::$app->request->post();
-
-                   
 
                  foreach ($ids as $sample_id){  
 
                      $p = $post['Packagelist']['name'];
                      $r = str_replace("," , "", $post['Packagelist']['rate']);
 
-        
                      $analysis = new Pstcanalysis();
                      $modelpackage =  Package::findOne(['id'=>$post['Packagelist']['name']]);
 
@@ -958,7 +896,6 @@ class PstcrequestController extends Controller
                         $analysis_package->taggingId_old = 0;
                         $analysis_package->user_id = 0;
                         $analysis_package->save(false);
-
                       
                     }      
                  }                   
