@@ -18,6 +18,8 @@ use common\models\referral\Bidnotification;
 use common\models\referral\Referral;
 use common\models\referral\Sample;
 use common\models\referral\Analysis;
+use common\models\referral\Attachment;
+use common\models\referral\Pstcrequest;
 use common\models\lab\Customer;
 use yii\db\Query;
 
@@ -472,6 +474,7 @@ class RestreferralController extends \yii\rest\Controller
                     $modelReferral->create_time = date('Y-m-d H:i:s');
                     $modelReferral->update_time = date('Y-m-d H:i:s');
                     $modelReferral->bid = $request['bid'];
+                    $modelReferral->pstc_id = $request['pstc_id'];
                     if($modelReferral->save(false)){
                         $referralId = $modelReferral->referral_id;
                         $referralSave = 1; //flags that the request has been save in this transaction
@@ -902,6 +905,16 @@ class RestreferralController extends \yii\rest\Controller
                         $return = 2;
                     }
                     if($referralSave == 1 && $sampleSave == 1){
+
+                        //find and update the pstc if meron
+
+                        $pstc = Pstcrequest::findOne($referral->pstc_id);
+                        if($pstc){
+                            $pstc->referral_id = $referral->referral_id;
+                            $pstc->save(false);
+                        }
+
+
                         $transaction->commit();
                         $return = 1;
                     } else {
@@ -1103,6 +1116,73 @@ class RestreferralController extends \yii\rest\Controller
         } else {
             throw new \yii\web\HttpException(400, 'No records found');
         }
+    }
+
+    //salvaged from STG under attachment controller
+    public function actionUpload_deposit()
+    {
+        set_time_limit(120);
+        
+        if(isset($_FILES['file_data']['tmp_name'])){
+            $connection= \Yii::$app->referraldb;
+            $connection->createCommand('SET FOREIGN_KEY_CHECKS=0')->execute();
+            $transaction = $connection->beginTransaction();
+            
+            if(count(\Yii::$app->request->post('uploader_data')) > 0){
+                $upload = json_decode(\Yii::$app->request->post('uploader_data'));
+                
+                $model = new Attachment;
+                $model->filename = $_FILES['file_data']['name'];
+                $model->attachment_type = 1;
+                $model->referral_id = (int) $upload->referral_id;
+                $model->upload_date = date('Y-m-d H:i:s');
+                $model->uploadedby_user_id = (int) $upload->user_id;
+                $model->uploadedby_name = $upload->uploader;
+                if($model->save(false)){
+                    $dir = $upload->referral_code;
+                    $path = "uploads/referral/".$dir."/";
+                    $dir_ok = 1;
+                    if(!is_dir($path)){
+                        if(mkdir($path, 0755, true)){
+                            $indexfile = fopen($path."index.php", 'w');
+                            if($indexfile){
+                                fwrite($indexfile, '<center><br><br><h1>Forbidden Access!</h1></center>');
+                                fclose($indexfile);
+                            } else {
+                                $transaction->rollBack();
+                                $dir_ok = 0;
+                                $return = 2;
+                            }
+                        } else {
+                            $transaction->rollBack();
+                            $dir_ok = 0;
+                            $return = 2;
+                        }
+                    }
+                    if($dir_ok == 1){
+                        if(move_uploaded_file($_FILES['file_data']['tmp_name'],$path.$_FILES['file_data']['name'])){
+                            $transaction->commit();
+                            $return = 1;
+                        } else {
+                            $transaction->rollBack();
+                            $return = 2;
+                        }
+                    } else {
+                        $transaction->rollBack();
+                        $return = 2;
+                    }
+                } else {
+                    $transaction->rollBack();
+                    $return = 2;
+                }
+            } else {
+                $transaction->rollBack();
+                $return = 0;
+            }
+        } else {
+            $return = 0;
+        }
+        return $return;
     }
 
     //salvaged from STG

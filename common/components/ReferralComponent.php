@@ -176,7 +176,8 @@ class ReferralComponent extends Component {
                     'created_at' => $request['created_at'],
                     'sample_received_date' => $ref_request['sample_received_date'],
                     'user_id_receiving' => Yii::$app->user->identity->profile->user_id,
-                    'bid'=>0
+                    'bid'=>0,
+                    'pstc_id' => $request['pstc_id'],
                 ];
 
             //perform the extraction of the sample data, salvaged code from STG
@@ -876,7 +877,6 @@ class ReferralComponent extends Component {
     }
     //get attachment
     function getAttachment($referralId,$rstlId,$type){
-        return false;
         if($referralId > 0 && $rstlId > 0 && $type > 0) {
             $apiUrl=$this->source.'/show_upload?referral_id='.$referralId.'&rstl_id='.$rstlId.'&type='.$type;
             $curl = new curl\Curl();

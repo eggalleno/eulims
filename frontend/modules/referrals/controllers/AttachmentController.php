@@ -150,9 +150,7 @@ class AttachmentController extends Controller
 
         $model = new Attachment();
         if($model->load(Yii::$app->request->post())){
-        //if(Yii::$app->request->post()){
             $model->filename = UploadedFile::getInstances($model,'filename');
-            //$model->filetype = 1;
             $model->referral_id = $referralId;
 
             if($model->filename){
@@ -173,8 +171,13 @@ class AttachmentController extends Controller
                         'user_id' => Yii::$app->user->identity->profile->user_id,
                         'uploader' => $uploaderName,
                     ];
-                    $referralUrl='https://eulimsapi.onelab.ph/api/web/referral/attachments/upload_deposit';
-                    //$referralUrl='http://localhost/eulimsapi.onelab.ph/api/web/referral/attachments/upload_deposit';
+
+                    //btc has been here, i will not improve this code here anymore but i will just direct it to contact the referral component api link
+
+                    $refcom = new ReferralComponent();
+                    $referralUrl= $refcom->getSource().'/upload_deposit';
+                    //this code below was the first setup
+                    // $referralUrl='https://eulimsapi.onelab.ph/api/web/referral/attachments/upload_deposit';
 
                     $data = ['file_data'=>$file_data,'uploader_data'=>json_encode($uploader_data)];
 
@@ -187,7 +190,6 @@ class AttachmentController extends Controller
                     //curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
 
                     $response = curl_exec($ch);
-
                     if($response == 1){
                         Yii::$app->session->setFlash('success', "Deposit slip successfully uploaded.");
                         return $this->redirect(['/lab/request/view','id'=>$requestId]);
