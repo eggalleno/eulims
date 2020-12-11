@@ -430,10 +430,9 @@ class AttachmentController extends Controller
            // $referral = $this->findReferral($referralId);
             
             $rstlId = (int) Yii::$app->user->identity->profile->rstl_id;
-            $referral=json_decode($refcomponent->getReferralOne($referralId, $rstlId));
-            
-            $file_download = $function->downloadAttachment($referral->referral_id,$rstlId,$fileId);
+            $referral=$refcomponent->getReferralOne($referralId, $rstlId);
 
+            $file_download = $refcomponent->downloadAttachment($referral['referral_id'],$rstlId,$fileId);
             if($file_download == 'false'){
                 Yii::$app->session->setFlash('error', "Can't download file!");
                 return $this->redirect(['/referrals/referral/viewreferral','id'=>$referralId]);
