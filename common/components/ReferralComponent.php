@@ -26,6 +26,8 @@ use common\models\lab\Lab;//used to point to old referral
 use common\models\lab\Samplecode;//used to point to old referral
 use common\models\lab\Referralrequest;
 use yii\helpers\Json;
+use yii\helpers\Html;
+
 
 
 /**
@@ -38,7 +40,28 @@ class ReferralComponent extends Component {
     public $source="";
 
     function init(){
-        $this->source = 'http://www.eulims.local/api/restreferral'; //incase you need to get the api somewhere
+        $this->source = 'https://eulims.onelab.ph/api/restreferral'; //incase you need to get the api somewhere
+
+        if(!isset($_SESSION['usertoken'])){
+            echo Html::button('Please login to access the Synching thru API', ['value'=>'/chat/info/login', 'class' => 'btn btn-lg btn-info','title' => Yii::t('app', "Login"),'id'=>'btnOP','onclick'=>'LoadModal(this.title, this.value,"100px","300px");']);
+            exit();
+        }
+    }
+
+    function customreturn($response){
+
+        if(is_array($response)){
+
+            if(isset($response['name'])&&isset($response['message'])&&isset($response['type'])){
+                echo "<h1>".$response['name']."</h1>";
+                echo "<hint>";
+                echo $response['message'];
+                echo "</hint>";
+                exit;                
+            }
+        }
+
+        return true;
     }
 
     /**
@@ -73,14 +96,13 @@ class ReferralComponent extends Component {
         //trying to contact the mothership as API :D oh GOD how long do i need to read these code
         $apiUrl=$this->source.'/notify';
         $curl = new curl\Curl();
+        $token= 'Authorization: Bearer '.$_SESSION['usertoken'];
+        $curl->setOption(CURLOPT_HTTPHEADER, ['Content-Type: application/json' , $token]);
         $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
         $curl->setOption(CURLOPT_TIMEOUT, 180);
         $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
-        $response = $curl->setRequestBody($notificationData)
-        ->setHeaders([
-            'Content-Type' => 'application/json',
-            'Content-Length' => strlen($notificationData),
-        ])->post($apiUrl);
+        $curl->setRequestBody($notificationData);
+        $response = $curl->post($apiUrl);
 
 
         //check the response
@@ -114,14 +136,13 @@ class ReferralComponent extends Component {
         //trying to contact the mothership as API :D oh GOD how long do i need to read these code
         $apiUrl=$this->source.'/notifysent';
         $curl = new curl\Curl();
+        $token= 'Authorization: Bearer '.$_SESSION['usertoken'];
+            $curl->setOption(CURLOPT_HTTPHEADER, ['Content-Type: application/json' , $token]);
         $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
         $curl->setOption(CURLOPT_TIMEOUT, 180);
         $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
-        $response = $curl->setRequestBody($notificationData)
-        ->setHeaders([
-            'Content-Type' => 'application/json',
-            'Content-Length' => strlen($notificationData),
-        ])->post($apiUrl);
+        $curl->setRequestBody($notificationData);
+        $response = $curl->post($apiUrl);
 
 
         //check the response
@@ -227,19 +248,16 @@ class ReferralComponent extends Component {
             //obviously encoding the 
             $data = Json::encode(['request_data'=>$requestData,'sample_data'=>$sample_data,'analysis_data'=>$analysis_data,'agency_id'=>$agency_id],JSON_NUMERIC_CHECK);
 
-
             //trying to contact the mothership as API :D oh GOD how long do i need to read these code
             $apiUrl=$this->source.'/insertreferraldata';
             $curl = new curl\Curl();
+            $token= 'Authorization: Bearer '.$_SESSION['usertoken'];
+            $curl->setOption(CURLOPT_HTTPHEADER, ['Content-Type: application/json' , $token]);
             $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
             $curl->setOption(CURLOPT_TIMEOUT, 180);
             $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
-            $response = $curl->setRequestBody($data)
-            ->setHeaders([
-                'Content-Type' => 'application/json',
-                'Content-Length' => strlen($data),
-            ])->post($apiUrl);
-
+            $curl->setRequestBody($data);
+            $response = $curl->post($apiUrl);
             //next in line sigh just decoding
             $response = Json::decode($response); //returns response and referralID
 
@@ -264,6 +282,8 @@ class ReferralComponent extends Component {
         if($testnameId > 0){
             $apiUrl=$this->source.'/testnameone?testname_id='.$testnameId;
             $curl = new curl\Curl();
+            $token= 'Authorization: Bearer '.$_SESSION['usertoken'];
+            $curl->setOption(CURLOPT_HTTPHEADER, ['Content-Type: application/json' , $token]);
             $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
             $curl->setOption(CURLOPT_TIMEOUT, 180);
             $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
@@ -282,6 +302,8 @@ class ReferralComponent extends Component {
         if($methodrefId > 0){
             $apiUrl=$this->source.'/methodreferenceone?methodref_id='.$methodrefId;
             $curl = new curl\Curl();
+            $token= 'Authorization: Bearer '.$_SESSION['usertoken'];
+            $curl->setOption(CURLOPT_HTTPHEADER, ['Content-Type: application/json' , $token]);
             $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
             $curl->setOption(CURLOPT_TIMEOUT, 180);
             $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
@@ -295,14 +317,13 @@ class ReferralComponent extends Component {
     function sendReferral($data){
         $apiUrl=$this->source.'/sendreferral';
         $curl = new curl\Curl();
+        $token= 'Authorization: Bearer '.$_SESSION['usertoken'];
+            $curl->setOption(CURLOPT_HTTPHEADER, ['Content-Type: application/json' , $token]);
         $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
         $curl->setOption(CURLOPT_TIMEOUT, 180);
         $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
-        $response = $curl->setRequestBody($data)
-        ->setHeaders([
-            'Content-Type' => 'application/json',
-            'Content-Length' => strlen($data),
-        ])->post($apiUrl);
+        $curl->setRequestBody($data);
+        $response = $curl->post($apiUrl);
 
         return Json::decode($response);
     }
@@ -311,6 +332,8 @@ class ReferralComponent extends Component {
         if($methodrefId > 0){
             $apiUrl=$this->source.'/agencymethodreferenceone?methodref_id='.$methodrefId;
             $curl = new curl\Curl();
+            $token= 'Authorization: Bearer '.$_SESSION['usertoken'];
+            $curl->setOption(CURLOPT_HTTPHEADER, ['Content-Type: application/json' , $token]);
             $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
             $curl->setOption(CURLOPT_TIMEOUT, 180);
             $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
@@ -331,6 +354,8 @@ class ReferralComponent extends Component {
         if($discountId >= 0){
             $apiUrl=$this->source.'/discountbyid?discount_id='.$discountId;
             $curl = new curl\Curl();
+            $token= 'Authorization: Bearer '.$_SESSION['usertoken'];
+            $curl->setOption(CURLOPT_HTTPHEADER, ['Content-Type: application/json' , $token]);
             $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
             $curl->setOption(CURLOPT_TIMEOUT, 180);
             $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
@@ -349,6 +374,8 @@ class ReferralComponent extends Component {
         if($customerId > 0){
             $apiUrl=$this->source.'/getcustomer?customer_id='.$customerId;
             $curl = new curl\Curl();
+            $token= 'Authorization: Bearer '.$_SESSION['usertoken'];
+            $curl->setOption(CURLOPT_HTTPHEADER, ['Content-Type: application/json' , $token]);
             $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
             $curl->setOption(CURLOPT_TIMEOUT, 180);
             $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
@@ -364,6 +391,8 @@ class ReferralComponent extends Component {
         if($labId > 0){
             $apiUrl=$this->source.'/sampletypebylab?lab_id='.$labId;
             $curl = new curl\Curl();
+            $token= 'Authorization: Bearer '.$_SESSION['usertoken'];
+            $curl->setOption(CURLOPT_HTTPHEADER, ['Content-Type: application/json' , $token]);
             $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
             $curl->setOption(CURLOPT_TIMEOUT, 180);
             $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
@@ -373,26 +402,14 @@ class ReferralComponent extends Component {
             return "Not valid lab";
         }
     }
-    //get referral testname by sampletype
-    function getTestnames($labId,$sampletypeId){
-        if($labId > 0 && $sampletypeId > 0){
-            $apiUrl=$this->source.'/api/web/referral/listdatas/testnamebylab_sampletype?lab_id='.$labId.'&sampletype_id='.$sampletypeId;
-            $curl = new curl\Curl();
-            $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
-            $curl->setOption(CURLOPT_TIMEOUT, 180);
-            $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
-            $list = $curl->get($apiUrl);
-            return $list;
-        } else {
-            return "Not valid lab or sampletype";
-        }
-    }
 
     //btc use in the referral view button add analysis
     function getTestnamesbysampletypeidsonly($sampletypeId,$lab_id){
         if($sampletypeId > 0){
             $apiUrl=$this->source.'/testnamebysampletypeids?sampletype_ids='.$sampletypeId.'&lab_id='.$lab_id;
             $curl = new curl\Curl();
+            $token= 'Authorization: Bearer '.$_SESSION['usertoken'];
+            $curl->setOption(CURLOPT_HTTPHEADER, ['Content-Type: application/json' , $token]);
             $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
             $curl->setOption(CURLOPT_TIMEOUT, 180);
             $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
@@ -403,26 +420,15 @@ class ReferralComponent extends Component {
         }
     }
 
-    //get referral methodref by testname
-    function getMethodrefs($labId,$sampletypeId,$testnameId){
-        if($labId > 0 && $sampletypeId > 0 && $testnameId > 0){
-            //$apiUrl=$this->source.'/api/web/referral/listdatas/testnamemethodref?testname_id='.$testnameId.'&sampletype_id='.$sampletypeId.'&lab_id='.$labId;
-            $apiUrl=$this->source.'/api/web/referral/services/methodrefs?testname_id='.$testnameId.'&sampletype_id='.$sampletypeId.'&lab_id='.$labId;
-            $curl = new curl\Curl();
-            $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
-            $curl->setOption(CURLOPT_TIMEOUT, 180);
-            $list = $curl->get($apiUrl);
-            return $list;
-        } else {
-            return "Not valid testname";
-        }
-    }
-
     //btc this function here is same with the top but with only testname_id only as argument
     function getMethodrefbytestnameidonly($testnameId){
 
         $apiUrl=$this->source.'/testnamemethodref?testname_id='.$testnameId;
         $curl = new curl\Curl();
+        $token= 'Authorization: Bearer '.$_SESSION['usertoken'];
+            $curl->setOption(CURLOPT_HTTPHEADER, ['Content-Type: application/json' , $token]);
+        $token= 'Authorization: Bearer '.$_SESSION['usertoken'];
+        $curl->setOption(CURLOPT_HTTPHEADER, ['Content-Type: application/json' , $token]);
         $curl->setOption(CURLOPT_CONNECTTIMEOUT, 120);
         $curl->setOption(CURLOPT_TIMEOUT, 120);
         $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
@@ -435,11 +441,13 @@ class ReferralComponent extends Component {
     {
         $apiUrl=$this->source.'/labs';
         $curl = new curl\Curl();
+        $token= 'Authorization: Bearer '.$_SESSION['usertoken'];
+            $curl->setOption(CURLOPT_HTTPHEADER, ['Content-Type: application/json' , $token]);
         $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
         $curl->setOption(CURLOPT_TIMEOUT, 180);
         $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
         $list = Json::decode($curl->get($apiUrl));
-
+        $this->customreturn($list);
         return $list?$list:[];
     }
     //get referral discount list
@@ -447,6 +455,8 @@ class ReferralComponent extends Component {
     {
         $apiUrl=$this->source.'/discounts';
         $curl = new curl\Curl();
+        $token= 'Authorization: Bearer '.$_SESSION['usertoken'];
+            $curl->setOption(CURLOPT_HTTPHEADER, ['Content-Type: application/json' , $token]);
         $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
         $curl->setOption(CURLOPT_TIMEOUT, 180);
         $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
@@ -458,6 +468,8 @@ class ReferralComponent extends Component {
     {
         $apiUrl=$this->source.'/purposes';
         $curl = new curl\Curl();
+        $token= 'Authorization: Bearer '.$_SESSION['usertoken'];
+            $curl->setOption(CURLOPT_HTTPHEADER, ['Content-Type: application/json' , $token]);
         $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
         $curl->setOption(CURLOPT_TIMEOUT, 180);
         $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
@@ -469,6 +481,8 @@ class ReferralComponent extends Component {
     {
         $apiUrl=$this->source.'/modesrelease';
         $curl = new curl\Curl();
+        $token= 'Authorization: Bearer '.$_SESSION['usertoken'];
+            $curl->setOption(CURLOPT_HTTPHEADER, ['Content-Type: application/json' , $token]);
         $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
         $curl->setOption(CURLOPT_TIMEOUT, 180);
         $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
@@ -518,6 +532,8 @@ class ReferralComponent extends Component {
         $apiUrl=$this->source.'/listmatchagency?rstl_id='.$request->rstl_id.'&lab_id='.$request->lab_id.'&methodref_id='.$methodrefId.'&package_id='.$packageId;
 
         $curl = new curl\Curl();
+        $token= 'Authorization: Bearer '.$_SESSION['usertoken'];
+            $curl->setOption(CURLOPT_HTTPHEADER, ['Content-Type: application/json' , $token]);
         $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
         $curl->setOption(CURLOPT_TIMEOUT, 180);
         $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
@@ -534,6 +550,8 @@ class ReferralComponent extends Component {
             $agencies = rtrim($agencyId);
             $apiUrl=$this->source.'/listagency?agency_id='.$agencies;
             $curl = new curl\Curl();
+            $token= 'Authorization: Bearer '.$_SESSION['usertoken'];
+            $curl->setOption(CURLOPT_HTTPHEADER, ['Content-Type: application/json' , $token]);
             $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
             $curl->setOption(CURLOPT_TIMEOUT, 180);
             $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
@@ -550,6 +568,8 @@ class ReferralComponent extends Component {
         if($requestId > 0 && $agencyId > 0) {
             $apiUrl=$this->source.'/checknotify?request_id='.$requestId.'&agency_id='.$agencyId;
             $curl = new curl\Curl();
+            $token= 'Authorization: Bearer '.$_SESSION['usertoken'];
+            $curl->setOption(CURLOPT_HTTPHEADER, ['Content-Type: application/json' , $token]);
             $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
             $curl->setOption(CURLOPT_TIMEOUT, 180);
             $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
@@ -559,20 +579,7 @@ class ReferralComponent extends Component {
             return 'Not valid request!';
         }
     }
-    //check if bid notified
-    /*function checkBidNotify($requestId,$agencyId)
-    {
-        if($requestId > 0 && $agencyId > 0) {
-            $apiUrl=$this->source.'/api/web/referral/bidnotifications/checknotify?request_id='.$requestId.'&agency_id='.$agencyId;
-            $curl = new curl\Curl();
-            $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
-            $curl->setOption(CURLOPT_TIMEOUT, 180);
-            $list = $curl->get($apiUrl);
-            return $list;
-        } else {
-            return 'Not valid request!';
-        }
-    }*/
+
     //check if confirmed //btc has been here
     function checkConfirm($requestId,$rstlId,$testingAgencyId)
     {
@@ -580,6 +587,8 @@ class ReferralComponent extends Component {
         if($requestId > 0 && $rstlId > 0 && $testingAgencyId > 0) {
             $apiUrl=$this->source.'/checkconfirm?request_id='.$requestId.'&receiving_id='.$rstlId.'&testing_id='.$testingAgencyId;
             $curl = new curl\Curl();
+            $token= 'Authorization: Bearer '.$_SESSION['usertoken'];
+            $curl->setOption(CURLOPT_HTTPHEADER, ['Content-Type: application/json' , $token]);
             $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
             $curl->setOption(CURLOPT_TIMEOUT, 180);
             $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
@@ -609,6 +618,8 @@ class ReferralComponent extends Component {
         if($labId > 0 && $agencyId > 0) {
             $apiUrl=$this->source.'/checkactivelab?lab_id='.$labId.'&agency_id='.$agencyId;
             $curl = new curl\Curl();
+            $token= 'Authorization: Bearer '.$_SESSION['usertoken'];
+            $curl->setOption(CURLOPT_HTTPHEADER, ['Content-Type: application/json' , $token]);
             $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
             $curl->setOption(CURLOPT_TIMEOUT, 180);
             $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
@@ -618,48 +629,15 @@ class ReferralComponent extends Component {
             return 'Not valid request!';
         }
     }
-    //check if agency is active
-    function checkActiveAgency($agencyId)
-    {
-        if($agencyId > 0) {
-            $apiUrl=$this->source.'/api/web/referral/referrals/checkactiveagency?agency_id='.$agencyId;
-            $curl = new curl\Curl();
-            $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
-            $curl->setOption(CURLOPT_TIMEOUT, 180);
-            $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
-            $list = $curl->get($apiUrl);
-            return $list;
-        } else {
-            return 'Not valid request!';
-        }
-    }
-    //post delete request
-    function removeReferral($agencyId,$requestId)
-    {
-        if($agencyId > 0 && $requestId > 0){
-            $apiUrl=$this->source.'/api/web/referral/referrals/deletereferral';
-            $curl = new curl\Curl();
-            $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
-            $curl->setOption(CURLOPT_TIMEOUT, 180);
-            $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
-            $data = Json::encode(['request_id'=>$requestId,'rstl_id'=>$agencyId],JSON_NUMERIC_CHECK);
-            $response = $curl->setRequestBody($data)
-            ->setHeaders([
-                'Content-Type' => 'application/json',
-                'Content-Length' => strlen($data),
-            ])->post($apiUrl);
 
-            return $response;
-        } else {
-            return 0;
-        }
-    }
     //get referral notifications
     function listUnrespondedNofication($rstlId)
     {
         if($rstlId > 0) {
             $apiUrl=$this->source.'/countnotification?rstl_id='.$rstlId;
             $curl = new curl\Curl();
+            $token= 'Authorization: Bearer '.$_SESSION['usertoken'];
+            $curl->setOption(CURLOPT_HTTPHEADER, ['Content-Type: application/json' , $token]);
             $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
             $curl->setOption(CURLOPT_TIMEOUT, 180);
             $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
@@ -675,6 +653,8 @@ class ReferralComponent extends Component {
         if($rstlId > 0) {
             $apiUrl=$this->source.'/countbidnotification?rstl_id='.$rstlId;
             $curl = new curl\Curl();
+            $token= 'Authorization: Bearer '.$_SESSION['usertoken'];
+            $curl->setOption(CURLOPT_HTTPHEADER, ['Content-Type: application/json' , $token]);
             $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
             $curl->setOption(CURLOPT_TIMEOUT, 180);
             $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
@@ -691,6 +671,8 @@ class ReferralComponent extends Component {
         if($requestId > 0 && $rstlId > 0){
             $apiUrl=$this->source.'/bidderagency?request_id='.$requestId.'&rstl_id='.$rstlId;
             $curl = new curl\Curl();
+            $token= 'Authorization: Bearer '.$_SESSION['usertoken'];
+            $curl->setOption(CURLOPT_HTTPHEADER, ['Content-Type: application/json' , $token]);
             $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
             $curl->setOption(CURLOPT_TIMEOUT, 180);
             $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
@@ -700,56 +682,15 @@ class ReferralComponent extends Component {
             return false;
         }
     }
-    //list bidders
-    function listBidders($agencyId){
-        if($agencyId > 0){
-            $apiUrl=$this->source.'/api/web/referral/bidnotifications/listbidder?agency_id='.$agencyId;
-            $curl = new curl\Curl();
-            $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
-            $curl->setOption(CURLOPT_TIMEOUT, 180);
-            $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
-            $list = $curl->get($apiUrl);
-            return $list;
-        } else {
-            return false;
-        }
-    }
-    //count bid notices
-    function countBidnotice($requestId,$rstlId){
-        return false;
-        if($requestId > 0 && $rstlId > 0){
-            $apiUrl=$this->source.'/bidnotice?request_id='.$requestId.'&rstl_id='.$rstlId;
-            $curl = new curl\Curl();
-            $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
-            $curl->setOption(CURLOPT_TIMEOUT, 180);
-            $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
-            $list = $curl->get($apiUrl);
-            return $list;
-        } else {
-            return false;
-        }
-    }
-    //get bid estimated due date
-    function getBidDuedate($requestId,$rstlId,$senderId)
-    {
-        if($rstlId > 0 && $requestId > 0 && $senderId > 0) {
-            $apiUrl=$this->source.'/api/web/referral/bidnotifications/showdue?request_id='.$requestId.'&rstl_id='.$rstlId.'&sender_id='.$senderId;
-            $curl = new curl\Curl();
-            $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
-            $curl->setOption(CURLOPT_TIMEOUT, 180);
-            $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
-            $list = $curl->get($apiUrl);
-            return $list;
-        } else {
-            return 'Not valid request!';
-        }
-    }
+
     //get referral details via referral_id
     function getReferraldetails($referralId,$rstlId)
     {
         if($referralId > 0 && $rstlId > 0) {
             $apiUrl=$this->source.'/viewdetail?referral_id='.$referralId.'&rstl_id='.$rstlId;
             $curl = new curl\Curl();
+            $token= 'Authorization: Bearer '.$_SESSION['usertoken'];
+            $curl->setOption(CURLOPT_HTTPHEADER, ['Content-Type: application/json' , $token]);
             $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
             $curl->setOption(CURLOPT_TIMEOUT, 180);
             $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
@@ -765,6 +706,8 @@ class ReferralComponent extends Component {
         if($referralId > 0 && $rstlId > 0) {
             $apiUrl=$this->source.'/getreferraldetail?referral_id='.$referralId.'&rstl_id='.$rstlId;
             $curl = new curl\Curl();
+            $token= 'Authorization: Bearer '.$_SESSION['usertoken'];
+            $curl->setOption(CURLOPT_HTTPHEADER, ['Content-Type: application/json' , $token]);
             $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
             $curl->setOption(CURLOPT_TIMEOUT, 180);
             $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
@@ -780,6 +723,8 @@ class ReferralComponent extends Component {
         if($rstlId > 0) {
             $apiUrl=$this->source.'/listall?rstl_id='.$rstlId;
             $curl = new curl\Curl();
+            $token= 'Authorization: Bearer '.$_SESSION['usertoken'];
+            $curl->setOption(CURLOPT_HTTPHEADER, ['Content-Type: application/json' , $token]);
             $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
             $curl->setOption(CURLOPT_TIMEOUT, 180);
             $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
@@ -789,26 +734,14 @@ class ReferralComponent extends Component {
             return 'Not valid request!';
         }
     }
-    //get all bid notifications of rstl
-    function getBidNotificationAll($rstlId)
-    {
-        if($rstlId > 0) {
-            $apiUrl=$this->source.'/api/web/referral/bidnotifications/listall?rstl_id='.$rstlId;
-            $curl = new curl\Curl();
-            $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
-            $curl->setOption(CURLOPT_TIMEOUT, 180);
-            $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
-            $list = $curl->get($apiUrl);
-            return $list;
-        } else {
-            return 'Not valid request!';
-        }
-    }
+
     //get notification //btc was here
     function getNotificationOne($noticeId,$rstlId)
     {
             $apiUrl=$this->source.'/notification_one?notificationId='.$noticeId.'&rstlId='.$rstlId;
             $curl = new curl\Curl();
+            $token= 'Authorization: Bearer '.$_SESSION['usertoken'];
+            $curl->setOption(CURLOPT_HTTPHEADER, ['Content-Type: application/json' , $token]);
             $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
             $curl->setOption(CURLOPT_TIMEOUT, 180);
             $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
@@ -821,6 +754,8 @@ class ReferralComponent extends Component {
         if($rstlId > 0 && $requestId > 0 && $senderId > 0) {
             $apiUrl=$this->source.'/showdue?request_id='.$requestId.'&rstl_id='.$rstlId.'&sender_id='.$senderId;
             $curl = new curl\Curl();
+            $token= 'Authorization: Bearer '.$_SESSION['usertoken'];
+            $curl->setOption(CURLOPT_HTTPHEADER, ['Content-Type: application/json' , $token]);
             $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
             $curl->setOption(CURLOPT_TIMEOUT, 180);
             $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
@@ -836,6 +771,8 @@ class ReferralComponent extends Component {
         if($rstlId > 0 && $referralId > 0) {
             $apiUrl=$this->source.'/checkowner?referral_id='.$referralId.'&sender_id='.$rstlId;
             $curl = new curl\Curl();
+            $token= 'Authorization: Bearer '.$_SESSION['usertoken'];
+            $curl->setOption(CURLOPT_HTTPHEADER, ['Content-Type: application/json' , $token]);
             $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
             $curl->setOption(CURLOPT_TIMEOUT, 180);
             $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
@@ -851,6 +788,8 @@ class ReferralComponent extends Component {
         if($referralId > 0){
             $apiUrl=$this->source.'/referral_one?referral_id='.$referralId.'&rstl_id='.$rstlId;
             $curl = new curl\Curl();
+            $token= 'Authorization: Bearer '.$_SESSION['usertoken'];
+            $curl->setOption(CURLOPT_HTTPHEADER, ['Content-Type: application/json' , $token]);
             $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
             $curl->setOption(CURLOPT_TIMEOUT, 180);
             $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
@@ -865,6 +804,8 @@ class ReferralComponent extends Component {
         if($requestId > 0 && $rstlId > 0) {
             $apiUrl=$this->source.'/getsamplecode?request_id='.$requestId.'&rstl_id='.$rstlId;
             $curl = new curl\Curl();
+            $token= 'Authorization: Bearer '.$_SESSION['usertoken'];
+            $curl->setOption(CURLOPT_HTTPHEADER, ['Content-Type: application/json' , $token]);
             $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
             $curl->setOption(CURLOPT_TIMEOUT, 180);
             $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
@@ -879,6 +820,8 @@ class ReferralComponent extends Component {
         if($referralId > 0 && $rstlId > 0 && $type > 0) {
             $apiUrl=$this->source.'/show_upload?referral_id='.$referralId.'&rstl_id='.$rstlId.'&type='.$type;
             $curl = new curl\Curl();
+            $token= 'Authorization: Bearer '.$_SESSION['usertoken'];
+            $curl->setOption(CURLOPT_HTTPHEADER, ['Content-Type: application/json' , $token]);
             $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
             $curl->setOption(CURLOPT_TIMEOUT, 180);
             $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
@@ -900,6 +843,8 @@ class ReferralComponent extends Component {
         if($referralId > 0 && $rstlId > 0) {
             $apiUrl=$this->source.'/referred_agency?referral_id='.$referralId.'&rstl_id='.$rstlId;
             $curl = new curl\Curl();
+            $token= 'Authorization: Bearer '.$_SESSION['usertoken'];
+            $curl->setOption(CURLOPT_HTTPHEADER, ['Content-Type: application/json' , $token]);
             $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
             $curl->setOption(CURLOPT_TIMEOUT, 180);
             $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
@@ -914,127 +859,25 @@ class ReferralComponent extends Component {
     function updatesamplecode($data){
         $referralUrl=$this->source.'/updatesamplecode';
         $curl = new curl\Curl();
+        $token= 'Authorization: Bearer '.$_SESSION['usertoken'];
+            $curl->setOption(CURLOPT_HTTPHEADER, ['Content-Type: application/json' , $token]);
         $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
         $curl->setOption(CURLOPT_TIMEOUT, 180);
         $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
-        $referralreturn = $curl->setRequestBody($data)
-        ->setHeaders([
-            'Content-Type' => 'application/json',
-            'Content-Length' => strlen($data),
-        ])->post($referralUrl);
+        $curl->setRequestBody($data);
+        $referralreturn = $curl->post($referralUrl);
 
         return $referralreturn;
     }
 
-    
-
-
-    function getReferralAll($rstlId){
-        if($rstlId > 0) {
-            $apiUrl=$this->source.'/api/web/referral/referrals/referral_all?rstl_id='.$rstlId;
-            $curl = new curl\Curl();
-            $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
-            $curl->setOption(CURLOPT_TIMEOUT, 180);
-            $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
-            $list = $curl->get($apiUrl);
-            return $list;
-        } else {
-            return 'false';
-        }
-    }
-    function getIncomingReferral($rstlId) {
-        if($rstlId > 0) {
-            //api for new referral
-            // $apiUrl=$this->source.'/api/web/referral/referrals/incoming_referral?rstl_id='.$rstlId;
-            //direct the api to the old referral
-            $apiUrl=$this->source.'/lab/api/list/model/referrals/agency/'.$rstlId;
-            $curl = new curl\Curl();
-            $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
-            $curl->setOption(CURLOPT_TIMEOUT, 180);
-            $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
-            $list = $curl->get($apiUrl);
-            return $list; exit;
-        } else {
-            return 'false';
-        }
-    }
-    function getSentReferral($rstlId) {
-        if($rstlId > 0) {
-            $apiUrl=$this->source.'/api/web/referral/referrals/sent_referral?rstl_id='.$rstlId;
-            $curl = new curl\Curl();
-            $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
-            $curl->setOption(CURLOPT_TIMEOUT, 180);
-            $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
-            $list = $curl->get($apiUrl);
-            return $list;
-        } else {
-            return 'false';
-        }
-    }
-    //offer service
-    function offerService($data){
-        $referralUrl=$this->source.'/api/web/referral/services/offer';
-        $curl = new curl\Curl();
-        $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
-        $curl->setOption(CURLOPT_TIMEOUT, 180);
-        $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
-        $referralreturn = $curl->setRequestBody($data)
-        ->setHeaders([
-            'Content-Type' => 'application/json',
-            'Content-Length' => strlen($data),
-        ])->post($referralUrl);
-
-        return $referralreturn;
-    }
-    //remove service
-    function removeService($data){
-        $referralUrl=$this->source.'/api/web/referral/services/remove';
-        $curl = new curl\Curl();
-        $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
-        $curl->setOption(CURLOPT_TIMEOUT, 180);
-        $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
-        $referralreturn = $curl->setRequestBody($data)
-        ->setHeaders([
-            'Content-Type' => 'application/json',
-            'Content-Length' => strlen($data),
-        ])->post($referralUrl);
-
-        return $referralreturn;
-    }
-    //check if service is already offered
-    function checkOffered($methodrefId,$rstlId){
-        if($rstlId > 0 && $methodrefId > 0) {
-            $apiUrl=$this->source.'/api/web/referral/services/check_offered?methodref_id='.$methodrefId.'&rstl_id='.$rstlId;
-            $curl = new curl\Curl();
-            $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
-            $curl->setOption(CURLOPT_TIMEOUT, 180);
-            $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
-            $check = $curl->get($apiUrl);
-            return $check;
-        } else {
-            return 0;
-        }
-    }
-    //return method reference offered by
-    function offeredBy($methodrefId){
-        if($methodrefId > 0){
-            $apiUrl=$this->source.'/api/web/referral/services/offeredby?methodref_id='.$methodrefId;
-            $curl = new curl\Curl();
-            $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
-            $curl->setOption(CURLOPT_TIMEOUT, 180);
-            $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
-            $offeredby = $curl->get($apiUrl);
-            return $offeredby;
-        } else {
-            return 0;
-        }
-    }
     //get package one
     function getPackageOne($packageId)
     {
         if($packageId > 0){
             $apiUrl=$this->source.'/package_detail?package_id='.$packageId;
             $curl = new curl\Curl();
+            $token= 'Authorization: Bearer '.$_SESSION['usertoken'];
+            $curl->setOption(CURLOPT_HTTPHEADER, ['Content-Type: application/json' , $token]);
             $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
             $curl->setOption(CURLOPT_TIMEOUT, 180);
             $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
@@ -1050,6 +893,8 @@ class ReferralComponent extends Component {
         if($labId > 0 && $sampletypeId > 0){
             $apiUrl=$this->source.'/listpackage?lab_id='.$labId.'&sampletype_id='.$sampletypeId;
             $curl = new curl\Curl();
+            $token= 'Authorization: Bearer '.$_SESSION['usertoken'];
+            $curl->setOption(CURLOPT_HTTPHEADER, ['Content-Type: application/json' , $token]);
             $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
             $curl->setOption(CURLOPT_TIMEOUT, 180);
             $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
@@ -1084,179 +929,17 @@ class ReferralComponent extends Component {
             return 'false'; //why false when u can return 0, anyway ... btc here
         }
     }
-    //function to get agency bid details for update to local ulims
-    function getBidDetails($referralId,$rstlId,$bidderAgencyId,$bidId)
-    {
-        if($referralId > 0 && $rstlId > 0 && $bidderAgencyId > 0 && $bidId > 0) {
-            $apiUrl=$this->source.'/api/web/referral/bids/bid_details?referral_id='.$referralId.'&rstl_id='.$rstlId.'&bidder_id='.$bidderAgencyId.'&bid_id='.$bidId;
-            $curl = new curl\Curl();
-            $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
-            $curl->setOption(CURLOPT_TIMEOUT, 180);
-            $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
-            $list = $curl->get($apiUrl);
-            return $list;
-        } else {
-            return 'false';
-        }
-    }
-    //function to get agency bid details for update to local ulims
-    function getTestbidDetails($referralId,$rstlId,$bidderAgencyId)
-    {
-        if($referralId > 0 && $rstlId > 0 && $bidderAgencyId > 0) {
-            $apiUrl=$this->source.'/api/web/referral/bids/testbid_details?referral_id='.$referralId.'&rstl_id='.$rstlId.'&bidder_id='.$bidderAgencyId;
-            $curl = new curl\Curl();
-            $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
-            $curl->setOption(CURLOPT_TIMEOUT, 180);
-            $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
-            $list = $curl->get($apiUrl);
-            return $list;
-        } else {
-            return 'false';
-        }
-    }
-
-    //function bid notification details
-    function getBidNoticeDetails($referralId,$rstlId,$noticeId,$seen)
-    {
-        if($referralId > 0 && $rstlId > 0 && $noticeId > 0 && $seen == 1) {
-            $apiUrl=$this->source.'/api/web/referral/bids/notice_details?referral_id='.$referralId.'&agency_id='.$rstlId.'&notice_id='.$noticeId.'&seen='.$seen;
-            $curl = new curl\Curl();
-            $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
-            $curl->setOption(CURLOPT_TIMEOUT, 180);
-            $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
-            $list = $curl->get($apiUrl);
-            return $list;
-        } else {
-            return 'false';
-        }
-    }
-    //get referral track receiving
-
-    //get referral track receiving by referral id
-
-    function getTrackreceiving($referralId)
-    {
-       
-        if($referralId > 0) {
-            $apiUrl=$this->source.'/api/web/referral/referraltrackreceivings/detail?referral_id='.$referralId;
-            $curl = new curl\Curl();
-            $curl->setOption(CURLOPT_CONNECTTIMEOUT, 120);
-            $curl->setOption(CURLOPT_TIMEOUT, 120);
-            $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
-            $list = $curl->get($apiUrl);
-            return $list;
-        } else {
-            return 'Not valid request!';
-        }
-    }
-    //get referral track testing by referral id
-    function getTracktesting($referralId)
-    {
-       
-        if($referralId > 0) {
-            $apiUrl=$this->source.'/api/web/referral/referraltracktestings/detail?referral_id='.$referralId;
-            $curl = new curl\Curl();
-            $curl->setOption(CURLOPT_CONNECTTIMEOUT, 120);
-            $curl->setOption(CURLOPT_TIMEOUT, 120);
-            $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
-            $list = $curl->get($apiUrl);
-            return $list;
-        } else {
-            return 'Not valid request!';
-        }
-    }
-    
-    //get Status Logs
-    function getStatuslogs($Id)
-    {
-       
-        if($Id > 0) {
-            $apiUrl=$this->source.'/api/web/referral/referrals/logs?id='.$Id;
-            $curl = new curl\Curl();
-            $curl->setOption(CURLOPT_CONNECTTIMEOUT, 120);
-            $curl->setOption(CURLOPT_TIMEOUT, 120);
-            $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
-            $list = $curl->get($apiUrl);
-            return $list;
-        } else {
-            return 'Not valid request!';
-        }
-    }
-    //get referral track testing by referral id
-    function getTracktestingdata($Id)
-    {
-       
-        if($Id > 0) {
-            $apiUrl=$this->source.'/api/web/referral/referraltracktestings/getdata?id='.$Id;
-            $curl = new curl\Curl();
-            $curl->setOption(CURLOPT_CONNECTTIMEOUT, 120);
-            $curl->setOption(CURLOPT_TIMEOUT, 120);
-            $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
-            $list = $curl->get($apiUrl);
-            return $list;
-        } else {
-            return 'Not valid request!';
-        }
-    }
-    //get Courier
-    function getCourierdata()
-    {
-       
-            $apiUrl=$this->source.'/api/web/referral/couriers/getdata';
-            $curl = new curl\Curl();
-            $curl->setOption(CURLOPT_CONNECTTIMEOUT, 120);
-            $curl->setOption(CURLOPT_TIMEOUT, 120);
-            $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
-            $list = $curl->get($apiUrl);
-            if($list){
-                return $list;
-            }else {
-                return 'Error in connection!';
-            }
-    }
-    function getCourierone($id)
-    {
-       
-            $apiUrl=$this->source.'/api/web/referral/couriers/getone?id='.$id;
-            $curl = new curl\Curl();
-            $curl->setOption(CURLOPT_CONNECTTIMEOUT, 120);
-            $curl->setOption(CURLOPT_TIMEOUT, 120);
-            $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
-            $list = $curl->get($apiUrl);
-            if($list){
-                return $list;
-            }else {
-                return 'Error in connection!';
-            }
-    }
-    
-    function getCheckstatus($referralId,$statusId)
-    {
-        if($referralId > 0 && $statusId > 0) {
-            //$apiUrl=$this->source.'/api/web/referral/bids/notice_details?referral_id='.$referralId.'&agency_id='.$rstlId.'&notice_id='.$noticeId.'&seen='.$seen;
-            $apiUrl=$this->source.'/api/web/referral/statuslogs/checkstatuslogs?referralId='.$referralId.'&statusId='.$statusId;
-            $curl = new curl\Curl();
-            $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
-            $curl->setOption(CURLOPT_TIMEOUT, 180);
-            $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
-            $list = $curl->get($apiUrl);
-            return $list;
-        } else {
-            return 'false';
-        }
-    }
 
     function setestimatedue($notificationData){
         $apiUrl=$this->source.'/confirm';
         $curl = new curl\Curl();
+        $token= 'Authorization: Bearer '.$_SESSION['usertoken'];
+            $curl->setOption(CURLOPT_HTTPHEADER, ['Content-Type: application/json' , $token]);
         $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
         $curl->setOption(CURLOPT_TIMEOUT, 180);
         $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
-        $response = $curl->setRequestBody($notificationData)
-        ->setHeaders([
-            'Content-Type' => 'application/json',
-            'Content-Length' => strlen($notificationData),
-        ])->post($apiUrl);
+        $curl->setRequestBody($notificationData);
+        $response = $curl->post($apiUrl);
 
         return $response;
     }
@@ -1265,6 +948,8 @@ class ReferralComponent extends Component {
 
         $apiUrl=$this->source.'/lab/api/view/model/referrals/id/'.$request_id;
         $curl = new curl\Curl();
+        $token= 'Authorization: Bearer '.$_SESSION['usertoken'];
+            $curl->setOption(CURLOPT_HTTPHEADER, ['Content-Type: application/json' , $token]);
         $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
         $curl->setOption(CURLOPT_TIMEOUT, 180);
         $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
@@ -1353,6 +1038,23 @@ class ReferralComponent extends Component {
         }
         $Row=$Command->queryOne();
         return $Row;
+    }
+
+    /* BIDDING **/
+     //count bid notices
+    function countBidnotice($requestId,$rstlId){
+        return false;
+        if($requestId > 0 && $rstlId > 0){
+            $apiUrl=$this->source.'/bidnotice?request_id='.$requestId.'&rstl_id='.$rstlId;
+            $curl = new curl\Curl();
+            $curl->setOption(CURLOPT_CONNECTTIMEOUT, 180);
+            $curl->setOption(CURLOPT_TIMEOUT, 180);
+            $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
+            $list = $curl->get($apiUrl);
+            return $list;
+        } else {
+            return false;
+        }
     }
     
 }
