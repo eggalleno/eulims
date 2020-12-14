@@ -148,8 +148,8 @@ class RequestController extends Controller
 
             //gets the attachement details ??? //btc
 			//set third parameter to 1 for attachment type deposit slip
-            //updated to new api with false return temporarily //btc TODOOOOOOOOOOOOOO
-            $deposit = json_decode($refcomponent->getAttachment($reqModel->referral_id,Yii::$app->user->identity->profile->rstl_id,1),true);
+            $deposit = $refcomponent->getAttachment($reqModel->referral_id,Yii::$app->user->identity->profile->rstl_id,1);
+
             //set third parameter to 2 for attachment type or
             //updated to new api with false return temporarily //btc TODOOOOOOOOOOOOOO
             $or = json_decode($refcomponent->getAttachment($reqModel->referral_id,Yii::$app->user->identity->profile->rstl_id,2),true);

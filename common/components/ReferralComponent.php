@@ -49,7 +49,6 @@ class ReferralComponent extends Component {
         return $this->source;
     }
 
-
     /**
     *
     * Notifies refered agency about the referral
@@ -884,22 +883,14 @@ class ReferralComponent extends Component {
             $curl->setOption(CURLOPT_TIMEOUT, 180);
             $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
             $list = $curl->get($apiUrl);
-            return $list;
+            return Json::decode($list);
         } else {
             return 'Invalid referral!';
         }
     }
     function downloadAttachment($referralId,$rstlId,$fileId){
         if($referralId > 0 && $rstlId > 0 && $fileId > 0) {
-            $apiUrl=$this->source.'/api/web/referral/attachments/download?referral_id='.$referralId.'&rstl_id='.$rstlId.'&file='.$fileId;
-            //$curl = new curl\Curl();
-            //$file = $curl->get($apiUrl);
-            //return $apiUrl;
-            //if($file == 0){
-            //    return 'false';
-            //} else {
-            //    return $apiUrl;
-            //}
+            $apiUrl=$this->source.'/download?referral_id='.$referralId.'&rstl_id='.$rstlId.'&file='.$fileId;
             return $apiUrl;
         } else {
             return 'false';

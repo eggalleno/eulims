@@ -23,7 +23,11 @@ use common\models\referral\Agency;
  */
 class ReferralFunctions extends Component
 {
-	public $source = 'https://eulimsapi.onelab.ph';
+	public $source="";
+
+    function init(){
+        $this->source = 'http://www.eulims.local/api/restreferral'; //incase you need to get the api somewhere
+    }
 	//public $source = 'http://localhost/eulimsapi.onelab.ph';
 
 	//check if the agency is notified
@@ -145,12 +149,13 @@ class ReferralFunctions extends Component
     //download attachment
     function downloadAttachment($referralId,$rstlId,$fileId)
     {
-        if($referralId > 0 && $rstlId > 0 && $fileId > 0) {
-            $apiUrl=$this->source.'/api/web/referral/attachments/download?referral_id='.$referralId.'&rstl_id='.$rstlId.'&file='.$fileId;
-            return $apiUrl;
-        } else {
-            return 'false';
-        }
+    	return "HAHA";
+        // if($referralId > 0 && $rstlId > 0 && $fileId > 0) {
+        //     $apiUrl=$this->source.'/download?referral_id='.$referralId.'&rstl_id='.$rstlId.'&file='.$fileId;
+        //     return $apiUrl;
+        // } else {
+        //     return 'false';
+        // }
     }
 
     //check if test bid added

@@ -935,6 +935,68 @@ class RestreferralController extends \yii\rest\Controller
         return ['response'=>$return,'referral_id'=>$referralId,'estimated_due'=>$estimatedDue];
     }
 
+    //salvaged code from STG from attactment controller
+    public function actionShow_upload()
+    {
+        \Yii::$app->response->format= \yii\web\Response::FORMAT_JSON;
+        set_time_limit(120);
+        
+        if(\Yii::$app->request->get('referral_id') > 0 && \Yii::$app->request->get('rstl_id') > 0 && \Yii::$app->request->get('type') > 0){
+            try {
+                $referralId = (int) \Yii::$app->request->get('referral_id');
+                $rstlId = (int) \Yii::$app->request->get('rstl_id');
+                $type = (int) \Yii::$app->request->get('type');
+                
+                $attachment = Attachment::find()
+                    ->joinWith('referral',false)
+                    ->where('tbl_attachment.referral_id =:referralId AND attachment_type =:attachmentType', [':referralId'=>$referralId,':attachmentType'=>$type])
+                    ->andWhere('receiving_agency_id =:receivingAgency OR testing_agency_id =:testingAgency', [':receivingAgency'=>$rstlId,':testingAgency'=>$rstlId])
+                    ->asArray()->all();
+                
+                if($attachment){
+                    return $attachment;
+                } else {
+                    return 0;
+                }
+            } catch (Exception $e) {
+                throw new \yii\web\HttpException(500, 'Internal server error');
+            }
+        } else {
+            throw new \yii\web\HttpException(400, 'No records found');
+        }
+    }
+
+    //salvaged code from STG attachment controller
+    public function actionDownload()
+    {
+        set_time_limit(120);
+        
+        if(\Yii::$app->request->get('referral_id') > 0 && \Yii::$app->request->get('file') > 0 && \Yii::$app->request->get('rstl_id') > 0){
+            $referralId = (int) \Yii::$app->request->get('referral_id');
+            $rstlId = (int) \Yii::$app->request->get('rstl_id');
+            $fileId = (int) \Yii::$app->request->get('file');
+            return $attachment = Attachment::find()
+                ->select('tbl_attachment.*,tbl_referral.referral_code')
+                ->joinWith('referral',false)
+                ->where('tbl_attachment.referral_id =:referralId AND attachment_id =:fileId', [':referralId'=>$referralId,':fileId'=>$fileId])
+                ->andWhere('receiving_agency_id =:receivingAgency OR testing_agency_id =:testingAgency', [':receivingAgency'=>$rstlId,':testingAgency'=>$rstlId])
+                ->asArray()->one();
+            
+            $path = \Yii::getAlias('@webroot') . '/uploads';
+
+            return $file = $path . "/referral/".$attachment['referral_code'].'/'.$attachment['filename'];
+
+
+            // return $path = \Yii\helpers\Url::to("uploads/referral/".$attachment['referral_code'].'/'.$attachment['filename'];
+
+            if(file_exists($path)) {
+                return Yii::$app->response->sendFile($path);
+            } else {
+                return 0;
+            }
+        }
+    }
+
     //protecetd function was salvaged from STG
     protected function checkReferral($requestId,$rstlId)
     {
