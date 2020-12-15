@@ -137,9 +137,13 @@ class RequestController extends Controller
                 'query' => $analysisQuery,
                 'pagination' => false,
             ]);
-
-            //gets the customer on the API //updated to new api //btc
-            $customer = $refcomponent->getCustomerOne($reqModel->referral_id);
+            //if referral id is empty, look for the customer details in the local
+            if($reqModel->referral_id){
+                //gets the customer on the API //updated to new api //btc
+                $customer = $refcomponent->getCustomerOne($reqModel->referral_id);                
+            }else{
+                $customer = Customer::findOne($reqModel->customer_id); //look in the local
+            }
 
             //gets all the matching agency ??? hard to maintain, needs inovative idea here //btc 
             $agency = $refcomponent->listMatchAgency($id);
