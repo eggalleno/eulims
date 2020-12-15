@@ -60,7 +60,7 @@ class PstcrequestController extends Controller
         $rstlId = (int) Yii::$app->user->identity->profile->rstl_id;
         $pstcComponent = new PstcComponent();
         $referrals = json_decode($pstcComponent->getAll($rstlId),true);
-
+        
         if((int) $referrals == 0){
             $referralDataprovider = new ArrayDataProvider([
                 'allModels' => [],
@@ -342,6 +342,7 @@ class PstcrequestController extends Controller
                         $analysis->request_id = $model->request_id;
                         $analysis->sample_id = $sample->sample_id;
                         $analysis->testname =$an['testname'];
+                        $analysis->methodref_id =$an['method_id'];
                         $analysis->method =$an['method'];
                         $analysis->references =$an['reference'];
                         $analysis->fee = $an['fee'];

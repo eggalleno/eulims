@@ -268,8 +268,8 @@ class InfoController extends Controller
 				} else{
 					 Yii::$app->session->setFlash('error', 'Login failed!');
 				}
-				//exit;
-				return $this->redirect(['/lab/request']);
+		
+				return $this->redirect(Yii::$app->request->referrer ?: Yii::$app->homeUrl);
 			
 		}else{
 			return $this->render('login', [

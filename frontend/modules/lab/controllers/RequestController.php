@@ -152,7 +152,7 @@ class RequestController extends Controller
 
             //set third parameter to 2 for attachment type or
             //updated to new api with false return temporarily //btc TODOOOOOOOOOOOOOO
-            $or = json_decode($refcomponent->getAttachment($reqModel->referral_id,Yii::$app->user->identity->profile->rstl_id,2),true);
+            $or = $refcomponent->getAttachment($reqModel->referral_id,Yii::$app->user->identity->profile->rstl_id,2);
 
             //get the referred Agency details //btc
             //updated to new api //btc TODOOOOOOOOOOOOOO

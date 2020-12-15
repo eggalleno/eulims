@@ -561,7 +561,6 @@ class ReferralController extends Controller
 
                     $refcomponent = new ReferralComponent;
                     $response = $refcomponent->syncReferral($requestId,$agency_id); //return boolean
-
                     if($response['response']==1){
 
                         //put the code here to notify the referred agency
@@ -586,14 +585,15 @@ class ReferralController extends Controller
 
                     }elseif($response['response']==2){
                         //referral is already exisiting in the server, now we try to notify only
-                            $notifyresponse = $refcomponent->notifyAgency($response['referral_id'],$agency_id,"Notification Sent");
+                        $notifyresponse = $refcomponent->notifyAgency($response['referral_id'],$agency_id,"Notification Sent");
                         if($notifyresponse){
                             $refreq =  Referralrequest::find()->where(['request_id'=>$requestId])->one();
                             if($refreq){
                                 $refreq->notified=1;
                                 $refreq->save(false);
+                                return "<div class='alert alert-success'><span class='glyphicon glyphicon-exclamation-sign' style='font-size:18px;'></span>&nbsp;Referral already Synced! and Agency is Notified!</div>";
                             }
-                            return "<div class='alert alert-success'><span class='glyphicon glyphicon-exclamation-sign' style='font-size:18px;'></span>&nbsp;Referral already Synced! and Agency is Notified!</div>";
+                            return "<div class='alert alert-warning'><span class='glyphicon glyphicon-exclamation-sign' style='font-size:18px;'></span>&nbsp;Referral already Synced! but failed to notify Agency!</div>";
                         }
 
                         return "<div class='alert alert-danger'><span class='glyphicon glyphicon-exclamation-sign' style='font-size:18px;'></span>&nbsp;Referral already Synced! , But failed to notify the target agency</div>";
@@ -1432,6 +1432,7 @@ class ReferralController extends Controller
         }
         return $return;
     }
+
     //get samplecode from referral db
     public function actionGet_samplecode()
     {

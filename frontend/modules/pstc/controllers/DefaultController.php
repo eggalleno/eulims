@@ -16,6 +16,10 @@ class DefaultController extends Controller
      */
     public function actionIndex()
     {
+        if(isset($_SESSION['usertoken'])){
+            return $this->redirect('/pstc/pstcrequest');
+        }
+        
         return $this->render('login');
     }
 

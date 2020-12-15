@@ -30,7 +30,7 @@ class RestreferralController extends \yii\rest\Controller
         $behaviors = parent::behaviors();
         $behaviors['authenticator'] = [
             'class' => \sizeg\jwt\JwtHttpBearerAuth::class,
-            'except' => ['*'],
+            'except' => ['index'],
             'user'=> \Yii::$app->referralaccount
         ];
 
@@ -441,7 +441,6 @@ class RestreferralController extends \yii\rest\Controller
             $analyses = \Yii::$app->request->post('analysis_data');
             //checks if the referral in the centralized server is already existing
             $checkReferral = $this->checkReferral($request['request_id'],$request['rstl_id']);
-
             if ($checkReferral>0) {
                 #referral is already existing
                 //therefore passing it to the referralID variable
@@ -551,7 +550,7 @@ class RestreferralController extends \yii\rest\Controller
                 
             }
 
-            // return ['referral'=>$referralSave,'sample'=>$sampleSave,'analysis'=>$analysisSave]; use to debug , gives off the reason 
+            // return ['referral'=>$referralSave,'sample'=>$sampleSave,'analysis'=>$analysisSave];// use to debug , gives off the reason 
 
             //after all of the procedure above, determines waether to send notification or not
             if($referralSave == 1 && $sampleSave == 1 && $analysisSave == 1){
@@ -565,14 +564,12 @@ class RestreferralController extends \yii\rest\Controller
             }
         }
         
-
         return ['response'=>$return,'referral_id'=>$referralId];
     }
 
     //returns boolean, notifies the referred agency about the referral    
     public function actionNotify(){
         \Yii::$app->response->format= \yii\web\Response::FORMAT_JSON;
-
         if(count(\Yii::$app->request->post('notice_details')) > 0){
             $details = \Yii::$app->request->post('notice_details');
 
