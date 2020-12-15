@@ -20,7 +20,7 @@ use common\models\referral\Sample;
 use common\models\referral\Analysis;
 use common\models\referral\Attachment;
 use common\models\referral\Pstcrequest;
-use common\models\lab\Customer;
+use common\models\referral\Customer;
 use yii\db\Query;
 
 class RestreferralController extends \yii\rest\Controller
@@ -78,9 +78,12 @@ class RestreferralController extends \yii\rest\Controller
         return $discount;
     }
 
-    public function actionGetcustomer($customer_id){
+    public function actionGetcustomer($referral_id){
         \Yii::$app->response->format= \yii\web\Response::FORMAT_JSON;
-        $customer = Customer::findOne($customer_id);
+        $reff = Referral::findOne($referral_id);
+        if(!$reff)
+            return null;
+        $customer = Customer::find()->where(['local_customer_id'=>$reff->customer_id,'rstl_id'=>$reff->receiving_agency_id])->one();
         return $customer;
     }
 
@@ -449,103 +452,103 @@ class RestreferralController extends \yii\rest\Controller
                 return ['response'=>$return,'referral_id'=>$referralId];
             } else{
                 if(count($request)>0){
-                    $modelReferral = new Referral;
-                    $modelReferral->referral_date_time = $request['request_datetime'];
-                    $modelReferral->referralDate = date('Y-m-d',strtotime($request['request_datetime']));
-                    $modelReferral->referralTime = date("h:i:sa",strtotime($request['request_datetime']));
-                    $modelReferral->local_request_id = $request['request_id'];
-                    $modelReferral->receiving_agency_id = $request['rstl_id'];
-                    $modelReferral->testing_agency_id = 0;
-                    $modelReferral->lab_id = $request['lab_id'];
-                    $modelReferral->sample_received_date = $request['sample_received_date'];
-                    $modelReferral->customer_id = $request['customer_id'];
-                    $modelReferral->payment_type_id = $request['payment_type_id'];
-                    $modelReferral->modeofrelease_id = $request['modeofrelease_ids'];
-                    $modelReferral->purpose_id = $request['purpose_id'];
-                    $modelReferral->discount_id = $request['discount_id'];
-                    $modelReferral->discount_rate = $request['discount'];
-                    $modelReferral->total_fee = $request['total'];
-                    $modelReferral->report_due = $request['report_due'];
-                    $modelReferral->conforme = $request['conforme'];
-                    $modelReferral->receiving_user_id = $request['user_id_receiving'];
-                    $modelReferral->cro_receiving = $request['receivedBy'];
-                    $modelReferral->created_at_local = date('Y-m-d H:i:s',$request['created_at']);
-                    $modelReferral->create_time = date('Y-m-d H:i:s');
-                    $modelReferral->update_time = date('Y-m-d H:i:s');
-                    $modelReferral->bid = $request['bid'];
-                    $modelReferral->pstc_id = $request['pstc_id'];
-                    if($modelReferral->save(false)){
-                        $referralId = $modelReferral->referral_id;
-                        $referralSave = 1; //flags that the request has been save in this transaction
-                        //iterates the sample and save them
-                        if(count($samples) > 0){
-                            foreach ($samples as $sample) {
-                                $modelSample = new Sample;
-                                $modelSample->referral_id = $modelReferral->referral_id;
-                                $modelSample->local_sample_id = $sample['sample_id'];
-                                $modelSample->local_request_id = $sample['request_id'];
-                                $modelSample->receiving_agency_id = $sample['rstl_id'];
-                                //$modelSample->package_id = $sample['package_id'];
-                                $modelSample->sample_type_id = $sample['sampletype_id'];
-                                $modelSample->sample_code = $sample['sample_code'];
-                                $modelSample->sample_name = $sample['samplename'];
-                                $modelSample->description = $sample['description'];
-                                $modelSample->customer_description = $sample['customer_description'];
-                                $modelSample->sampling_date = $sample['sampling_date'];
-                                $modelSample->remarks = $sample['remarks'];
-                                $modelSample->sample_month = $sample['sample_month'];
-                                $modelSample->sample_year = $sample['sample_year'];
-                                $modelSample->active = $sample['active'];
-                                $modelSample->created_at = date('Y-m-d H:i:s');
-                                $modelSample->updated_at = date('Y-m-d H:i:s');
-                                if($modelSample->save(false)){
-                                    $sampleSave = 1; //flags that 
-                                    //now iterates the analyses
+                        $modelReferral = new Referral;
+                        $modelReferral->referral_date_time = $request['request_datetime'];
+                        $modelReferral->referralDate = date('Y-m-d',strtotime($request['request_datetime']));
+                        $modelReferral->referralTime = date("h:i:sa",strtotime($request['request_datetime']));
+                        $modelReferral->local_request_id = $request['request_id'];
+                        $modelReferral->receiving_agency_id = $request['rstl_id'];
+                        $modelReferral->testing_agency_id = 0;
+                        $modelReferral->lab_id = $request['lab_id'];
+                        $modelReferral->sample_received_date = $request['sample_received_date'];
+                        $modelReferral->customer_id = $request['customer_id'];
+                        $modelReferral->payment_type_id = $request['payment_type_id'];
+                        $modelReferral->modeofrelease_id = $request['modeofrelease_ids'];
+                        $modelReferral->purpose_id = $request['purpose_id'];
+                        $modelReferral->discount_id = $request['discount_id'];
+                        $modelReferral->discount_rate = $request['discount'];
+                        $modelReferral->total_fee = $request['total'];
+                        $modelReferral->report_due = $request['report_due'];
+                        $modelReferral->conforme = $request['conforme'];
+                        $modelReferral->receiving_user_id = $request['user_id_receiving'];
+                        $modelReferral->cro_receiving = $request['receivedBy'];
+                        $modelReferral->created_at_local = date('Y-m-d H:i:s',$request['created_at']);
+                        $modelReferral->create_time = date('Y-m-d H:i:s');
+                        $modelReferral->update_time = date('Y-m-d H:i:s');
+                        $modelReferral->bid = $request['bid'];
+                        $modelReferral->pstc_id = $request['pstc_id'];
+                        if($modelReferral->save(false)){
+                            $referralId = $modelReferral->referral_id;
+                            $referralSave = 1; //flags that the request has been save in this transaction
+                            //iterates the sample and save them
+                            if(count($samples) > 0){
+                                foreach ($samples as $sample) {
+                                    $modelSample = new Sample;
+                                    $modelSample->referral_id = $modelReferral->referral_id;
+                                    $modelSample->local_sample_id = $sample['sample_id'];
+                                    $modelSample->local_request_id = $sample['request_id'];
+                                    $modelSample->receiving_agency_id = $sample['rstl_id'];
+                                    //$modelSample->package_id = $sample['package_id'];
+                                    $modelSample->sample_type_id = $sample['sampletype_id'];
+                                    $modelSample->sample_code = $sample['sample_code'];
+                                    $modelSample->sample_name = $sample['samplename'];
+                                    $modelSample->description = $sample['description'];
+                                    $modelSample->customer_description = $sample['customer_description'];
+                                    $modelSample->sampling_date = $sample['sampling_date'];
+                                    $modelSample->remarks = $sample['remarks'];
+                                    $modelSample->sample_month = $sample['sample_month'];
+                                    $modelSample->sample_year = $sample['sample_year'];
+                                    $modelSample->active = $sample['active'];
+                                    $modelSample->created_at = date('Y-m-d H:i:s');
+                                    $modelSample->updated_at = date('Y-m-d H:i:s');
+                                    if($modelSample->save(false)){
+                                        $sampleSave = 1; //flags that 
+                                        //now iterates the analyses
 
-                                    foreach ($analyses as $analysis) {
-                                        $modelAnalysis = new Analysis;
-                                        $modelAnalysis->sample_id = $modelSample->sample_id;
-                                        $modelAnalysis->local_analysis_id = $analysis['analysis_id'];
-                                        $modelAnalysis->local_sample_id = $analysis['sample_id'];
-                                        $modelAnalysis->date_analysis = $analysis['date_analysis'];
-                                        $modelAnalysis->agency_id = $analysis['rstl_id'];
-                                        $modelAnalysis->package_id = $analysis['package_id'];
-                                        $modelAnalysis->testname_id = $analysis['test_id'];
-                                        $modelAnalysis->methodreference_id = $analysis['methodref_id'];
-                                        $modelAnalysis->analysis_fee = $analysis['fee'];
-                                        $modelAnalysis->cancelled = $analysis['cancelled'];
-                                        $modelAnalysis->status = 1;
-                                        $modelAnalysis->cancelled = 0;
-                                        $modelAnalysis->is_package = $analysis['is_package'];
-                                        $modelAnalysis->type_fee_id = $analysis['type_fee_id'];
-                                        $modelAnalysis->created_at = date('Y-m-d H:i:s');
-                                        $modelAnalysis->updated_at = date('Y-m-d H:i:s');
+                                        foreach ($analyses as $analysis) {
+                                            $modelAnalysis = new Analysis;
+                                            $modelAnalysis->sample_id = $modelSample->sample_id;
+                                            $modelAnalysis->local_analysis_id = $analysis['analysis_id'];
+                                            $modelAnalysis->local_sample_id = $analysis['sample_id'];
+                                            $modelAnalysis->date_analysis = $analysis['date_analysis'];
+                                            $modelAnalysis->agency_id = $analysis['rstl_id'];
+                                            $modelAnalysis->package_id = $analysis['package_id'];
+                                            $modelAnalysis->testname_id = $analysis['test_id'];
+                                            $modelAnalysis->methodreference_id = $analysis['methodref_id'];
+                                            $modelAnalysis->analysis_fee = $analysis['fee'];
+                                            $modelAnalysis->cancelled = $analysis['cancelled'];
+                                            $modelAnalysis->status = 1;
+                                            $modelAnalysis->cancelled = 0;
+                                            $modelAnalysis->is_package = $analysis['is_package'];
+                                            $modelAnalysis->type_fee_id = $analysis['type_fee_id'];
+                                            $modelAnalysis->created_at = date('Y-m-d H:i:s');
+                                            $modelAnalysis->updated_at = date('Y-m-d H:i:s');
 
-                                        if($modelAnalysis->save()){
-                                            $analysisSave = 1;
-                                        }else{
-                                            $analysisSave = 0;
-                                            $transaction->rollBack();
-                                            break;
+                                            if($modelAnalysis->save()){
+                                                $analysisSave = 1;
+                                            }else{
+                                                $analysisSave = 0;
+                                                $transaction->rollBack();
+                                                break;
+                                            }
                                         }
-                                    }
-                                    //checks if the analysis was not save therefore breaks this loop also
-                                    // if($analysisSave = 0)
-                                    //     break;
+                                        //checks if the analysis was not save therefore breaks this loop also
+                                        // if($analysisSave = 0)
+                                        //     break;
 
-                                }else{
-                                    $sampleSave = 0; //flags the a sample was not save therefore rollsback
-                                    //else for the if sample was save
-                                    $transaction->rollBack();
-                                    break;
+                                    }else{
+                                        $sampleSave = 0; //flags the a sample was not save therefore rollsback
+                                        //else for the if sample was save
+                                        $transaction->rollBack();
+                                        break;
+                                    }
                                 }
                             }
                         }
-                    }
-                    else{
-                        //esle for "if request was saved"
-                        $transaction->rollBack();
-                    }
+                        else{
+                            //esle for "if request was saved"
+                            $transaction->rollBack();
+                        }
                 }
                 
             }
@@ -853,7 +856,7 @@ class RestreferralController extends \yii\rest\Controller
                         $referral->referral_date_time = $request['request_datetime'];
                         $referral->testing_agency_id = (int) \Yii::$app->request->post('agency_id');
                         $referral->sample_received_date = $request['sample_received_date'];
-                        $referral->customer_id = $request['customer_id'];
+                        // $referral->customer_id = $request['customer_id'];
                         $referral->payment_type_id = $request['payment_type_id'];
                         $referral->modeofrelease_id = $request['modeofrelease_ids'];
                         $referral->purpose_id = $request['purpose_id'];
@@ -1041,7 +1044,7 @@ class RestreferralController extends \yii\rest\Controller
                     ->all();
                     
                 $customer = Customer::find()
-                    ->where('customer_id =:customerId', [':customerId'=>$referral->customer_id])
+                    ->where('local_customer_id =:customerId','rstl_id =:rstl_id', [':customerId'=>$referral->customer_id,':rstl_id'=>$referral->receiving_agency_id])
                     ->one();
                     
                 $data = ['request_data'=>$referral,'sample_analysis_data'=>$samples_analyses,'customer_data'=>$customer];

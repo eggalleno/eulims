@@ -22,6 +22,7 @@ use linslin\yii2\curl;
 use common\models\lab\exRequestreferral;
 use common\models\lab\Analysis;
 use common\models\lab\Sample;
+use common\models\lab\Customer;
 use common\models\lab\Lab;//used to point to old referral
 use common\models\lab\Samplecode;//used to point to old referral
 use common\models\lab\Referralrequest;
@@ -171,6 +172,8 @@ class ReferralComponent extends Component {
         $samples = Sample::find()->where(['request_id'=>$request_id])->asArray()->all();
         //get the associated analyses of the request above
         $analyses = Analysis::find()->where(['request_id'=>$request_id])->asArray()->all();
+        //added customer to the sync
+        $customerData = Customer::find()->where(['customer_id'=>$request['customer_id']])->asArray()->one();
 
         if(count($request) > 0 && count($ref_request) > 0 && count($samples) > 0 && count($analyses) > 0){
 
@@ -246,7 +249,7 @@ class ReferralComponent extends Component {
             }
 
             //obviously encoding the 
-            $data = Json::encode(['request_data'=>$requestData,'sample_data'=>$sample_data,'analysis_data'=>$analysis_data,'agency_id'=>$agency_id],JSON_NUMERIC_CHECK);
+            $data = Json::encode(['request_data'=>$requestData,'sample_data'=>$sample_data,'analysis_data'=>$analysis_data,'customerData'=>$customerData,'agency_id'=>$agency_id],JSON_NUMERIC_CHECK);
 
             //trying to contact the mothership as API :D oh GOD how long do i need to read these code
             $apiUrl=$this->source.'/insertreferraldata';
@@ -259,6 +262,7 @@ class ReferralComponent extends Component {
             $curl->setRequestBody($data);
             $response = $curl->post($apiUrl);
             //next in line sigh just decoding
+
             $response = Json::decode($response); //returns response and referralID
 
                 //if response is false , information weren't saved and not notified
@@ -370,9 +374,9 @@ class ReferralComponent extends Component {
      * @param integer $customerId
      * @return array
      */
-    function getCustomerOne($customerId){
-        if($customerId > 0){
-            $apiUrl=$this->source.'/getcustomer?customer_id='.$customerId;
+    function getCustomerOne($referral_id){
+        if($referral_id > 0){
+            $apiUrl=$this->source.'/getcustomer?referral_id='.$referral_id;
             $curl = new curl\Curl();
             $token= 'Authorization: Bearer '.$_SESSION['usertoken'];
             $curl->setOption(CURLOPT_HTTPHEADER, ['Content-Type: application/json' , $token]);

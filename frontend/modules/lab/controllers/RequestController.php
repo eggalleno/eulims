@@ -139,7 +139,7 @@ class RequestController extends Controller
             ]);
 
             //gets the customer on the API //updated to new api //btc
-            $customer = $refcomponent->getCustomerOne($reqModel->customer_id);
+            $customer = $refcomponent->getCustomerOne($reqModel->referral_id);
 
             //gets all the matching agency ??? hard to maintain, needs inovative idea here //btc 
             $agency = $refcomponent->listMatchAgency($id);
@@ -810,10 +810,10 @@ class RequestController extends Controller
         $connection= Yii::$app->labdb;
         $refcomponent = new ReferralComponent();
         
-        $labreferral = ArrayHelper::map(json_decode($refcomponent->listLabreferral()), 'lab_id', 'labname');
-        $discountreferral = ArrayHelper::map(json_decode($refcomponent->listDiscountreferral()), 'discount_id', 'type');
-        $purposereferral = ArrayHelper::map(json_decode($refcomponent->listPurposereferral()), 'purpose_id', 'name');
-        $modereleasereferral = ArrayHelper::map(json_decode($refcomponent->listModereleasereferral()), 'modeofrelease_id', 'mode');
+        $labreferral = ArrayHelper::map($refcomponent->listLabreferral(), 'lab_id', 'labname');
+        $discountreferral = ArrayHelper::map($refcomponent->listDiscountreferral(), 'discount_id', 'type');
+        $purposereferral = ArrayHelper::map($refcomponent->listPurposereferral(), 'purpose_id', 'name');
+        $modereleasereferral = ArrayHelper::map($refcomponent->listModereleasereferral(), 'modeofrelease_id', 'mode');
 
         $sampleCount = Sample::find()->where('request_id =:requestId',[':requestId'=>$id])->count();
         $analysisCount = Analysis::find()->where('request_id =:requestId',[':requestId'=>$id])->count();

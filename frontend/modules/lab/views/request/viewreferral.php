@@ -167,7 +167,7 @@ if($requeststatus > 0 && $notified == 1 && $hasTestingAgency > 0 && !empty($mode
                         [
                             'label'=>'Customer / Agency',
                             'format'=>'raw',
-                            'value'=> !empty($customer['customer_name']) ? $customer['customer_name'] : "",
+                            'value'=> !empty($customer['customer_name']) ? $customer['customer_name'] : "Customer Details Not Synced Yet",
                             'valueColOptions'=>['style'=>'width:30%'], 
                             'displayOnly'=>true
                         ],
