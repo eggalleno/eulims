@@ -49,7 +49,7 @@ $func=new Functions();
             [
                 'attribute' => 'request_id',
                 'format' => 'raw',
-                'value' => function($data){ return $data->request->request_ref_num;},
+                'value' => function($data){ return !empty($data->request->request_ref_num) ? $data->request->request_ref_num : null;},
                 'group'=>true,  // enable grouping
 				'headerOptions' => ['class' => 'text-center'],
             ],
