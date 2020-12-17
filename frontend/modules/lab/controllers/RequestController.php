@@ -137,9 +137,13 @@ class RequestController extends Controller
                 'query' => $analysisQuery,
                 'pagination' => false,
             ]);
-
-            //gets the customer on the API //updated to new api //btc
-            $customer = $refcomponent->getCustomerOne($reqModel->customer_id);
+            //if referral id is empty, look for the customer details in the local
+            if($reqModel->referral_id){
+                //gets the customer on the API //updated to new api //btc
+                $customer = $refcomponent->getCustomerOne($reqModel->referral_id);                
+            }else{
+                $customer = Customer::findOne($reqModel->customer_id); //look in the local
+            }
 
             //gets all the matching agency ??? hard to maintain, needs inovative idea here //btc 
             $agency = $refcomponent->listMatchAgency($id);
@@ -810,10 +814,10 @@ class RequestController extends Controller
         $connection= Yii::$app->labdb;
         $refcomponent = new ReferralComponent();
         
-        $labreferral = ArrayHelper::map(json_decode($refcomponent->listLabreferral()), 'lab_id', 'labname');
-        $discountreferral = ArrayHelper::map(json_decode($refcomponent->listDiscountreferral()), 'discount_id', 'type');
-        $purposereferral = ArrayHelper::map(json_decode($refcomponent->listPurposereferral()), 'purpose_id', 'name');
-        $modereleasereferral = ArrayHelper::map(json_decode($refcomponent->listModereleasereferral()), 'modeofrelease_id', 'mode');
+        $labreferral = ArrayHelper::map($refcomponent->listLabreferral(), 'lab_id', 'labname');
+        $discountreferral = ArrayHelper::map($refcomponent->listDiscountreferral(), 'discount_id', 'type');
+        $purposereferral = ArrayHelper::map($refcomponent->listPurposereferral(), 'purpose_id', 'name');
+        $modereleasereferral = ArrayHelper::map($refcomponent->listModereleasereferral(), 'modeofrelease_id', 'mode');
 
         $sampleCount = Sample::find()->where('request_id =:requestId',[':requestId'=>$id])->count();
         $analysisCount = Analysis::find()->where('request_id =:requestId',[':requestId'=>$id])->count();
