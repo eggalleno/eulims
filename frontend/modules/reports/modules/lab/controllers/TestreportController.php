@@ -225,7 +225,7 @@ class TestreportController extends Controller
 
             return $this->redirect(['view', 'id' => $model->testreport_id]);
         }
-
+		$model->lab_id=1;
         if(Yii::$app->request->isAjax)
             return $this->renderAjax('create', [
                 'model' => $model,

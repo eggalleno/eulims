@@ -13,6 +13,37 @@ use kartik\widgets\SwitchInput;
 /* @var $form yii\widgets\ActiveForm */
 ?>
 
+<style>
+      .blink {
+        animation: blinker 0.6s linear infinite;
+        color: #1c87c9;
+        font-size: 30px;
+        font-weight: bold;
+        font-family: sans-serif;
+      }
+      @keyframes blinker {
+        50% {
+          opacity: 0;
+        }
+      }
+      .blink-one {
+        animation: blinker-one 1s linear infinite;
+      }
+      @keyframes blinker-one {
+        0% {
+          opacity: 0;
+        }
+      }
+      .blink-two {
+        animation: blinker-two 1.4s linear infinite;
+      }
+      @keyframes blinker-two {
+        100% {
+          opacity: 0;
+        }
+      }
+</style>
+
 <div class="testreport-form">
 
     <?php $form = ActiveForm::begin(); ?>
@@ -37,19 +68,23 @@ use kartik\widgets\SwitchInput;
          ]
      ]);
      ?>
-
-     <div class="row-form">
+	<div class="alert alert-info" style="background: #d4f7e8 !important;margin-top: 1px !important;">
+       <a href="#" class="close" data-dismiss="alert" >×</a>
+      <p class="note" style="color:#265e8d"><b>Slow down...</b><br/> Make sure to select <b>MULTIPLE</b> if you want to generate individual reports per sample.</p>
+   
+    </div>
+    <div class="row-form">
         <?php echo $form->field($model, 'lab_id')->widget(SwitchInput::classname(), [
         //'disabled' => $disabled,
             'name'=>'chkmultiple',
-        'pluginOptions' => [
-            'size' => 'small',
-            'handleWidth'=>'53',
-            'onColor' => 'success',
-            'offColor' => 'danger',
-            'onText' => 'Yes',
-            'offText' => 'No',
-        ]
+			'pluginOptions' => [
+				'size' => 'large',
+				'handleWidth'=>'100',
+				'onColor' => 'success',
+				'offColor' => 'danger',
+				'onText' => 'Yes',
+				'offText' => 'No',
+			]
     ])->label("Multiple Report?"); ?>
     </div>
 
@@ -76,7 +111,7 @@ use kartik\widgets\SwitchInput;
         <?= Html::submitButton($model->isNewRecord ? 'Create' : 'Update', ['class' => $model->isNewRecord ? 'btn btn-success mybtn' : 'btn btn-primary mybtn',
             'id'=>'createTestReport',
             'data' => [
-                'confirm' => 'Are you sure you want to generate this Testreport ?',
+                'confirm' => knowthymulti(),
             ]]) ?>
         <?php if(Yii::$app->request->isAjax){ ?>
             <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
@@ -134,3 +169,12 @@ use kartik\widgets\SwitchInput;
     });
 
 </script>
+
+
+
+<?php
+function knowthymulti(){
+	return "<div><h1 class='blink'><b>NOTICE!</b></h1></div><div class='alert alert-warning' style='background: #ffc0cb !important;margin-top: 1px !important;'><h2 style='color:#d73925'>Wait! You are about to generate report.</h2><h4 style='color:#d73925'>Please double check if you want to generate it with multiple or single report.</h4></div>";
+}
+?>
+
