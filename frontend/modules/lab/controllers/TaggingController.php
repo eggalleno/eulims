@@ -117,7 +117,8 @@ class TaggingController extends Controller
         $taggingmodel = Tagging::find()->where(['analysis_id'=>$id])->one();
         $analysis = Analysis::find()->where(['analysis_id'=>$id])->one();      
         $model = new Tagging();
-        $taggingmodel->disposed_date = date('Y-m-d',strtotime("+1 month"));
+		if(!$taggingmodel->disposed_date)
+			$taggingmodel->disposed_date = date('Y-m-d',strtotime("+1 month"));
         if ($taggingmodel){
             return $this->renderAjax('updateanalysis', [
                 'taggingmodel' => $taggingmodel,
@@ -177,6 +178,8 @@ class TaggingController extends Controller
                 $manner = $_POST['manner'];
                 $disposed = $_POST['disposed_date'];
             }
+			
+			
 
             $profile = Profile::find()->where(['fullname'=> $user_id])->one();
 
@@ -196,6 +199,25 @@ class TaggingController extends Controller
              WHERE `analysis_id`=".$id;
             $Command=$Connection->createCommand($sql);
             $Command->execute();
+			
+			//get the sampleid
+			$thistagging = Tagging::findOne($id);
+			if($thistagging){
+				$analysis = Analysis::findOne($analysis_id);
+				if($analysis){
+					//get all of analyses id from the samples
+					$analyses = Analysis::find()->where(['sample_id' => $analysis->sample_id])->all();
+					foreach($analyses as $anal){
+						//query and update all tagging based on the last disposal
+						$tag = Tagging::find()->where(['analysis_id'=>$anal->analysis_id])->one();
+						if($tag){
+							$tag->disposed_date=$disposed;
+							$tag->save(false);
+						}
+					}
+				}
+			}
+			//check if this is the last test updated
 
             $searchModel = new TaggingSearch();
             $model = new Sample();

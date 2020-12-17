@@ -52,7 +52,7 @@ $manner= ArrayHelper::map(Sampledisposal::find()->where(['status'=>1])->all(),'d
                     echo $form->field($taggingmodel, 'disposed_date')->widget(DatePicker::classname(), [
                     'options' => ['placeholder' => 'Select Date ...',
                     'autocomplete'=>'off'],
-                    'value'=> date('Y-m-d'),
+                    //'value'=> $taggingmodel->disposed_date?$taggingmodel->disposed_date:date('Y-m-d'),
                     'type' => DatePicker::TYPE_COMPONENT_APPEND,
                         'pluginOptions' => [
                             'format' => 'yyyy-mm-dd',
